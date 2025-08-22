@@ -89,7 +89,7 @@
 - Distribución de elementos clave (header, hero, formulario, catálogo, footer).
 
 10. Preparar un mockup principal de la landing page. ✅
-- Chair: Three.js : https://threejs.org/examples/#webgl_loader_gltf_sheen
+- Chair: Three.js : https://threejs.org/examples/#webgl_loader_gltf_sheen 
 - Progressive building/customization: https://threejs.org/examples/#webgl_loader_ldraw
 - How to create simplified furnitures in ThreeJS: https://amrishodiq.medium.com/how-to-create-simplified-furnitures-in-threejs-6373d1a5363f
 - Template 1: https://www.behance.net/gallery/227943121/E-commerce-B2B-Furniture-Platform-Redesign-UI-UX?tracking_source=search_projects|furniture+store+web+design&l=0
@@ -102,21 +102,21 @@
 
 ## 22 de Agosto - 23 de Agosto
 
-1. Inicializar repositorio privado en GitHub 
+1. Inicializar repositorio privado en GitHub  ✅ ✅
 - Crear repo muebleria-mvp. ✅
 - Subir carpeta inicial con estructura básica /frontend, /design, /docs. ✅
 - Configurar .gitignore para Node, .env y dependencias. ✅
 
-2. Configurar frontend
-- Decide si usarás Next.js (ideal SEO) o React + Vite (más ligero).
-- Ejecuta npx create-next-app@latest o npm create vite@latest.
-- Instala TailwindCSS (npm install -D tailwindcss postcss autoprefixer).
-- Configura tailwind.config.js y globals.css.
+2. Configurar frontend ✅ ✅
+- Decide si usarás Next.js (ideal SEO) o React + Vite (más ligero). ✅
+- Ejecuta npx create-next-app@latest o npm create vite@latest. ✅
+- Instala TailwindCSS (npm install -D tailwindcss postcss autoprefixer). ✅
+- Configura tailwind.config.js y globals.css. ✅
 
-3. Montar entorno en AWS
-- S3 bucket público para hosting estático.
-- Configurar permisos + CloudFront para servir versión inicial.
-- Usa un subdominio temporal tipo demo-muebleria.s3-website-us-east-1.amazonaws.com (luego se vincula con Route 53).
+3. Montar entorno en Vercel ✅ ✅
+- Conectar repositorio Git en Vercel para hosting automático. ✅
+- Desplegar con push a rama principal; usa CDN global integrado. ✅
+- Usar subdominio temporal tipo demo-muebleria.vercel.app (luego vincular dominio personalizado en Vercel Domains). ✅
 
 4. Estructura de componentes React (según wireframes):
 - Header (logo, menú ancla).
@@ -129,3 +129,7 @@
 - Rutas ancla (#inicio, #catalogo, #contacto).
 - Contenido de prueba (texto lorem ipsum y placeholders).
 - Push al repo y deploy a AWS.
+
+7. Muestra (idea) de Silla en threejs: https://www.youtube.com/watch?v=O8q8H9c9XZ4
+
+rafce

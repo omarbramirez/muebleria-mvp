@@ -1,0 +1,18 @@
+{
+    "navbar": {
+        "home": "Inicio",
+        "how_it_works": "Cómo funciona",
+        "catalog": "Catálogo",
+        "reserve": "Reservar"
+    },
+    "header":{
+        "call_to_action": "Reserva ahora",
+        "punchline": "Muebles personalizables en línea",
+        "description": "Diseña, personaliza y ordena tus muebles en línea, listos para fabricarse bajo demanda por talleres especializados."
+    },
+    "footer": {
+        "contact": "Contacto",
+        "privacy_policy": "Política de privacidad",
+        "terms": "Términos y condiciones"
+    }
+}
