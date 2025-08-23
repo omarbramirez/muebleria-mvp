@@ -23,8 +23,9 @@ const Chair: React.FC = () => {
         <ChairModel />
         <OrbitControls
           enableDamping
-          minDistance={1}
-          maxDistance={10}
+          minDistance={1.5}
+          maxDistance={1.5}
+          enableZoom={false}
           target={[0, 0.35, 0]}
         />
       </Canvas>

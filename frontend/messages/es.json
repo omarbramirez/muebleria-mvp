@@ -5,10 +5,76 @@
         "catalog": "Catálogo",
         "reserve": "Reservar"
     },
-    "header":{
+    "header": {
         "call_to_action": "Reserva ahora",
-        "punchline": "Muebles personalizables en línea",
-        "description": "Diseña, personaliza y ordena tus muebles en línea, listos para fabricarse bajo demanda por talleres especializados."
+        "title": "Muebles personalizables en línea",
+        "description": "Diseña, personaliza y ordena tus muebles en línea, listos para fabricarse bajo demanda por talleres especializados.",
+        "link": "Reserva"
+    },
+    "tab_menu": {
+        "tabs": {
+            "choose": {
+                "call_to_action": "Elige",
+                "title": "Elige",
+                "description": "Selecciona el producto que mejor se adapte a tus necesidades. Explora nuestra gama de opciones y encuentra el diseño perfecto.",
+                "link": "Catálogo"
+            },
+            "customize": {
+                "call_to_action": "Personaliza",
+                "title": "Personaliza",
+                "description": "Personaliza tu producto con colores, materiales y detalles únicos para que refleje tu estilo.",
+                "link": "Catálogo"
+            },
+            "produce": {
+                "call_to_action": "Produce",
+                "title": "Produce",
+                "description": "Nuestro equipo fabrica tu producto con los más altos estándares de calidad y precisión.",
+                "link": "Reserva"
+            },
+            "receive": {
+                "call_to_action": "Recibe",
+                "title": "Recibe",
+                "description": "Recibe tu producto personalizado directamente en tu puerta, listo para usar.",
+                "link": "Reserva"
+            }
+        }
+    },
+    "form": {
+        "name": "Nombre",
+        "namePlaceholder": "Ingresa tu nombre",
+        "nameRequired": "El nombre es obligatorio",
+        "email": "Correo electrónico",
+        "emailPlaceholder": "Ingresa tu correo electrónico",
+        "emailRequired": "El correo electrónico es obligatorio",
+        "emailInvalid": "El correo electrónico no es válido",
+        "furnitureType": "Tipo de mueble",
+        "furnitureTypePlaceholder": "Selecciona un tipo de mueble",
+        "furnitureTypeRequired": "El tipo de mueble es obligatorio",
+        "furnitureTypes": {
+            "chair": "Silla",
+            "table": "Mesa",
+            "sofa": "Sofá"
+        },
+        "message": "Mensaje",
+        "messagePlaceholder": "Describe tu personalización",
+        "messageRequired": "El mensaje es obligatorio",
+        "submit": "Enviar",
+        "submitting": "Enviando...",
+        "success": "¡Formulario enviado con éxito!",
+        "error": "Error al enviar el formulario. Intenta de nuevo."
+    },
+    "Contact": {
+        "title": "Contáctame",
+        "subtitle": "Contáctame con confianza",
+        "description": "¿Tienes dudas o comentarios? ¡Me encantaría saber de ti! Usa el formulario a continuación.",
+        "form": {
+            "name": "Nombre completo",
+            "email": "Correo electrónico",
+            "message": "Escribe tu mensaje aquí",
+            "submit": "Enviar",
+            "msgOnSuccess": "Enviado con éxito",
+            "msgOnError": "Algo salió mal, por favor inténtalo de nuevo más tarde."
+        }
     },
     "footer": {
         "contact": "Contacto",

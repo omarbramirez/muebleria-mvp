@@ -7,12 +7,13 @@ import {assets} from '@/app/assets/assets';
 const Navbar = () => {
     const t = useTranslations('navbar');
 return (
-    <nav className="flex items-center justify-between px-6 py-4 shadow-md bg-white">
-      <Link href="#top">
-        <Image
+    <nav className="flex items-center justify-between px-6 py-4 shadow-md bg-white ">
+      <Link href="#top" className='w-28 cursor-pointer mr-14 text-black' >
+        {/* <Image
           src={assets.logo}
 className='w-28 cursor-pointer mr-14' alt='logo'
-        />
+        /> */}
+        LOGO
       </Link>
       <ul className="flex gap-6 text-gray-800 font-medium">
         <li>
