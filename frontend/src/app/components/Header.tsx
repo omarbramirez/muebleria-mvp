@@ -6,7 +6,7 @@ import {Link} from '@/i18n/navigation';
 const Header = () => {
     const t = useTranslations('header');
   return (
-    <div id="top" className="relative w-full min-h-screen flex">
+    <div id="top" className="relative w-full h-screen flex">
       <div className="w-1/2 h-full flex items-center justify-center">
         <div className="w-11/12 max-w-3xl text-left flex flex-col gap-4">
           <h3 className="text-xl md:text-2xl mb-3">{t('call_to_action')}</h3>
