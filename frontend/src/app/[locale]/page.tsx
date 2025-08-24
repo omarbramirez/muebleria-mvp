@@ -1,8 +1,12 @@
 import Image from "next/image";
-import Navbar from "../components/Navbar";
-import Header from "../components/Header";
-import TabMenu from "../components/TabMenu";
-import Contact from "../components/Contact";
+import Navbar from "@/app/components/Navbar";
+import Header from "@/app/components/Header";
+import TabMenu from "@/app/components/TabMenu";
+import Contact from "@/app/components/Contact";
+import ProductGrid from "@/app/components/ProductGrid";
+import NewsletterForm from "@/app/components/NewsletterForm";
+import Footer from "@/app/components/Footer";
+
 
 export default function Home() {
   return (
@@ -11,6 +15,9 @@ export default function Home() {
       <Header/>
       <TabMenu/>
       <Contact/>
+      <ProductGrid/>
+      <NewsletterForm/>
+      <Footer/>
     </div>
   );
 }

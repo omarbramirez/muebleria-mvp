@@ -9,7 +9,7 @@ const TabMenu: React.FC = () => {
   const [activeTab, setActiveTab] = useState(tabs[0].id);
 const t = useTranslations('tab_menu');
   return (
-    <div id="show" className="w-full w-full h-screen mx-auto py-20">
+    <div id="how" className="w-full mx-auto min-h-screen ">
 
       <div className="flex flex-col sm:flex-row border-b border-gray-200 ">
         {tabs.map((tab) => (
@@ -38,7 +38,7 @@ const t = useTranslations('tab_menu');
    <div className='p-20'>
      <h3 className="text-xl md:text-2xl mb-3">{t(tab.title)}</h3>
           <h1 className="text-3xl sm:text-6xl lg:text-[66px]">{t(tab.call_to_action)}</h1> 
-          <p className="max-w-2xl font-IBM_Plex_Sans">{t(tab.description)}</p>
+          <p className="max-w-2xl">{t(tab.description)}</p>
             {t(tab.link) && (
                   <div className="flex flex-col sm:flex-row items-center gap-4 mt-4">
               <Link

@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { FormData } from "@/types/types";
 
 export const useContactForm = () => {
-  const t = useTranslations('Contact')
+  const t = useTranslations('contact')
 
   const [result, setResult] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);

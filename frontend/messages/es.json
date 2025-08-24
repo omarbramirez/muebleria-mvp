@@ -39,40 +39,18 @@
             }
         }
     },
-    "form": {
-        "name": "Nombre",
-        "namePlaceholder": "Ingresa tu nombre",
-        "nameRequired": "El nombre es obligatorio",
-        "email": "Correo electrónico",
-        "emailPlaceholder": "Ingresa tu correo electrónico",
-        "emailRequired": "El correo electrónico es obligatorio",
-        "emailInvalid": "El correo electrónico no es válido",
-        "furnitureType": "Tipo de mueble",
-        "furnitureTypePlaceholder": "Selecciona un tipo de mueble",
-        "furnitureTypeRequired": "El tipo de mueble es obligatorio",
-        "furnitureTypes": {
-            "chair": "Silla",
-            "table": "Mesa",
-            "sofa": "Sofá"
-        },
-        "message": "Mensaje",
-        "messagePlaceholder": "Describe tu personalización",
-        "messageRequired": "El mensaje es obligatorio",
-        "submit": "Enviar",
-        "submitting": "Enviando...",
-        "success": "¡Formulario enviado con éxito!",
-        "error": "Error al enviar el formulario. Intenta de nuevo."
-    },
-    "Contact": {
-        "title": "Contáctame",
-        "subtitle": "Contáctame con confianza",
-        "description": "¿Tienes dudas o comentarios? ¡Me encantaría saber de ti! Usa el formulario a continuación.",
+    "contact": {
+        "title": "Únete a la preventa",
+        "subtitle": "Sé de los primeros en probar nuestro servicio",
+        "description": "Regístrate y te avisaremos en cuanto nuestra plataforma esté lista. Así podrás personalizar y pedir tus muebles antes que nadie.",
+        "tabs":{"clients": "Clientes", "providers": "Proveedor"},
+
         "form": {
             "name": "Nombre completo",
             "email": "Correo electrónico",
-            "message": "Escribe tu mensaje aquí",
-            "submit": "Enviar",
-            "msgOnSuccess": "Enviado con éxito",
+            "message": "Déjanos tus comentarios o dudas (opcional)",
+            "submit": "Registrarme",
+            "msgOnSuccess": "¡Registro exitoso! Te contactaremos pronto.",
             "msgOnError": "Algo salió mal, por favor inténtalo de nuevo más tarde."
         }
     },
