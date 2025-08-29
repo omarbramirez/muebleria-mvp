@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import useWeb3Forms from "@web3forms/react";
 import { useTranslations } from 'next-intl';
-import { FormData } from "@/types/types";
+import { FormData } from "@/types/index";
 
 export const useContactForm = () => {
   const t = useTranslations('contact')

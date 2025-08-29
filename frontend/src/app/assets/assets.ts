@@ -5,7 +5,7 @@ import produce from './produce.gif';
 import receive from './receive.gif'
 import right_arrow_white from './right-arrow-white.png'
 
-import {Tabs} from '@/types/types';
+import {Tabs} from '@/types/index';
 export const assets = {
     logo,
     choose,

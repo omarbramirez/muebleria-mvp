@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import {tabs} from '@/app/assets/assets';
 import { useTranslations } from 'next-intl';
-import {TabMenuProps} from '@/types/types';
+import {TabMenuProps} from '@/types/index';
 import {Link} from '@/i18n/navigation';
 import Image from 'next/image'
 const TabMenu: React.FC = () => {
