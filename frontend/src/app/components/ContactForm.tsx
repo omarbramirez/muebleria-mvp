@@ -3,9 +3,9 @@ import Image from "next/image";
 import { assets } from "../assets/assets";
 import { useTranslations } from "next-intl";
 import { UseFormRegister, UseFormHandleSubmit } from "react-hook-form";
-import { FormData } from "@/types/types";
+import { FormData } from "@/types/index";
 import { motion } from 'motion/react'
-import {ContactFormProps} from '@/types/types';
+import {ContactFormProps} from '@/types/index';
 
 
 export const ContactForm: React.FC<ContactFormProps> = ({ register, handleSubmit, onSubmit, result, isSuccess }) => {

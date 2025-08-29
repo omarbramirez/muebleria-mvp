@@ -6,6 +6,7 @@ import Contact from "@/app/components/Contact";
 import ProductGrid from "@/app/components/ProductGrid";
 import NewsletterForm from "@/app/components/NewsletterForm";
 import Footer from "@/app/components/Footer";
+import StyleGuide from "../components/StyleGuide";
 
 
 export default function Home() {
@@ -14,10 +15,12 @@ export default function Home() {
       <Navbar/>
       <Header/>
       <TabMenu/>
+      {/*
       <Contact/>
       <ProductGrid/>
       <NewsletterForm/>
-      <Footer/>
+      <Footer/> */}
+      {/* <StyleGuide/> */}
     </div>
   );
 }
