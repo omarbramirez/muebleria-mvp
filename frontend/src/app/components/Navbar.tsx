@@ -10,14 +10,14 @@ const Navbar = () => {
 const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="w-full fixed top-0 start-0 z-49 flex items-center justify-between px-6 py-4 shadow-md bg-background-light ">
-      <Link href="#top" className="w-28 flex cursor-pointer mr-14 text-black">
+    <nav className="w-full fixed top-0 left-0 z-50 flex items-center justify-between px-6 py-4 shadow-md bg-background-light">
+      <Link href="#top" className="w-1/2 flex cursor-pointer text-black">
         LOGO
       </Link>
 
       {/* Desktop Menu */}
           
-      <ul className="hidden md:flex w-2/3 gap-4">
+      <ul className="hidden md:flex flex-1 justify-end gap-4">
         <li><LinkItem href="#top">{t("home")}</LinkItem></li>
         <li><LinkItem href="#how">{t("how_it_works")}</LinkItem></li>
         <li><LinkItem href="#catalog">{t("catalog")}</LinkItem></li>
@@ -29,7 +29,7 @@ const [isOpen, setIsOpen] = useState(false);
       <button
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Toggle menu"
-              className="w-auto md:hidden"
+              className="md:hidden"
             >
               {isOpen ? <X className="text-secondary"/> : <Menu className="text-secondary"/>}
             </button>

@@ -11,7 +11,7 @@ const Header = () => {
   return (
     <div id="top" className="relative w-full h-screen flex bg-background-dark ">
       {/* Columna de texto */}
-      <div className="w-1/2 h-full flex items-center justify-center z-10 shadow-xl">
+      <div className="w-1/2 h-full flex items-center justify-center z-10">
         <div className="w-11/12 max-w-3xl flex flex-col gap-4 ">
           <Heading as='h3' variant='secondary' className="text-left " size='md'>{t('call_to_action')}</Heading>
           <Heading as="h1" variant="primaryLight" className="text-left" size='lg'>{t('title')}</Heading>
@@ -19,7 +19,7 @@ const Header = () => {
   {t('description')}
 </Paragraph>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4 mt-4">
+          <div className="flex flex-col sm:flex-row items-center mt-4">
             <Button
               href="#reserve"
             >
