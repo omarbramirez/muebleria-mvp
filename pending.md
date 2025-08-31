@@ -189,3 +189,6 @@ Genera una ilustración estilo comic futurista de dos personajes juntos vistos a
 1) una mujer hechicera poderosa y joven, 27 años, con cabello super negro, vestimenta gótica juvenil, mirada muy cansada, está herida y un poco sucia de su sangre, tiene vendajes blancos solo en sus muñecas, las manos están libre de vendajes. Y una curita en su frente.
 
 2) un robot poderoso hombre con su cuerpo color carbon, desgastado y sucio de oxido y lodo,  con una actitud derrotada, y una kufiya palestina alrededor de su cuello. 
+
+
+## 30 de Agosto

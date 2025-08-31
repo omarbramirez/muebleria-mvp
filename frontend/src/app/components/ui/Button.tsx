@@ -4,18 +4,18 @@ import { cn } from '@/app/lib/cn';
 import { ButtonVariant, Size, CommonProps, ButtonAsButton, ButtonAsLink, ButtonProps } from '@/types/index';
 
 const base =
-    'w-1/2 inline-flex items-center justify-center select-none ' +
+    'w-auto px-9  inline-flex items-center justify-center select-none ' +
     'font-medium rounded-md transition-colors duration-200 ' +
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ' +
-    'disabled:opacity-50 disabled:pointer-events-none';
+    'disabled:opacity-50 disabled:pointer-events-none ';
 
 const byVariant: Record<ButtonVariant, string> = {
     primary:
-        'text-white bg-[var(--color-primary)] ' +
+        'text-white bg-primary ' +
         'hover:opacity-90 ' +
         'focus-visible:ring-[var(--color-primary)]',
     secondary:
-        'text-white bg-[var(--color-secondary)] ' +
+        'text-white bg-secondary ' +
         'hover:opacity-90 ' +
         'focus-visible:ring-[var(--color-secondary)]',
     outline:

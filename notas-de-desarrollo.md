@@ -13,3 +13,21 @@ export function cn(...classes: Array<string | undefined | false | null>) {
 4. **`Record<Size, string>`** => ipo utilitario de TypeScript que construye un objeto donde:
 - K son las keys permitidas.
 - T es el tipo de valor que tendrán esas keys (`string` porque las clases de Tailwind se representan como cadenas).
+
+5. Si colocas el listener en document dentro de un componente ya estás escuchando globalmente, aunque el ref esté en el menú.
+
+- La ventaja de usar document.addEventListener("mousedown", …) dentro del componente es que solo el handler conoce el ref del menú.
+- Esto evita que tengas que tocar otros componentes como Navbar o body.
+- Cada menú puede manejar su propio cierre, aislando la lógica.
+
+```
+useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (isOpen && menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      setIsOpen(false);
+    }
+  };
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, [isOpen, setIsOpen]);
+```

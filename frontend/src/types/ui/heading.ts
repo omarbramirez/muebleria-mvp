@@ -2,6 +2,7 @@ import { Size } from '@/types/ui/common';
 
 export type HeadingVariant = 'primary' |'primaryLight' | 'secondary' | 'muted';
 export type HeadingTag = 'h1' | 'h2' | 'h3' | 'h4';
+export type HeadingHierarchy = 'forSection' |'forContent';
 
 export type HeadingProps = {
   as?: HeadingTag;
@@ -9,6 +10,7 @@ export type HeadingProps = {
   className?: string;
   children: React.ReactNode;
   size?: Size;
+  hierarchy?: HeadingHierarchy;
 };
 
 

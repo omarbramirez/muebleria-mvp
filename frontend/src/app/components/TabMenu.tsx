@@ -3,57 +3,73 @@ import React, { useState } from 'react';
 import {tabs} from '@/app/assets/assets';
 import { useTranslations } from 'next-intl';
 import {TabMenuProps} from '@/types/index';
-import {Link} from '@/i18n/navigation';
+import { Heading } from '@/app/components/ui/Heading';
 import Image from 'next/image'
+import { Paragraph } from '@/app/components/ui/Paragraph';
+import { Button } from '@/app/components/ui/Button';
+
 const TabMenu: React.FC = () => {
   const [activeTab, setActiveTab] = useState(tabs[0].id);
 const t = useTranslations('tab_menu');
   return (
-    <div id="how" className="w-full mx-auto min-h-screen ">
+    <div id="how" className="w-full h-auto py-20  px-8 sm:px-20 !bg-background-light">
+                <Heading as="h1" variant="primary" size='lg' hierarchy='forSection'>{t('title')}</Heading>
+      <div className="flex gap-3 flex-col sm:flex-row w-full items-center justify-center mb-20">
+{tabs.map((tab) => {
+  const isActive = activeTab === tab.id;
+  const Icon = tab.icon;
 
-      <div className="flex flex-col sm:flex-row border-b border-gray-200 ">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            className={`px-4 py-2 text-lg font-medium transition-colors duration-200 ${
-              activeTab === tab.id
-                ? 'border-b-2 border-white-500 text-white-600'
-                : 'text-gray-600 hover:text-gray-200'
-            }`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {t(tab.label)}
-          </button>
-        ))}
+  return (
+    <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex flex-col items-center justify-center p-4 w-54 h-34 rounded-lg shadow-md transition-colors duration-200a text-foreground hover:text-foreground-white ${isActive ? " text-foreground-white bg-secondary" : "  hover:bg-primary border border-primary "}`} >
+
+
+
+                 
+
+
+
+
+      <Icon className={isActive ? "text-primary" : "text-secondary"} />
+      {t(tab.label)}
+    </button>
+  )
+})}
+
       </div>
-      <div className="">
         {tabs.map((tab) => (
           <div
+          id={tab.id}
             key={tab.id}
-            className={` className="w-1/2 h-full flex items-center justify-center" p-4 ${activeTab === tab.id ? 'block' : 'hidden'}`}
+            className={`w-full h-screen flex flex-col sm:flex-row items-center justify-center sm:p-4 ${activeTab === tab.id ? 'block' : 'hidden'}`}
           >
-<div className="w-1/2 h-full bg-white">
-<Image src={tab.img} alt='' className='mx-auto' />
+<div className="sm:w-2/5 h-1/2 sm:h-full sm:mx-auto my-10">
+<Image src={tab.img} alt='' className='w-full h-full object-cover rounded-2xl' />
 </div>
-   <div className='p-20'>
-     <h3 className="text-xl md:text-2xl mb-3">{t(tab.title)}</h3>
-          <h1 className="text-3xl sm:text-6xl lg:text-[66px]">{t(tab.call_to_action)}</h1> 
-          <p className="max-w-2xl">{t(tab.description)}</p>
+   <div className=' sm:w-2/5 h-1/2 sm:h-full flex flex-col justify-center  items-left !sm:items-center p-4'>
+    <Heading as='h4' variant='secondary' size='sm'>{t(tab.call_to_action)}</Heading>
+     <Heading as='h1' variant='primary' size='lg' hierarchy='forContent'>{t(tab.title)}</Heading>
+     <Paragraph variant="primary" size="md">
+       {t(tab.description)}
+     </Paragraph>
+          
             {t(tab.link) && (
-                  <div className="flex flex-col sm:flex-row items-center gap-4 mt-4">
-              <Link
-                href="#show"
-                className="px-10 py-3 border border-white  bg-black text-white flex items-center gap-2 dark:bg-transparent hover:bg-gray-800 transition-colors"
-              >
-                {t(tab.link)}
-              </Link>
-              </div>
+
+
+
+ <div className="w-auto flex flex-col sm:flex-row items-center my-4 mb-10 gap-3">
+            <Button
+              href="#reserve"
+              variant='primary'
+            >
+              {t(tab.button)}
+            </Button>
+          </div>
+
             )}
    </div>
           </div>
         ))}
       </div>
-    </div>
   );
 };
 

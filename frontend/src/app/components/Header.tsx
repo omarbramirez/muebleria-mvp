@@ -9,19 +9,20 @@ const Header = () => {
   const t = useTranslations('header');
 
   return (
-    <div id="top" className="relative w-full h-screen flex bg-background-dark ">
+<div id="top" className="static w-full h-screen grid grid-rows-2 sm:grid-cols-2 bg-primary">
       {/* Columna de texto */}
-      <div className="w-1/2 h-full flex items-center justify-center z-10">
+     <div className="flex min-h-0 sm:h-screen items-end  sm:items-center justify-center z-10 sm:p-10">
         <div className="w-11/12 max-w-3xl flex flex-col gap-4 ">
-          <Heading as='h3' variant='secondary' className="text-left " size='md'>{t('call_to_action')}</Heading>
-          <Heading as="h1" variant="primaryLight" className="text-left" size='lg'>{t('title')}</Heading>
+          <Heading as='h3' variant='secondary'  size='md'>{t('call_to_action')}</Heading>
+          <Heading as="h1" variant="primaryLight" size='lg' hierarchy='forContent'>{t('title')}</Heading>
 <Paragraph variant="primaryWhite" size="md" className="max-w-2xl">
   {t('description')}
 </Paragraph>
 
-          <div className="flex flex-col sm:flex-row items-center mt-4">
+          <div className="w-full flex flex-col  sm:flex-row items-center justify-left my-4 mb-10">
             <Button
               href="#reserve"
+              variant='secondary'
             >
               {t("link")}
             </Button>
@@ -30,7 +31,7 @@ const Header = () => {
       </div>
 
       {/* Columna de imagen */}
-      <div className="w-1/2 h-full">
+      <div  className="min-h-0 sm:h-screen flex items-center justify-center">
         <Chair />
       </div>
     </div>

@@ -12,30 +12,28 @@
         "link": "Reserva"
     },
     "tab_menu": {
+        "title":  "¿Cómo funciona?",
         "tabs": {
             "choose": {
-                "call_to_action": "Elige",
+                "call_to_action": "Explora el catálogo",
                 "title": "Elige",
                 "description": "Selecciona el producto que mejor se adapte a tus necesidades. Explora nuestra gama de opciones y encuentra el diseño perfecto.",
-                "link": "Catálogo"
+                "button": "Catálogo",
+                "link": "#"
             },
             "customize": {
-                "call_to_action": "Personaliza",
+                "call_to_action": "Hazlo a tu medida",
                 "title": "Personaliza",
                 "description": "Personaliza tu producto con colores, materiales y detalles únicos para que refleje tu estilo.",
-                "link": "Catálogo"
-            },
-            "produce": {
-                "call_to_action": "Produce",
-                "title": "Produce",
-                "description": "Nuestro equipo fabrica tu producto con los más altos estándares de calidad y precisión.",
-                "link": "Reserva"
+                "button": "Apuntarme",
+                "link": "#"
             },
             "receive": {
-                "call_to_action": "Recibe",
+                "call_to_action": "Finaliza tu pedido",
                 "title": "Recibe",
                 "description": "Recibe tu producto personalizado directamente en tu puerta, listo para usar.",
-                "link": "Reserva"
+                "button": "Reservar",
+                "link": "#"
             }
         }
     },
@@ -43,12 +41,11 @@
         "title": "Únete a la preventa",
         "subtitle": "Sé de los primeros en probar nuestro servicio",
         "description": "Regístrate y te avisaremos en cuanto nuestra plataforma esté lista. Así podrás personalizar y pedir tus muebles antes que nadie.",
-        "tabs":{"clients": "Clientes", "providers": "Proveedor"},
-
+        "tabs":{"clients": "Clientes", "providers": "Proveedores"},
         "form": {
             "name": "Nombre completo",
             "email": "Correo electrónico",
-            "message": "Déjanos tus comentarios o dudas (opcional)",
+            "message": "Déjanos tus comentarios",
             "submit": "Registrarme",
             "msgOnSuccess": "¡Registro exitoso! Te contactaremos pronto.",
             "msgOnError": "Algo salió mal, por favor inténtalo de nuevo más tarde."

@@ -17,7 +17,7 @@ const [isOpen, setIsOpen] = useState(false);
 
       {/* Desktop Menu */}
           
-      <ul className="hidden md:flex flex-1 justify-end gap-4">
+      <ul className="hidden sm:flex flex-1 justify-end gap-4" >
         <li><LinkItem href="#top">{t("home")}</LinkItem></li>
         <li><LinkItem href="#how">{t("how_it_works")}</LinkItem></li>
         <li><LinkItem href="#catalog">{t("catalog")}</LinkItem></li>
@@ -25,11 +25,11 @@ const [isOpen, setIsOpen] = useState(false);
       </ul>
 
       {/* Mobile Menu */}
-      <ResponsiveMenu isOpen={isOpen}/>
+      <ResponsiveMenu isOpen={isOpen} setIsOpen={setIsOpen}/>
       <button
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Toggle menu"
-              className="md:hidden"
+              className="sm:hidden"
             >
               {isOpen ? <X className="text-secondary"/> : <Menu className="text-secondary"/>}
             </button>
