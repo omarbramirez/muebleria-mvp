@@ -10,7 +10,7 @@ const requiredSchema = Yup.object({
   email: Yup.string().email("Invalid email").required("Email is required"),
 });
 
-function SubscribeForm({}: Props) {
+function NewsletterForm({}: Props) {
   const [status, setStatus] = useState<number | null>(null);
   const [message, setMessage] = useState<string>("");
   const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
@@ -93,4 +93,4 @@ function SubscribeForm({}: Props) {
   );
 }
 
-export default SubscribeForm;
+export default NewsletterForm;
