@@ -8,6 +8,7 @@ const byVariant: Record<HeadingVariant, string> = {
     primary: 'text-primary font-heading',
     primaryLight: 'text-foreground-white font-heading',
     secondary: 'text-secondary font-body',
+    
     muted: 'text-gray-500 dark:text-gray-400',
 };
 

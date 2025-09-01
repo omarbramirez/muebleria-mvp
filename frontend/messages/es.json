@@ -12,7 +12,7 @@
         "link": "Reserva"
     },
     "tab_menu": {
-        "title":  "¿Cómo funciona?",
+        "title": "¿Cómo funciona?",
         "tabs": {
             "choose": {
                 "call_to_action": "Explora el catálogo",
@@ -38,10 +38,20 @@
         }
     },
     "contact": {
-        "title": "Únete a la preventa",
-        "subtitle": "Sé de los primeros en probar nuestro servicio",
-        "description": "Regístrate y te avisaremos en cuanto nuestra plataforma esté lista. Así podrás personalizar y pedir tus muebles antes que nadie.",
-        "tabs":{"clients": "Clientes", "providers": "Proveedores"},
+        "tabs": {
+            "clients": {
+                "label": "Clientes",
+                "title": "Únete a la preventa",
+                "call_to_action": "Sé de los primeros en probar nuestro servicio",
+                "description": "Regístrate y te avisaremos en cuanto nuestra plataforma esté lista. Así podrás personalizar y pedir tus muebles antes que nadie."
+            },
+            "providers": {
+                "label": "Proveedores",
+                "title": "Colabora con nosotros",
+                "call_to_action": "Sé parte de nuestra red de proveedores",
+                "description": "Regístrate y te contactaremos para explorar oportunidades de colaboración. Podrás ofrecer tus productos en nuestra plataforma y llegar a clientes interesados en muebles personalizados."
+            }
+        },
         "form": {
             "name": "Nombre completo",
             "email": "Correo electrónico",
@@ -51,9 +61,32 @@
             "msgOnError": "Algo salió mal, por favor inténtalo de nuevo más tarde."
         }
     },
-    "footer": {
-        "contact": "Contacto",
-        "privacy_policy": "Política de privacidad",
-        "terms": "Términos y condiciones"
+    "product_grid": {
+        "call_to_action": "Reserva ahora",
+        "title": "Muebles personalizables en línea",
+        "description": "Diseña, personaliza y ordena tus muebles en línea, listos para fabricarse bajo demanda por talleres especializados.",
+        "link": "Reserva",
+        "categories": {
+            "desks": {
+                "id": "desks",
+                "name": "Escritorios"
+            },
+            "chairs": {
+                "id": "chairs",
+                "name": "Sillas"
+            },
+            "stools": {
+                "id": "stools",
+                "name": "Taburetes"
+            },
+            "shelves": {
+                "id": "shelves",
+                "name": "Estanterías"
+            }
+        }},
+        "footer": {
+            "contact": "Contacto",
+            "privacy_policy": "Política de privacidad",
+            "terms": "Términos y condiciones"
+        }
     }
-}

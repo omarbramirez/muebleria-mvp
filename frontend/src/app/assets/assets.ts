@@ -2,16 +2,29 @@ import logo from './next.svg';
 import choose from './choose.jpg';
 import customize from './customize.jpg';
 import receive from './receive.jpg'
-import right_arrow_white from './right-arrow-white.png'
-import { MousePointerClick, ChartCandlestick, PackageCheck } from "lucide-react";
 
-import {Tabs} from '@/types/index';
+
+import desks from './desks.jpg';
+import chairs from './chairs.jpg';
+import stools from './stools.jpg'
+import shelves from './shelves.jpg'
+
+
+
+import right_arrow_white from './right-arrow-white.png'
+import { MousePointerClick, ChartCandlestick, PackageCheck, LampDesk, Armchair, Spool,ToolCase } from "lucide-react";
+
+import { Tabs } from '@/types/index';
 export const assets = {
-    logo,
-    choose,
-    customize,
-    receive,
-    right_arrow_white
+  logo,
+  choose,
+  customize,
+  receive,
+  desks,
+  chairs,
+  stools,
+  shelves,
+  right_arrow_white
 }
 
 export const tabs: Tabs[] = [
@@ -36,7 +49,7 @@ export const tabs: Tabs[] = [
     link: 'tabs.customize.link',
     img: assets.customize,
     icon: ChartCandlestick,
-  }, 
+  },
   {
     id: 'receive',
     label: 'tabs.receive.title',
@@ -45,7 +58,34 @@ export const tabs: Tabs[] = [
     description: 'tabs.receive.description',
     button: 'tabs.receive.button',
     link: 'tabs.receive.link',
-    img:assets.receive,
+    img: assets.receive,
     icon: PackageCheck,
   },
 ];
+
+export const categories = [
+  {
+    id: "desks",
+    name: "categories.desks.name",
+    cover: assets.desks,
+    icon: LampDesk,
+  },
+  {
+    id: "chairs",
+    name: "categories.chairs.name",
+    cover: assets.chairs,
+    icon: Armchair,
+    },
+  {
+    id: "stools",
+    name: "categories.stools.name",
+    cover: assets.stools,
+    icon: Spool,
+    },
+  {
+    id: "shelves",
+    name: "categories.shelves.name",
+    cover: assets.shelves,
+    icon: ToolCase,
+    },
+]

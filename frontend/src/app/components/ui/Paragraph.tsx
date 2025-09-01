@@ -23,6 +23,7 @@ const bySize: Record<ParagraphSize, string> = {
   lg: 'text-lg sm:text-xl leading-relaxed',
 };
 
+
 export function Paragraph({
   as: Tag = 'p',
   variant = 'primary',

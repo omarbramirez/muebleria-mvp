@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect } from 'react'
 import { useTranslations } from "next-intl";
-import { useContactForm } from "../hooks/useContactForm";
+import { useContactForm } from "@/app/hooks/useContactForm";
 import { ContactForm } from "./ContactForm";
 import { motion } from 'motion/react'
 import { div } from 'motion/react-client';
@@ -11,39 +11,26 @@ import { Paragraph } from '@/app/components/ui/Paragraph';
 
 const Contact = () => {
   const t = useTranslations("contact");
-  const { register, handleSubmit, submit, result,isSuccess, setIsSuccess, reset } = useContactForm();
-
-useEffect(() => {
-  if (isSuccess) {
-    reset()
-    const timer = setTimeout(() => setIsSuccess(false), 3000);
-    return () => clearTimeout(timer);
-  }
-}, [isSuccess, setIsSuccess]);
-
-
+  const { register, handleSubmit, onSubmit, result,isSuccess, setResult, reset, setValue  } = useContactForm();
   
-  const [activeTab, setActiveTab] = useState('clients');
+  const [activeTab, setActiveTab] = useState<"clients" | "providers">("clients");
 
   const tabs = [
-    { id: 'clients', label: t('tabs.clients'), formType: 'client' },
-    { id: 'providers', label: t('tabs.providers'), formType: 'provider' },
+    { id: 'clients', label: t('tabs.clients.label') },
+    { id: 'providers', label: t('tabs.providers.label') },
   ];
 
   return (
-    <div className="w-full mx-auto h-full bg-primary">
-      <motion.section
+      <div
         id="contact"
-        className="w-full px-[12%] py-10 scroll-mt-20 bg-[url('/footer-bg-color.png')] bg-no-repeat bg-center bg-[length:90%_auto] dark:bg-none"
+        className="w-full px-8 mx-auto h-full bg-primary"
       >
         <div className="max-w-3xl flex flex-col gap-4 mx-auto">
-          <Heading as="h1" variant="primaryLight" size='lg' hierarchy='forSection'>{t('title')}</Heading>
-          {/* <h1 className="text-3xl sm:text-6xl lg:text-[66px] text-center mx-auto">
-            {t('title')}
-          </h1> */}
-              <Heading as='h3' variant='secondary' size='md' className='!text-center my-1'>{t('subtitle')}</Heading>
+          <Heading as="h1" variant="primaryLight" size='lg' hierarchy='forSection'>{t(`tabs.${activeTab}.title`)}</Heading>
+         
+              <Heading as='h3' variant='secondary' size='md' className='!text-center my-1'>{t(`tabs.${activeTab}.call_to_action`)}</Heading>
           <Paragraph variant="primaryWhite" size="md" className='!text-center'>
-                 {t('description')}
+                 {t(`tabs.${activeTab}.description`)}
                </Paragraph>
         </div>
 
@@ -59,7 +46,7 @@ useEffect(() => {
                     ? 'bg-secondary text-white border-blue-600'
                     : 'bg-background-light text-foreground hover:opacity-90'
                 } first:rounded-l-md last:rounded-r-md transition-colors duration-200`}
-                onClick={() => setActiveTab(tab.id)}
+                 onClick={() => setActiveTab(tab.id as "clients" | "providers")}
               >
                 {tab.label}
               </button>
@@ -68,30 +55,19 @@ useEffect(() => {
         </div>
 
         {/* Tab Content */}
-        <div className="max-w-3xl mx-auto">
-          {activeTab === 'clients' && (
-            <ContactForm
+         <div className="max-w-3xl mx-auto">
+          
+           <ContactForm
               register={register}
               handleSubmit={handleSubmit}
-              onSubmit={submit}
+              onSubmit={onSubmit}
               result={result}
+              formType={activeTab}  
               isSuccess={isSuccess}
-              formType="client"
+              setValue ={setValue }
             />
-          )}
-          {activeTab === 'providers' && (
-            <ContactForm
-              register={register}
-              handleSubmit={handleSubmit}
-              onSubmit={submit}
-              result={result}
-              isSuccess={isSuccess}
-              formType="provider"
-            />
-          )}
         </div>
-      </motion.section>
-    </div>
+      </div>
   );
 };
 

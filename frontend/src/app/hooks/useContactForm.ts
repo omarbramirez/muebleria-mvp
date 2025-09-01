@@ -12,17 +12,18 @@ export const useContactForm = () => {
   const [isSuccess, setIsSuccess] = useState(false);
 
   const accessKey = process.env.NEXT_PUBLIC_ACCESS_KEY!;
-  const { register, handleSubmit, reset } = useForm<FormData>();
+  const { register, handleSubmit, reset, setValue } = useForm<FormData>();
 
   const { submit } = useWeb3Forms({
     access_key: accessKey,
     settings: {
-      from_name: "omarbramirez.com",
+      from_name: "muebleria.com",
       subject: "Nuevo mensaje de contacto desde su sitio web",
     },
     onSuccess: () => {
       setIsSuccess(true);
       setResult(t("form.msgOnSuccess"));
+      reset();
     },
     onError: (msg) => {
       setIsSuccess(false);
@@ -30,5 +31,9 @@ export const useContactForm = () => {
     },
   });
 
-  return { register, handleSubmit, submit, result, isSuccess, setIsSuccess,reset };
+  const onSubmit = async (data: FormData) => {
+    await submit(data);
+  };
+
+  return { register, handleSubmit, onSubmit, result, isSuccess, setResult, reset, setValue };
 };

@@ -17,8 +17,8 @@ export default function Home() {
       <TabMenu/>
       
       <Contact/>
-      {/*
       <ProductGrid/>
+      {/*
       <NewsletterForm/>
       */}
       <Footer/> 
