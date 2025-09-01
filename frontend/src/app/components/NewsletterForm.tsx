@@ -1,78 +1,96 @@
-"use client"
-import { useState , FormEvent} from 'react';
+"use client";
 
-const NewsletterForm: React.FC  =()=>{
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+import React, { useState, useRef, useEffect } from "react";
+import * as Yup from "yup";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setMessage('');
+type Props = {};
 
-    // Validación básica
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setMessage('Por favor, ingresa un correo electrónico válido.');
-      setIsSubmitting(false);
-      return;
-    }
+const requiredSchema = Yup.object({
+  email: Yup.string().email("Invalid email").required("Email is required"),
+});
 
-    try {
-      // Aquí iría la lógica para enviar el correo a tu servicio de newsletter (e.g., Mailchimp, Supabase, etc.)
-      // Por ahora, simulamos una llamada API
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulación de llamada API
-      setMessage('¡Gracias por suscribirte! Revisa tu correo para confirmar.');
-      setEmail('');
-    } catch (error) {
-      setMessage('Hubo un error al procesar tu suscripción. Intenta de nuevo.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+function SubscribeForm({}: Props) {
+  const [status, setStatus] = useState<number | null>(null);
+  const [message, setMessage] = useState<string>("");
+  const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [run, setRun] = useState<boolean>(false);
+  const [totalCounts, setTotalCounts] = useState<number>(400);
+  const [dimensions, setDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
 
+  useEffect(() => {
+    const { innerWidth: width, innerHeight: height } = window;
+    setDimensions({
+      width,
+      height,
+    });
+  }, []);
   return (
-    <div className="w-full m-auto min-h-screen flex items-center justify-center">
-        <div className="max-w-2xl mx-auto" >
-      <h2 className="text-2xl font-bold text-center mb-4 text-gray-800">
-        Suscríbete a nuestro Newsletter
-      </h2>
-      <p className="text-center text-gray-600 mb-6">
-        Recibe las últimas noticias y actualizaciones directamente en tu correo.
-      </p>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Correo Electrónico
-          </label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="tucorreo@ejemplo.com"
-            className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={isSubmitting}
-          />
-        </div>
-        {message && (
-          <p className={`text-center ${message.includes('Gracias') ? 'text-green-600' : 'text-red-600'}`}>
-            {message}
-          </p>
-        )}
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className={`w-full py-3 rounded-md text-white font-semibold ${
-            isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-          } transition-colors`}
-        >
-          {isSubmitting ? 'Enviando...' : 'Suscribirse'}
-        </button>
-      </form>
-      </div>
+    <div className="flex flex-col space-y-8 md:w-[500px]">
+      <Formik
+        initialValues={{
+          email: "",
+        }}
+        validationSchema={requiredSchema}
+        onSubmit={async (values, { resetForm }) => {
+          setButtonDisabled(true);
+          try {
+            const response = await fetch("/api/subscribe", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: values?.email,
+              }),
+            });
+            const datas = await response.json();
+            if (datas.status >= 400) {
+              setStatus(datas.status);
+              setMessage("Error joining the newsletter. You can directly contact me at github@ebraj.");
+              setTimeout(() => {
+                setMessage("");
+                setButtonDisabled(false);
+              }, 2000);
+              return;
+            }
+
+            setStatus(201);
+            setMessage("Thank you for subscribing my newsletter 👻.");
+            setRun(true);
+            setTimeout(() => {
+              setTotalCounts(0);
+              setMessage("");
+              resetForm();
+              setButtonDisabled(false);
+            }, 4000);
+            setTotalCounts(400);
+          } catch (error) {
+            setStatus(500);
+            setMessage("Error joining the newsletter. You can directly contact me at github@ebraj.");
+            setTimeout(() => {
+              setMessage("");
+              setButtonDisabled(false);
+            }, 2000);
+          }
+        }}
+      >
+        <Form className="w-full">
+          <div className="w-full bg-transparent border flex-1 border-black rounded-full flex gap-2 px-3">
+            <Field type="email" name="email" className="w-full grow rounded-md bg-transparent px-5 py-3 outline-none" placeholder="Enter your email" autoComplete="off" />
+            <button className="rounded-full bg-black  my-2 px-4 py-2 font-bold text-gray-100 transition-all hover:scale-105 hover:bg-gray-900 disabled:opacity-80" type="submit" disabled={buttonDisabled}>
+              {submitting ? "Submitting" : "Subscribe"}
+            </button>
+          </div>
+          {message && <p className={`${status !== 201 ? "text-red-500" : "text-green-500"} pt-4 font-black`}>{message}</p>}
+        </Form>
+      </Formik>
     </div>
   );
 }
 
-export default NewsletterForm;
+export default SubscribeForm;

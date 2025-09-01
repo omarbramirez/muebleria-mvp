@@ -18,8 +18,9 @@ export default function Home() {
       
       <Contact/>
       <ProductGrid/>
-      {/*
+      
       <NewsletterForm/>
+      {/*
       */}
       <Footer/> 
       {/* <StyleGuide/> */}
