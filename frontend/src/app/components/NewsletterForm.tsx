@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import * as Yup from "yup";
 import { Formik, Form, Field } from "formik";
 
-type Props = {};
+type Props = Record<string, never>;
 
 const requiredSchema = Yup.object({
   email: Yup.string().email("Invalid email").required("Email is required"),
