@@ -1,7 +1,7 @@
 'use client';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/app/lib/cn';
-import { ButtonVariant, Size, CommonProps, ButtonAsButton, ButtonAsLink, ButtonProps } from '@/types/index';
+import { ButtonVariant, Size, ButtonAsButton, ButtonProps } from '@/types/index';
 
 const base =
     'w-auto px-9  inline-flex items-center justify-center select-none ' +
