@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import {tabs} from '@/app/assets/assets';
 import { useTranslations } from 'next-intl';
-import {TabMenuProps} from '@/types/index';
 import { Heading } from '@/app/components/ui/Heading';
 import Image from 'next/image'
 import { Paragraph } from '@/app/components/ui/Paragraph';

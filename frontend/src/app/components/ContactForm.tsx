@@ -1,15 +1,11 @@
 
 'use client'
-import Image from "next/image";
-import { assets } from "../assets/assets";
 import { useTranslations } from "next-intl";
-import { UseFormRegister, UseFormHandleSubmit } from "react-hook-form";
-import { FormData } from "@/types/index";
 import { motion } from 'motion/react'
 import {ContactFormProps} from '@/types/index';
 import { Button } from '@/app/components/ui/Button';
 import { Paragraph } from '@/app/components/ui/Paragraph';
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export const ContactForm: React.FC<ContactFormProps> = ({ register, handleSubmit, onSubmit, result, formType, setValue, isSuccess }) => {
 useEffect(() => {

@@ -6,9 +6,12 @@ export * from '@/types/ui/common';
 
 
 
+
 export * from '@/types/forms/contact';
 
 
 
 export * from '@/types/content/tabs';
 
+
+export * from '@/types/apis/subscribe/route'

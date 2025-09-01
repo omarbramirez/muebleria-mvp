@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import useWeb3Forms from "@web3forms/react";
 import { useTranslations } from 'next-intl';
@@ -25,7 +25,7 @@ export const useContactForm = () => {
       setResult(t("form.msgOnSuccess"));
       reset();
     },
-    onError: (msg) => {
+    onError: () => {
       setIsSuccess(false);
       setResult(t("form.msgOnError"));
     },

@@ -1,6 +1,8 @@
 
 
 import { NextResponse } from "next/server";
+import {MailchimpError} from '@/types/index'; 
+
 
 export async function POST(req: Request) {
   try {
@@ -37,7 +39,7 @@ export async function POST(req: Request) {
     });
 
     if (!response.ok) {
-      let errorData: any = {};
+      let errorData: MailchimpError = {};
       try {
         errorData = await response.json();
       } catch {

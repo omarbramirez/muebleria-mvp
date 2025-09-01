@@ -1,4 +1,4 @@
-import Image, { StaticImageData } from 'next/image';
+import { StaticImageData } from 'next/image';
 import { LucideIcon } from "lucide-react";
 export interface TabMenuProps {
   t: (key: string) => string; // t returns a string for translation keys

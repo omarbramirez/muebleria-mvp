@@ -1,17 +1,15 @@
 "use client"
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useTranslations } from "next-intl";
 import { useContactForm } from "@/app/hooks/useContactForm";
 import { ContactForm } from "./ContactForm";
-import { motion } from 'motion/react'
-import { div } from 'motion/react-client';
 import { useState } from 'react';
 import { Heading } from '@/app/components/ui/Heading';
 import { Paragraph } from '@/app/components/ui/Paragraph';
 
 const Contact = () => {
   const t = useTranslations("contact");
-  const { register, handleSubmit, onSubmit, result,isSuccess, setResult, reset, setValue  } = useContactForm();
+  const { register, handleSubmit, onSubmit, result,isSuccess,setValue  } = useContactForm();
   
   const [activeTab, setActiveTab] = useState<"clients" | "providers">("clients");
 
