@@ -13,14 +13,14 @@ export type MailchimpResponse = {
   list_id: string;
 
   // Campos opcionales
-  merge_fields?: Record<string, any>;
+  merge_fields?: Record<string, unknown>;
   stats?: {
     avg_open_rate?: number;
     avg_click_rate?: number;
   };
 
   // Para permitir campos adicionales que Mailchimp agregue en el futuro
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 export type ErrorCode =
