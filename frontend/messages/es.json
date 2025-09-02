@@ -83,10 +83,37 @@
                 "id": "shelves",
                 "name": "Estanterías"
             }
-        }},
-        "footer": {
-            "contact": "Contacto",
-            "privacy_policy": "Política de privacidad",
-            "terms": "Términos y condiciones"
         }
+    },
+    "news_letter_form": {
+        "call_to_action": "Sé parte de esta experiencia exclusiva",
+        "title": "Tu momento es ahora",
+        "description": "Al continuar aceptas recibir noticias y actualizaciones. Puedes darte de baja en cualquier momento.",
+        "email": "Correo electrónico",
+        "button": {
+            "idle": "Reservar",
+            "loading": "Enviando"
+        },
+        "messages": {
+            "msgOnSuccess": "¡Registro exitoso! Te contactaremos pronto",
+            "msgOnError": "Algo salió mal, por favor inténtalo de nuevo más tarde"
+        },
+        "errors": {
+            "EMAIL_REQUIRED": "El correo es obligatorio",
+            "MISSING_ENV": "Error de configuración interna",
+            "ALREADY_SUBSCRIBED": "Este correo ya está suscrito",
+            "MAILCHIMP_ERROR": "Hubo un error con Mailchimp",
+            "SERVER_ERROR": "Error interno del servidor"
+        },
+        "success": "Te has suscrito con éxito 🎉"
+    },
+    "footer": {
+        "contact": "Contacto",
+        "privacy_policy": "Política de privacidad",
+        "terms": "Términos y condiciones"
+    },
+    "sitemap":{
+        "main_pages": "Páginas principales",
+        "resources": "Recursos"
     }
+}

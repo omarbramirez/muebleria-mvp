@@ -67,7 +67,7 @@
     font-size: 16px;
     /* Base para em/rem */
     color: var(--color-foreground);
-    background: var(--color-background-light);
+    background: var(--color-primary);
     font-size: 16px;
     text-align: center;
     text-wrap: balance;
@@ -77,7 +77,7 @@
 
   @media (prefers-color-scheme: dark) {
   body {
-    background: var(--color-background-dark);
+    background: var(--color-primary);
     color: var(--color-foreground-white);
   }
 }

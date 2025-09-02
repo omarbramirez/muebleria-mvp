@@ -10,8 +10,8 @@ const byVariant: Record<ParagraphVariant, string> = {
   primaryWhite: 'text-foreground-white',
   secondary: 'text-secondary',
   muted: 'text-gray-500',
-  danger: 'text-rose-800 bg-rose-100 px-4 py-2 rounded-md  px-4 py-2 rounded-md !text-center',
-  success: 'text-emerald-800 bg-emerald-100 px-4 py-2 rounded-md text-center px-4 py-2 rounded-md !text-center',
+  danger: 'text-rose-800 bg-rose-100 px-4 py-2 rounded-md  px-4 py-2 rounded-md !text-center text-body',
+  success: 'text-emerald-800 bg-emerald-100 px-4 py-2 rounded-md text-center px-4 py-2 rounded-md !text-center text-body',
 };
 
 

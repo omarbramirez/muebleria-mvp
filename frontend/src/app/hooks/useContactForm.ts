@@ -1,16 +1,16 @@
-
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import useWeb3Forms from "@web3forms/react";
 import { useTranslations } from 'next-intl';
 import { FormData } from "@/types/index";
 
 export const useContactForm = () => {
-  const t = useTranslations('contact')
+  const t = useTranslations('contact');
 
-  const [result, setResult] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [result, setResult] = useState<string>("");
+  const [status, setStatus] = useState<201 | 400 | 500 | null>(null);
   const accessKey = process.env.NEXT_PUBLIC_ACCESS_KEY!;
   const { register, handleSubmit, reset, setValue } = useForm<FormData>();
 
@@ -21,19 +21,43 @@ export const useContactForm = () => {
       subject: "Nuevo mensaje de contacto desde su sitio web",
     },
     onSuccess: () => {
-      setIsSuccess(true);
+      setStatus(201);
       setResult(t("form.msgOnSuccess"));
       reset();
     },
     onError: () => {
-      setIsSuccess(false);
+      setStatus(400);
       setResult(t("form.msgOnError"));
     },
   });
 
   const onSubmit = async (data: FormData) => {
-    await submit(data);
+    try {
+      await submit(data);
+    } catch (error) {
+      setStatus(500);
+      setResult(t("form.msgOnError"));
+    } finally {
+      timeoutRef.current = setTimeout(() => {
+        setStatus(null);
+        setResult("");
+      }, 3000);
+    }
   };
 
-  return { register, handleSubmit, onSubmit, result, isSuccess, setResult, reset, setValue };
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  return {
+    register,
+    handleSubmit,
+    onSubmit,
+    result,
+    isSuccess: status === 201,
+    setValue,
+    status,
+  };
 };

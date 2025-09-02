@@ -13,7 +13,7 @@ export interface ContactFormProps {
   handleSubmit: UseFormHandleSubmit<FormData>;
   onSubmit: (formData: FormData) => void | Promise<void>;
   result: string;
-  isSuccess: boolean;
   formType: string;
   setValue: UseFormSetValue<FormData>;
+  status: number | null;
 }

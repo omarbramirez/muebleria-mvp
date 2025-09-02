@@ -9,7 +9,12 @@ import { Paragraph } from '@/app/components/ui/Paragraph';
 
 const Contact = () => {
   const t = useTranslations("contact");
-  const { register, handleSubmit, onSubmit, result,isSuccess,setValue  } = useContactForm();
+  const { register, 
+    handleSubmit, 
+    onSubmit, 
+    result,
+    setValue, 
+    status,  } = useContactForm();
   
   const [activeTab, setActiveTab] = useState<"clients" | "providers">("clients");
 
@@ -61,8 +66,8 @@ const Contact = () => {
               onSubmit={onSubmit}
               result={result}
               formType={activeTab}  
-              isSuccess={isSuccess}
               setValue ={setValue }
+              status={status}
             />
         </div>
       </div>
