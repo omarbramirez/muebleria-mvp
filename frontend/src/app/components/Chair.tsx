@@ -5,10 +5,12 @@ import { OrbitControls, useGLTF, Environment } from "@react-three/drei";
 import * as THREE from "three";
 
 // Memoized GLTF Model
-const ChairModel: React.FC = memo(() => {
+const ChairModelComponent: React.FC = () => {
   const { scene } = useGLTF("/models/gltf/SheenChair.glb");
   return <primitive object={scene} />;
-});
+};
+
+const ChairModel = memo(ChairModelComponent);
 
 const Chair: React.FC = () => {
   return (
