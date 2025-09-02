@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { MailchimpError, MailchimpResponse,SubscribeResponse, ErrorCode } from "@/types/index";
+import { MailchimpError, MailchimpResponse, SubscribeResponse, ErrorCode } from "@/types/index";
 
 // ---------- Tipados ----------
 
@@ -7,11 +7,10 @@ interface SubscribeRequest {
   email: string;
 }
 
-
-
 // ---------- Utilidades ----------
 
 function getMailchimpAuthHeader(apiKey: string): string {
+  // Aquí 'anystring' es solo un literal requerido por Mailchimp para auth, no es problema de any
   return `Basic ${Buffer.from(`anystring:${apiKey}`).toString("base64")}`;
 }
 
@@ -70,7 +69,6 @@ export async function POST(
     if (!response.ok) {
       const errorData = await parseMailchimpError(response);
 
-      // Caso UX diferenciado: ya suscrito
       if (errorData.title === "Member Exists") {
         return NextResponse.json(
           { success: false, code: "ALREADY_SUBSCRIBED", status: 409 },
@@ -97,10 +95,15 @@ export async function POST(
       { success: true, data: received },
       { status: 200 }
     );
-  } catch (error) {
-    console.error("Error en /api/subscribe:", error);
+  } catch (err: unknown) {
+    // Tipar el error como unknown evita el any
+    const errorMessage =
+      err instanceof Error ? err.message : "Unknown server error";
+
+    console.error("Error en /api/subscribe:", errorMessage);
+
     return NextResponse.json(
-      { success: false, code: "SERVER_ERROR", status: 500 },
+      { success: false, code: "SERVER_ERROR", status: 500, error: errorMessage },
       { status: 500 }
     );
   }
