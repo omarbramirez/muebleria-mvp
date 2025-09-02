@@ -32,7 +32,7 @@ export const sitemap: SitemapSection[] = [
     section: "sitemap.resources",
     links: [
       { name: "footer.contact", href: "#contact" },
-      { name: "footer.privacy_policy", href: "/privacy" },
+      { name: "footer.privacy_policy", href: "/policies" },
       { name: "footer.terms", href: "/terms" },
     ],
   },

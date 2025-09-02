@@ -14,13 +14,13 @@ export default function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full h-auto px-8 mx-auto">
             {sitemap.map((section) => (
               <div key={section.section}>
-                 <Heading
-                          as="h3"
-                          variant="primaryLight"
-                          size="sm"
-                          hierarchy="forContent"
-                          className=" !text-right my-1"
-                        >{t(section.section)}</Heading>
+                <Heading
+                  as="h3"
+                  variant="primaryLight"
+                  size="sm"
+                  hierarchy="forContent"
+                  className=" !text-right my-1"
+                >{t(section.section)}</Heading>
                 <ul aria-labelledby={section.section} className="space-y-2">
                   {section.links.map((link) => (
                     <li key={link.href}>
@@ -37,8 +37,10 @@ export default function Footer() {
           </div>
 
           <div className="mt-8 pt-8 border-t border-primary text-center flex items-center justify-center">
-            <p className="text-primary !text-center">
-              &copy; {new Date().getFullYear()} Omar B Ramírez. Todos los derechos
+            <p className="text-primary !text-center cursor-default">
+              &copy; {new Date().getFullYear()}                       <a
+                href="https://omarbramirez.com" className="!inline" target="_blank"
+              >Omar B Ramírez.</a> Todos los derechos
               reservados.
             </p>
           </div>
