@@ -24,7 +24,7 @@ const Header = () => {
 </Paragraph>
 
             <Button
-              href="#reserve"
+              href="/#reserve"
               variant='secondary'
             >
               {t("link")}

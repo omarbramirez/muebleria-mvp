@@ -40,10 +40,10 @@ useEffect(() => {
     <div ref={menuRef} className="w-auto md:hidden z-50" onClick={() => setIsOpen(false)}>
       {isOpen && (
         <ul className="w-auto absolute top-16 left-0 w-full bg-background-light shadow-lg flex flex-col gap-4 p-6" >
-          <li><LinkItem href="#top" >{t("home")}</LinkItem></li>
-          <li><LinkItem href="#how">{t("how_it_works")}</LinkItem></li>
-          <li><LinkItem href="#catalog">{t("catalog")}</LinkItem></li>
-          <li><LinkItem variant="secondary" href="#reserve">{t("reserve")}</LinkItem></li>
+          <li><LinkItem href="/#top" >{t("home")}</LinkItem></li>
+          <li><LinkItem href="/#how">{t("how_it_works")}</LinkItem></li>
+          <li><LinkItem href="/#catalog">{t("catalog")}</LinkItem></li>
+          <li><LinkItem variant="secondary" href="/#reserve">{t("reserve")}</LinkItem></li>
         </ul>
       )}
     </div>

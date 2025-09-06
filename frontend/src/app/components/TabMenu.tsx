@@ -54,7 +54,7 @@ const t = useTranslations('tab_menu');
             {t(tab.link) && (
 
             <Button
-              href="#reserve"
+              href="/#reserve"
               variant='primary'
             >
               {t(tab.button)}

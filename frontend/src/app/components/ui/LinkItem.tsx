@@ -40,6 +40,22 @@ export function LinkItem({
 }: LinkItemProps) {
   const classes = cn(base, byVariant[variant], bySize[size], className);
 
+  // Check if the href is an anchor link to the root page
+  const isAnchorLink = typeof href === 'string' && href.startsWith('/#');
+
+  if (isAnchorLink) {
+    // Render a standard <a> tag for anchor links
+    return (
+      <a
+        href={href}
+        className={classes}
+      >
+        {children}
+      </a>
+    );
+  }
+
+  // Otherwise, render the next-intl Link component
   return (
     <Link
       href={href}

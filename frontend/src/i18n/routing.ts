@@ -3,36 +3,20 @@ import { defineRouting } from "next-intl/routing";
 
 export const routing = defineRouting({
   // A list of all locales that are supported
-  locales: ["es","en"],
+  locales: ["es", "en"],
 
   // Used when no locale matches
   defaultLocale: "es",
-pathnames: {
-  "/policies": {
-    es: "/politicas",
-    en: "/policies"
-  },
-  "/terms": {
-    es: "/terminos",
-    en: "/terms"
-  },
-                   "/#top": {
-    es: "/%23top",
-    en: "/%23top"
-  },
-  "#how": {
-    es: "#como-funciona",
-    en: "#how"
-  },
-  "#catalog": {
-    es: "#catalogo",
-    en: "#catalog"
-  },
-  "#reserve": {
-    es: "#reservar",
-    en: "#reserve"
+  pathnames: {
+    "/policies": {
+      es: "/politicas",
+      en: "/policies"
+    },
+    "/terms": {
+      es: "/terminos",
+      en: "/terms"
+    }
   }
-}
 });
 
 // Lightweight wrappers around Next.js' navigation APIs
