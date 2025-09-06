@@ -21,7 +21,7 @@ const Header = () => {
 
           <div className="w-full flex flex-col  sm:flex-row items-center justify-left my-4 mb-10">
             <Button
-              href="#reserve"
+              href="/#reserve"
               variant='secondary'
             >
               {t("link")}

@@ -1,4 +1,7 @@
 {
+    "locale_switcher":{
+        "label": "Elige tu idioma"
+    },
     "navbar": {
         "home": "Inicio",
         "how_it_works": "Cómo funciona",

@@ -13,14 +13,10 @@ export default function Home() {
     <div>
       <Navbar/>
       <Header/>
-      <TabMenu/>
-      
+      <TabMenu/>  
       <Contact/>
-      <ProductGrid/>
-      
+      <ProductGrid/>      
       <NewsletterForm/>
-      {/*
-      */}
       <Footer/> 
     </div>
   );

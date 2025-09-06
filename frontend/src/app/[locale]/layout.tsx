@@ -20,7 +20,7 @@ export default async function LocaleLayout({
   }
 
   return (
-    <html lang={currentLocale} className="scroll-smooth">
+    <html lang={currentLocale} className="scroll-smooth" >
       <body
         className={`antialiased leading-8 overflow-x-hidden dark:bg-darkTheme dark:text-white`}
       >

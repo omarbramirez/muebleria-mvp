@@ -1,0 +1,127 @@
+{
+    "navbar": {
+        "home": "Home",
+        "how_it_works": "How it works",
+        "catalog": "Catalog",
+        "reserve": "Reserve"
+    },
+    "header": {
+        "call_to_action": "Book now",
+        "title": "Customizable furniture online",
+        "description": "Design, customize and order your furniture online, ready to be manufactured on demand by specialized workshops.",
+        "link": "Reserve"
+    },
+    "tab_menu": {
+        "title": "How does it work?",
+        "tabs": {
+            "choose": {
+                "call_to_action": "Explore the catalog",
+                "title": "Choose",
+                "description": "Select the product that best suits your needs. Explore our range of options and find the perfect design.",
+                "button": "Catalog",
+                "link": "#"
+            },
+            "customize": {
+                "call_to_action": "Make it your own",
+                "title": "Customize",
+                "description": "Customize your product with colors, materials and unique details so it reflects your style.",
+                "button": "Sign up",
+                "link": "#"
+            },
+            "receive": {
+                "call_to_action": "Complete your order",
+                "title": "Receive",
+                "description": "Receive your customized product directly at your door, ready to use.",
+                "button": "Reserve",
+                "link": "#"
+            }
+        }
+    },
+    "contact": {
+        "tabs": {
+            "clients": {
+                "label": "Clients",
+                "title": "Join the presale",
+                "call_to_action": "Be among the first to try our service",
+                "description": "Register and we will notify you as soon as our platform is ready. This way, you can customize and order your furniture before anyone else."
+            },
+            "providers": {
+                "label": "Providers",
+                "title": "Collaborate with us",
+                "call_to_action": "Be part of our network of providers",
+                "description": "Register and we will contact you to explore collaboration opportunities. You will be able to offer your products on our platform and reach clients interested in personalized furniture."
+            }
+        },
+        "form": {
+            "name": "Full name",
+            "email": "Email",
+            "message": "Leave us your comments",
+            "submit": "Register",
+            "msgOnSuccess": "Successful registration! We will contact you soon.",
+            "msgOnError": "Something went wrong, please try again later."
+        }
+    },
+    "product_grid": {
+        "call_to_action": "Book now",
+        "title": "Customizable furniture online",
+        "description": "Design, customize and order your furniture online, ready to be manufactured on demand by specialized workshops.",
+        "link": "Reserve",
+        "categories": {
+            "desks": {
+                "id": "desks",
+                "name": "Desks"
+            },
+            "chairs": {
+                "id": "chairs",
+                "name": "Chairs"
+            },
+            "stools": {
+                "id": "stools",
+                "name": "Stools"
+            },
+            "shelves": {
+                "id": "shelves",
+                "name": "Shelves"
+            }
+        }
+    },
+    "news_letter_form": {
+        "call_to_action": "Be part of this exclusive experience",
+        "title": "Your time is now",
+        "description": "By continuing you agree to receive news and updates. You can unsubscribe at any time.",
+        "email": "Email",
+        "button": {
+            "idle": "Reserve",
+            "loading": "Sending"
+        },
+        "messages": {
+            "msgOnSuccess": "Successful registration! We will contact you soon",
+            "msgOnError": "Something went wrong, please try again later"
+        },
+        "errors": {
+            "EMAIL_REQUIRED": "Email is required",
+            "MISSING_ENV": "Internal configuration error",
+            "ALREADY_SUBSCRIBED": "This email is already subscribed",
+            "MAILCHIMP_ERROR": "There was an error with Mailchimp",
+            "SERVER_ERROR": "Internal server error"
+        },
+        "success": "You have successfully subscribed 🎉"
+    },
+    "footer": {
+        "contact": "Contact",
+        "privacy_policy": "Privacy policy",
+        "terms": "Terms and conditions"
+    },
+    "policies": {
+        "title": "Privacy Notice",
+        "content": "Dear clients and visitors of {empresa}:\n\nAt {empresa} we understand the importance of protecting the personal data of our clients and visitors (hereinafter “The Holders”), which is why we commit to handle it lawfully, confidentially, and in compliance with the Federal Law on the Protection of Personal Data Held by Private Parties and other applicable regulations.\n\nDATA CONTROLLER\n{empresaLegal}, located at {domicilioEmpresa}, is responsible for collecting, using, and protecting the personal data of The Holders.\n\nCONSENT OF THE HOLDER\nIt will be considered that The Holders have granted their consent if they do not expressly object to this Notice.\n\nPERSONAL DATA SUBJECT TO PROCESSING\nWe may collect data such as: full name, email, phone number, address, RFC (for invoicing), payment details, as well as access information to {sitioWeb}. We do not collect sensitive data unless strictly necessary for the provision of services.\n\nPURPOSES OF THE PROCESSING\nThe data may be used for:\n1) Provision of services and commercialization of {empresa} products.\n2) Creation and administration of accounts in {sitioWeb}.\n3) Processing of orders, payments, and invoicing.\n4) Customer service (complaints, inquiries, returns).\n5) Compliance with legal obligations.\n\nSecondarily, we may use the data to send promotions, surveys, event invitations, and advertising related to {empresa}.\n\nDATA TRANSFER\nThe data may be shared with:\n- Business partners and authorized providers for service provision.\n- Banking institutions to process payments.\n- Competent authorities when required by law.\n\nARCO RIGHTS\nThe Holders may exercise their rights of Access, Rectification, Cancellation, and Opposition (ARCO) by sending an email to {correoDatosPersonales}.\n\nMODIFICATIONS\n{empresa} may modify this Notice at any time. Updates will be published on {sitioWeb}.\n\nCONTACT\n📧 {correoDatosPersonales}\n📍 {domicilioEmpresa}"
+    },
+    "terms": {
+        "title": "Terms and Conditions",
+        "content": "Welcome to {empresa}.\n\nBy using our website {sitioWeb}, you agree to these Terms and Conditions. If you do not agree, please do not use the site or provide your data.\n\nI. General provisions\n{empresaLegal}, located at {domicilioEmpresa}, operates this website {sitioWeb}. This site aims to provide information about our products and services, as well as opportunities for contact and lead generation.\n\nAll content, including texts, images, logos, and trademarks, is the property of {empresaLegal} and is protected by law. Reproduction or use without authorization is not allowed.\n\nII. User obligations\n- Provide truthful and complete information in the site’s forms.\n- Do not spread viruses, malware, or illegal content.\n- Do not use third-party information without authorization.\n- Use the site only for legal purposes and in good faith.\n\nIII. Use of personal data\nThe use of your personal data is governed by our Privacy Notice. By submitting your data through the site, you agree that we process it for purposes of contact, information delivery, and lead generation.\n\nIV. Modifications\n{empresa} may update these Terms and Conditions at any time. Modifications will be published on {sitioWeb} and will become effective upon publication.\n\nV. Contact\nFor any questions or comments about these Terms and Conditions, you can contact us at {correoContacto}."
+    },
+    "sitemap": {
+        "main_pages": "Main pages",
+        "resources": "Resources"
+    }
+}
