@@ -28,7 +28,7 @@ export const ResponsiveMenu = ({ isOpen, setIsOpen }: ResponsiveMenuProps) => {
     <nav ref={menuRef} className="md:hidden z-50">
       {isOpen && (
         <ul className="absolute top-16 left-0 w-full bg-background-light shadow-lg flex flex-col gap-4 p-6">
-          <li><LinkItem href="/#top" onClick={() => setIsOpen(false)}>{t("home")}</LinkItem></li>
+          <li><LinkItem href="#top" onClick={() => setIsOpen(false)}>{t("home")}</LinkItem></li>
           <li><LinkItem href="/#how" onClick={() => setIsOpen(false)}>{t("how_it_works")}</LinkItem></li>
           <li><LinkItem href="/#catalog" onClick={() => setIsOpen(false)}>{t("catalog")}</LinkItem></li>
           <li><LinkItem variant="secondary" href="/#reserve" onClick={() => setIsOpen(false)}>{t("reserve")}</LinkItem></li>
