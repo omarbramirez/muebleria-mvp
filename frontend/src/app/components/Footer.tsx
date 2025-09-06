@@ -23,9 +23,9 @@ export default function Footer() {
                 >{t(section.section)}</Heading>
                 <ul aria-labelledby={section.section} className="space-y-2">
                   {section.links.map((link) => (
-                    <li key={link.href}>
+                    <li key={`${link.href}`}>
                       <LinkItem
-                        href={link.href}
+                        href={`${link.href}`}
                       >
                         {t(link.name)} {/* label traducido */}
                       </LinkItem>
