@@ -4,6 +4,7 @@ import Chair from './Chair';
 import { Button } from '@/app/components/ui/Button';
 import { Heading } from '@/app/components/ui/Heading';
 import { Paragraph } from '@/app/components/ui/Paragraph';
+import {SlidingUpAnimation,RevealingAnimation, HoveringAnimation} from '@/app/components/animations/animations'
 
 const Header = () => {
   const t = useTranslations('header');
@@ -12,22 +13,23 @@ const Header = () => {
 <div id="top" className="static w-full h-screen grid grid-rows-2 sm:grid-cols-2 bg-primary">
       {/* Columna de texto */}
      <div className="flex min-h-0 sm:h-screen items-end  sm:items-center justify-center z-10 sm:p-10">
-        <div className="w-11/12 max-w-3xl flex flex-col gap-4 ">
+        <SlidingUpAnimation className="w-11/12 max-w-3xl flex flex-col gap-4 ">
+
+        <RevealingAnimation>
           <Heading as='h3' variant='secondary'  size='md'>{t('call_to_action')}</Heading>
+          </RevealingAnimation>
           <Heading as="h1" variant="primaryLight" size='lg' hierarchy='forContent'>{t('title')}</Heading>
 <Paragraph variant="primaryWhite" size="md" className="max-w-2xl">
   {t('description')}
 </Paragraph>
 
-          <div className="w-full flex flex-col  sm:flex-row items-center justify-left my-4 mb-10">
             <Button
               href="#reserve"
               variant='secondary'
             >
               {t("link")}
             </Button>
-          </div>
-        </div>
+        </SlidingUpAnimation>
       </div>
 
       {/* Columna de imagen */}

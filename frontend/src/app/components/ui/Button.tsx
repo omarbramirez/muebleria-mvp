@@ -2,6 +2,7 @@
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/app/lib/cn';
 import { ButtonVariant, Size, ButtonAsButton, ButtonProps } from '@/types/index';
+import {HoveringAnimation} from '@/app/components/animations/animations'
 
 const base =
     'w-auto px-9  inline-flex items-center justify-center select-none ' +
@@ -77,6 +78,7 @@ export function Button(props: ButtonProps) {
   if ('href' in props && typeof props.href === 'string') {
     const { href, prefetch, replace, scroll, shallow, locale } = props;
     return (
+       <HoveringAnimation className="w-1/3 flex flex-col  sm:flex-row items-center justify-center my-4 mb-10  mx-auto sm:mx-0 ">
       <Link
         href={href}
         prefetch={prefetch}
@@ -90,6 +92,7 @@ export function Button(props: ButtonProps) {
         <span>{children}</span>
         {rightIcon ? <span className="ml-1.5">{rightIcon}</span> : null}
       </Link>
+       </HoveringAnimation>
     );
   }
 
@@ -97,6 +100,7 @@ export function Button(props: ButtonProps) {
   const { type = 'button', disabled, ...buttonRest } = rest as ButtonAsButton;
 
   return (
+           <HoveringAnimation className="w-1/3 flex flex-col  sm:flex-row items-center justify-center my-4 mb-10  mx-auto ">
     <button
       type={type}
       className={classes}
@@ -108,5 +112,6 @@ export function Button(props: ButtonProps) {
       <span>{children}</span>
       {rightIcon ? <span className="ml-1.5">{rightIcon}</span> : null}
     </button>
+    </HoveringAnimation>
   );
 }

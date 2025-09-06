@@ -69,7 +69,7 @@ function NewsletterForm({}: Props) {
         }}
       >
         {() => (
-          <Form className="flex flex-col items-center">
+          <Form className="w-1/2 mx-auto flex flex-col items-center">
             {/* Campo email */}
             <Field
               type="email"
@@ -93,11 +93,12 @@ function NewsletterForm({}: Props) {
             />
 
             {/* Botón */}
-            <div className="w-auto flex flex-col sm:flex-row items-center my-4 mb-10 justify-center">
-              <Button type="submit" variant="secondary">
+
+ <Button type="submit" variant="secondary">
                 {loading ? t("button.loading") : t("button.idle")}
               </Button>
-            </div>
+
+             
 
             {/* Mensaje de API */}
             {message && (

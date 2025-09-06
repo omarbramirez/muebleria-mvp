@@ -5,6 +5,8 @@ import { ContactFormProps } from '@/types/index';
 import { Button } from '@/app/components/ui/Button';
 import { Paragraph } from '@/app/components/ui/Paragraph';
 import { useEffect } from "react";
+import {HoveringAnimation} from '@/app/components/animations/animations'
+
 
 export const ContactForm: React.FC<ContactFormProps> = ({
   register,
@@ -24,7 +26,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
 
   return (
     <motion.form
-      className="max-w-2xl mx-auto"
+      className="w-1/2 mx-auto"
       onSubmit={handleSubmit(onSubmit)}
     >
       {/* hidden inputs */}
@@ -63,15 +65,15 @@ export const ContactForm: React.FC<ContactFormProps> = ({
       />
 
       {/* submit button */}
-      <div className="w-auto flex flex-col sm:flex-row items-center my-4 mb-10 justify-center">
+
+
         <Button
           type="submit"
           variant="secondary"
-        >
+          >
           {t('form.submit')}
         </Button>
-      </div>
-
+    
       {/* feedback */}
       {status && (
       <Paragraph

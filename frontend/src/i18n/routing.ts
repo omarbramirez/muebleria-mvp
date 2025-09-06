@@ -16,9 +16,9 @@ pathnames: {
     es: "/terminos",
     en: "/terms"
   },
-  "#top": {
-    es: "/#inicio",
-    en: "/#top"
+                   "/#top": {
+    es: "/%23top",
+    en: "/%23top"
   },
   "#how": {
     es: "#como-funciona",

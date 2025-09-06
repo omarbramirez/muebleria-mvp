@@ -53,17 +53,12 @@ const t = useTranslations('tab_menu');
           
             {t(tab.link) && (
 
-
-
- <div className="w-auto flex flex-col sm:flex-row items-center my-4 mb-10 gap-3">
             <Button
               href="#reserve"
               variant='primary'
             >
               {t(tab.button)}
             </Button>
-          </div>
-
             )}
    </div>
           </div>
