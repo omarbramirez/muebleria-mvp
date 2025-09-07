@@ -8,27 +8,11 @@ export const routing = defineRouting({
   // Used when no locale matches
   defaultLocale: "es",
   pathnames: {
-  "/#top": {
-    es: "/#top",
-    en: "/#top"
-  },
-  "/#how": {
-    es: "/#how",
-    en: "/#how"
-  },
-  "/#catalog": {
-    es: "/#catalog",
-    en: "/#catalog"
-  },
-  "/#reserve": {
-    es: "/#reserve",
-    en: "/#reserve"
-  },
-  "/politicas": {
+  "/policies": {
     es: "/politicas",
     en: "/policies"
   },
-  "/terminos": {
+  "/terms": {
     es: "/terminos",
     en: "/terms"
   }

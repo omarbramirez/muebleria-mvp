@@ -24,13 +24,23 @@ export default function Footer() {
                 <ul aria-labelledby={section.section} className="space-y-2">
                   {section.links.map((link) => (
                     <li key={`${link.href}`}>
-                      <a className="text-primary"
+                      {link.href.includes("#") ? (
+                        <LinkItem as="a" className="text-primary"
                         href={`${link.href}`}
                       >
                         {t(link.name)} {/* label traducido */}
-                      </a>
+                      </LinkItem>
+                      ) : (
+<LinkItem as="a" className="text-primary"
+                        href={`${link.href}`}
+                      >
+                        {t(link.name)} {/* label traducido */}
+                      </LinkItem>
+                      )
+
+                      }
                     </li>
-                  ))}
+                  ))} 
                 </ul>
               </div>
             ))}

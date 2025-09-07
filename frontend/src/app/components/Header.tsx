@@ -23,7 +23,7 @@ const Header = () => {
   {t('description')}
 </Paragraph>
 
-            <Button
+            <Button as="a"
               href="/#reserve"
               variant='secondary'
             >

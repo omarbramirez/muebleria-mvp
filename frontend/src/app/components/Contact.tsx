@@ -6,6 +6,7 @@ import { ContactForm } from "./ContactForm";
 import { useState } from 'react';
 import { Heading } from '@/app/components/ui/Heading';
 import { Paragraph } from '@/app/components/ui/Paragraph';
+import { Button } from '@/app/components/ui/Button';
 
 const Contact = () => {
   const t = useTranslations("contact");
@@ -41,7 +42,8 @@ const Contact = () => {
         <div className="flex justify-center mt-8 mb-6">
           <div className="inline-flex rounded-md shadow-sm" role="group">
             {tabs.map((tab) => (
-              <button
+              <Button
+              as= "button"
                 key={tab.id}
                 type="button"
                 className={`px-4 py-2 text-sm font-medium  ${
@@ -52,7 +54,7 @@ const Contact = () => {
                  onClick={() => setActiveTab(tab.id as "clients" | "providers")}
               >
                 {tab.label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

@@ -94,7 +94,7 @@ function NewsletterForm({}: Props) {
 
             {/* Botón */}
 
- <Button type="submit" variant="secondary">
+ <Button as="button" type="submit" variant="secondary">
                 {loading ? t("button.loading") : t("button.idle")}
               </Button>
 

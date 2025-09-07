@@ -6,7 +6,6 @@ import { Heading } from '@/app/components/ui/Heading';
 import Image from 'next/image'
 import { Paragraph } from '@/app/components/ui/Paragraph';
 import { Button } from '@/app/components/ui/Button';
-
 const TabMenu: React.FC = () => {
   const [activeTab, setActiveTab] = useState(tabs[0].id);
 const t = useTranslations('tab_menu');
@@ -19,7 +18,7 @@ const t = useTranslations('tab_menu');
   const Icon = tab.icon;
 
   return (
-    <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex flex-col items-center justify-center p-4 w-54 h-34 rounded-lg shadow-md transition-colors duration-200a text-foreground hover:text-foreground-white ${isActive ? " text-foreground-white bg-secondary" : "  hover:bg-primary border border-primary "}`} >
+    <Button as="button" key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex flex-col items-center justify-center p-4 !w-54 !h-34 rounded-lg shadow-md transition-colors duration-200a text-foreground hover:text-foreground-white ${isActive ? " text-foreground-white bg-secondary" : "  hover:bg-primary border border-primary "}`} >
 
 
 
@@ -30,7 +29,7 @@ const t = useTranslations('tab_menu');
 
       <Icon className={isActive ? "text-primary" : "text-secondary"} />
       {t(tab.label)}
-    </button>
+    </Button>
   )
 })}
 
@@ -54,6 +53,7 @@ const t = useTranslations('tab_menu');
             {t(tab.link) && (
 
             <Button
+            as="a"
               href="/#reserve"
               variant='primary'
             >
