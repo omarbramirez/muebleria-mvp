@@ -14,9 +14,9 @@ const Navbar = () => {
 
   return (
     <nav className="w-full fixed top-0 left-0 z-50 flex items-center justify-between px-6 py-4 shadow-md bg-background-light">
-      <a href="/#top" className="w-1/2 flex cursor-pointer !text-black">
+      <LinkItem as="a" href="/#top" className="w-1/2 flex cursor-pointer !text-black !text-start !justify-start">
         LOGO
-      </a>
+      </LinkItem>
 
       {/* Desktop Menu */}
       <div className="flex items-center justify-between">
