@@ -45,12 +45,20 @@ export function LinkItem(props: LinkItemProps) {
     );
   }
 
-  // Caso 2: as="button" | "span" (o sin `as`, default button/span)
-  const { as = "button", ...htmlProps } = rest;
-  const Component = as;
+if (props.as === "a") {
+  const { as, ...anchorProps } = props;
   return (
-    <Component {...(htmlProps as any)} className={classes}>
+    <a {...anchorProps} className={classes}>
       {children}
-    </Component>
+    </a>
   );
 }
+
+if (props.as === "button") {
+  const { as, ...buttonProps } = props;
+  return (
+    <button {...buttonProps} className={classes}>
+      {children}
+    </button>
+  );
+}}

@@ -74,7 +74,7 @@ export function Button(props: ButtonProps) {
     const { as, ...linkProps } = props;
     return (
       <HoveringAnimation className="w-1/3 flex flex-col sm:flex-row items-center justify-center my-4 mb-10 mx-auto sm:mx-0 ">
-        <Link {...(linkProps as any)} className={classes} aria-busy={loading || undefined}>
+        <Link {...linkProps} className={classes} aria-busy={loading || undefined}>
           {loading ? <Spinner /> : leftIcon && <span className="mr-1.5">{leftIcon}</span>}
           <span>{children}</span>
           {rightIcon && <span className="ml-1.5">{rightIcon}</span>}
@@ -88,7 +88,7 @@ export function Button(props: ButtonProps) {
     const { as, ...anchorProps } = props;
     return (
       <HoveringAnimation className="w-1/3 flex flex-col sm:flex-row items-center justify-center my-4 mb-10 mx-auto sm:mx-0 ">
-        <a {...(anchorProps as any)} className={classes} aria-busy={loading || undefined}>
+        <a {...anchorProps} className={classes} aria-busy={loading || undefined}>
           {loading ? <Spinner /> : leftIcon && <span className="mr-1.5">{leftIcon}</span>}
           <span>{children}</span>
           {rightIcon && <span className="ml-1.5">{rightIcon}</span>}
@@ -98,7 +98,7 @@ export function Button(props: ButtonProps) {
   }
 
   // --- Caso 3: <button> real (default) ---
-  const { as, ...buttonProps } = props;
+  const { as: _ignore, ...buttonProps } = props;
 
  return (
     <HoveringAnimation className="w-1/3 flex flex-col sm:flex-row items-center justify-center my-4 mb-10 mx-auto sm:mx-0">
