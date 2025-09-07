@@ -37,9 +37,9 @@ export function LinkItem(props: LinkItemProps) {
 
   // Caso 1: forzamos uso de Link
   if (props.as === "link") {
-    const { as, ...linkProps } = rest;
+    const { as, ...linkProps } = props;
     return (
-      <Link {...(linkProps as any)} className={classes}>
+      <Link {...linkProps} className={classes}>
         {children}
       </Link>
     );

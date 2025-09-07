@@ -64,15 +64,14 @@ export function Button(props: ButtonProps) {
     leftIcon,
     rightIcon,
     className,
-    children,
-    ...rest
+    children
   } = props;
 
   const classes = cn(base, byVariant[variant], bySize[size], className);
 
   // --- Caso 1: <Link> interno ---
   if (props.as === 'link') {
-    const { as, ...linkProps } = rest;
+    const { as, ...linkProps } = props;
     return (
       <HoveringAnimation className="w-1/3 flex flex-col sm:flex-row items-center justify-center my-4 mb-10 mx-auto sm:mx-0 ">
         <Link {...(linkProps as any)} className={classes} aria-busy={loading || undefined}>
@@ -86,7 +85,7 @@ export function Button(props: ButtonProps) {
 
   // --- Caso 2: <a> nativo ---
   if (props.as === 'a') {
-    const { as, ...anchorProps } = rest;
+    const { as, ...anchorProps } = props;
     return (
       <HoveringAnimation className="w-1/3 flex flex-col sm:flex-row items-center justify-center my-4 mb-10 mx-auto sm:mx-0 ">
         <a {...(anchorProps as any)} className={classes} aria-busy={loading || undefined}>
@@ -99,16 +98,16 @@ export function Button(props: ButtonProps) {
   }
 
   // --- Caso 3: <button> real (default) ---
-  const { as, type = 'button', disabled, ...buttonRest } = rest as any;
+  const { as, ...buttonProps } = props;
 
-  return (
-    <HoveringAnimation className="w-1/3 flex flex-col sm:flex-row items-center justify-center my-4 mb-10 mx-auto sm:mx-0 ">
+ return (
+    <HoveringAnimation className="w-1/3 flex flex-col sm:flex-row items-center justify-center my-4 mb-10 mx-auto sm:mx-0">
       <button
-        type={type}
+        {...buttonProps}
+        type={buttonProps.type ?? "button"}
         className={classes}
-        disabled={disabled || loading}
+        disabled={buttonProps.disabled || loading}
         aria-busy={loading || undefined}
-        {...buttonRest}
       >
         {loading ? <Spinner /> : leftIcon && <span className="mr-1.5">{leftIcon}</span>}
         <span>{children}</span>
