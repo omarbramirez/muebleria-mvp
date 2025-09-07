@@ -71,7 +71,7 @@ export function Button(props: ButtonProps) {
 
   // --- Caso 1: <Link> interno ---
   if (props.as === 'link') {
-    const { as, ...linkProps } = props;
+    const { as: _ignore, ...linkProps } = props;
     return (
       <HoveringAnimation className="w-1/3 flex flex-col sm:flex-row items-center justify-center my-4 mb-10 mx-auto sm:mx-0 ">
         <Link {...linkProps} className={classes} aria-busy={loading || undefined}>
@@ -85,7 +85,7 @@ export function Button(props: ButtonProps) {
 
   // --- Caso 2: <a> nativo ---
   if (props.as === 'a') {
-    const { as, ...anchorProps } = props;
+    const { as: _ignore, ...anchorProps } = props;
     return (
       <HoveringAnimation className="w-1/3 flex flex-col sm:flex-row items-center justify-center my-4 mb-10 mx-auto sm:mx-0 ">
         <a {...anchorProps} className={classes} aria-busy={loading || undefined}>
