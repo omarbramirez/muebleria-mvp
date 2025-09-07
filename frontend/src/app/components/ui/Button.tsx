@@ -76,42 +76,64 @@ export function Button(props: ButtonProps) {
 
     // Si es Link (href)
   if ('href' in props && typeof props.href === 'string') {
-    const { href, prefetch, replace, scroll, shallow, locale } = props;
+        const { href, prefetch, replace, scroll, shallow, locale } = props;
+        const isAnchorLink = href.startsWith('/#');
+
+        // Contenido del botón (íconos, texto)
+        const buttonContent = (
+            <>
+                {loading ? <Spinner /> : leftIcon ? <span className="mr-1.5">{leftIcon}</span> : null}
+                <span>{children}</span>
+                {rightIcon ? <span className="ml-1.5">{rightIcon}</span> : null}
+            </>
+        );
+
+        return (
+            <HoveringAnimation className="w-1/3 flex flex-col sm:flex-row items-center justify-center my-4 mb-10 mx-auto sm:mx-0">
+                {isAnchorLink ? (
+                    // Renderiza <a> si es un ancla
+                    <a
+                        href={href}
+                        className={classes}
+                        aria-busy={loading || undefined}
+                    >
+                        {buttonContent}
+                    </a>
+                ) : (
+                    // Renderiza el componente Link de next-intl para otros enlaces
+                    <Link
+                        href={href}
+                        prefetch={prefetch}
+                        replace={replace}
+                        scroll={scroll}
+                        shallow={shallow}
+                        locale={locale}
+                        className={classes}
+                        aria-busy={loading || undefined}
+                    >
+                        {buttonContent}
+                    </Link>
+                )}
+            </HoveringAnimation>
+        );
+    }
+
+    // Si es <button>
+    const { type = 'button', disabled, ...buttonRest } = rest as ButtonAsButton;
+
     return (
-       <HoveringAnimation className="w-1/3 flex flex-col  sm:flex-row items-center justify-center my-4 mb-10  mx-auto sm:mx-0 ">
-      <Link
-        href={href}
-        prefetch={prefetch}
-        replace={replace}
-        scroll={scroll}
-        shallow={shallow}
-        className={classes}
-        aria-busy={loading || undefined}
-      >
-        {loading ? <Spinner /> : leftIcon ? <span className="mr-1.5">{leftIcon}</span> : null}
-        <span>{children}</span>
-        {rightIcon ? <span className="ml-1.5">{rightIcon}</span> : null}
-      </Link>
-       </HoveringAnimation>
+        <HoveringAnimation className="w-1/3 flex flex-col sm:flex-row items-center justify-center my-4 mb-10 mx-auto">
+            <button
+                type={type}
+                className={classes}
+                disabled={disabled || loading}
+                aria-busy={loading || undefined}
+                {...buttonRest}
+            >
+                {loading ? <Spinner /> : leftIcon ? <span className="mr-1.5">{leftIcon}</span> : null}
+                <span>{children}</span>
+                {rightIcon ? <span className="ml-1.5">{rightIcon}</span> : null}
+            </button>
+        </HoveringAnimation>
     );
-  }
-
-  // Si es <button>
-  const { type = 'button', disabled, ...buttonRest } = rest as ButtonAsButton;
-
-  return (
-           <HoveringAnimation className="w-1/3 flex flex-col  sm:flex-row items-center justify-center my-4 mb-10  mx-auto ">
-    <button
-      type={type}
-      className={classes}
-      disabled={disabled || loading}
-      aria-busy={loading || undefined}
-      {...buttonRest}
-    >
-      {loading ? <Spinner /> : leftIcon ? <span className="mr-1.5">{leftIcon}</span> : null}
-      <span>{children}</span>
-      {rightIcon ? <span className="ml-1.5">{rightIcon}</span> : null}
-    </button>
-    </HoveringAnimation>
-  );
 }
