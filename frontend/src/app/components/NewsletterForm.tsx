@@ -8,7 +8,7 @@ import { Heading } from "@/app/components/ui/Heading";
 import { Paragraph } from "@/app/components/ui/Paragraph";
 import { Button } from "@/app/components/ui/Button";
 import { useTranslations } from "next-intl";
-
+import { SlidingUpAnimation, RevealingAnimation, ScalingFadeInAnimation } from '@/app/components/animations/animations'
 type Props = Record<string, never>;
 
 const requiredSchema = Yup.object({
@@ -29,6 +29,9 @@ function NewsletterForm({}: Props) {
       className="w-full h-screen px-8 mx-auto bg-primary flex items-center justify-center flex-col"
     >
       <div className="max-w-3xl flex flex-col gap-4 mx-auto">
+        <ScalingFadeInAnimation>
+
+        
         <Heading
           as="h1"
           variant="primaryLight"
@@ -37,7 +40,7 @@ function NewsletterForm({}: Props) {
         >
           {t("title")}
         </Heading>
-
+</ScalingFadeInAnimation>
         <Heading
           as="h3"
           variant="secondary"

@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Heading } from '@/app/components/ui/Heading';
 import { Paragraph } from '@/app/components/ui/Paragraph';
 import { Button } from '@/app/components/ui/Button';
+import { SlidingUpAnimation, RevealingAnimation, ScalingFadeInAnimation } from '@/app/components/animations/animations'
 
 const Contact = () => {
   const t = useTranslations("contact");
@@ -30,7 +31,10 @@ const Contact = () => {
         className="w-full px-8 mx-auto h-full bg-primary"
       >
         <div className="max-w-3xl flex flex-col gap-4 mx-auto">
+          <ScalingFadeInAnimation>
+
           <Heading as="h1" variant="primaryLight" size='lg' hierarchy='forSection'>{t(`tabs.${activeTab}.title`)}</Heading>
+          </ScalingFadeInAnimation>
          
               <Heading as='h3' variant='secondary' size='md' className='!text-center my-1'>{t(`tabs.${activeTab}.call_to_action`)}</Heading>
           <Paragraph variant="primaryWhite" size="md" className='!text-center'>
@@ -42,8 +46,7 @@ const Contact = () => {
         <div className="flex justify-center mt-8 mb-6">
           <div className="inline-flex rounded-md shadow-sm" role="group">
             {tabs.map((tab) => (
-              <Button
-              as= "button"
+              <button
                 key={tab.id}
                 type="button"
                 className={`px-4 py-2 text-sm font-medium  ${
@@ -54,7 +57,7 @@ const Contact = () => {
                  onClick={() => setActiveTab(tab.id as "clients" | "providers")}
               >
                 {tab.label}
-              </Button>
+              </button>
             ))}
           </div>
         </div>

@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { Heading } from '@/app/components/ui/Heading';
 import { Paragraph } from '@/app/components/ui/Paragraph';
 import { categories } from '@/app/assets/assets';
+import { SlidingUpAnimation, RevealingAnimation, ScalingFadeInAnimation } from '@/app/components/animations/animations'
 
 const ProductGrid: React.FC = () => {
   const t = useTranslations('product_grid');
@@ -10,9 +11,12 @@ const ProductGrid: React.FC = () => {
   return (
     <div id="catalog" className="w-full px-8 mx-auto h-full bg-primary">
       <div className="max-w-3xl flex flex-col gap-4 mx-auto">
+        <ScalingFadeInAnimation>
+
         <Heading as="h1" variant="primaryLight" size='lg' hierarchy='forSection'>
           {t('title')}
         </Heading>
+        </ScalingFadeInAnimation>
         <Heading as='h3' variant='secondary' size='md' className='!text-center my-1'>
           {t('call_to_action')}
         </Heading>

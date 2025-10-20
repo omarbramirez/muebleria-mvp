@@ -19,7 +19,7 @@ export default function Footer() {
                   variant="primaryLight"
                   size="sm"
                   hierarchy="forContent"
-                  className=" !text-center my-1"
+                  className=" text-center sm:text-right my-1"
                 >{t(section.section)}</Heading>
                 <ul aria-labelledby={section.section} className="space-y-2">
                   {section.links.map((link) => (

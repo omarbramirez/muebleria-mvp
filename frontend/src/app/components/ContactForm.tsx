@@ -5,8 +5,6 @@ import { ContactFormProps } from '@/types/index';
 import { Button } from '@/app/components/ui/Button';
 import { Paragraph } from '@/app/components/ui/Paragraph';
 import { useEffect } from "react";
-import { HoveringAnimation } from '@/app/components/animations/animations'
-
 
 export const ContactForm: React.FC<ContactFormProps> = ({
   register,
