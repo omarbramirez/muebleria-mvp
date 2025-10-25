@@ -6,6 +6,7 @@ import { ResponsiveMenu } from '@/app/components/ui/ResponsiveMenu';
 import { Menu, X } from "lucide-react";
 import LocaleSwitcher from "@/app/components/LocaleSwitcher";
 import { NAVBAR_ITEMS } from "@/config/assets";
+import {LinkVariant} from "@/types/index";
 
 const Navbar = () => {
   const t = useTranslations("navbar");
@@ -20,12 +21,15 @@ const Navbar = () => {
       {/* Desktop Menu */}
       <div className="flex items-center justify-between">
       <ul className="hidden sm:flex flex-1 justify-end gap-4" >
-        {NAVBAR_ITEMS.map((item)=> (
-                      <li key={item.key}>
-              <LinkItem as="a" href={item.href} variant={item.variant}>
+        {NAVBAR_ITEMS.map((item)=> {
+          const variant = item.variant
+          return(
+                                  <li key={item.key}>
+              <LinkItem as="a" href={item.href} variant={variant as LinkVariant}>
                 {t(item.key)}
               </LinkItem>
               </li>
+          )
         ))}
       </ul>
       <LocaleSwitcher />

@@ -5,7 +5,7 @@ import { Link } from "@/i18n/navigation";
 export type LinkVariant = "primary" | "secondary" | "muted";
 
 interface CommonProps {
-  variant?: LinkVariant | string;
+  variant?: LinkVariant;
   size?: Size;
   className?: string;
   children: React.ReactNode;
