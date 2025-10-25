@@ -50,6 +50,18 @@
   --font-body: var(--font-body);
 }
 
+textarea {
+  border: 2px solid var(--color-secondary); /* Sets a 2px solid blue border */
+}
+
+
+#ia-model-creator{
+  display: flex;
+  flex-direction: column;
+  margin: 10px auto;
+  color: var(--color-primary);
+}
+
 
 
 /* Resets y estilos base */

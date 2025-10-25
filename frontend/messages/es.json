@@ -1,12 +1,12 @@
 {
-    "locale_switcher":{
+    "locale_switcher": {
         "label": "Elige tu idioma"
     },
     "navbar": {
         "home": "Inicio",
         "how_it_works": "Cómo funciona",
-        "catalog": "Catálogo",
-        "reserve": "Reservar"
+        "search": "Buscar",
+        "explore": "Explorar"
     },
     "header": {
         "call_to_action": "Reserva ahora",
@@ -110,20 +110,139 @@
         },
         "success": "Te has suscrito con éxito 🎉"
     },
+  "explore": {
+    "wizard": {
+      "roomType": {
+        "title": "¿Qué espacio o tipo de producto te interesa optimizar?",
+        "tag": "Estancia",
+        "description": "Cuéntanos qué área de tu hogar o proyecto deseas transformar. Te mostraremos ideas y productos diseñados para adaptarse a tus necesidades.",
+        "options": {
+          "1": {
+            "title": "Cocina",
+            "description": "Organiza, decora y optimiza cada rincón: desde módulos modulares hasta soluciones de iluminación y almacenamiento."
+          },
+          "2": {
+            "title": "Baño",
+            "description": "Convierte tu baño en un espacio funcional y relajante, con combinaciones que equilibran confort y estética."
+          },
+          "3": {
+            "title": "Sala / Comedor",
+            "description": "Crea un ambiente acogedor para compartir y disfrutar, con piezas que reflejan tu estilo de vida."
+          },
+          "4": {
+            "title": "Oficina / Estudio",
+            "description": "Diseña un entorno que potencie tu concentración y creatividad, optimizando espacio y ergonomía."
+          },
+          "5": {
+            "title": "Otro",
+            "description": "Selecciona esta opción si buscas soluciones para otro tipo de espacio o deseas una recomendación más abierta."
+          }
+        }
+      },
+
+      "budget": {
+        "title": "¿Cuál es tu rango aproximado de presupuesto?",
+        "tag": "Presupuesto",
+        "description": "Selecciona el rango que más se acerque a tu inversión planeada. Te ayudaremos a encontrar productos que equilibren calidad y costo.",
+        "options": {
+          "1": {
+            "title": "Menos de $2,000 MXN",
+            "description": "Pequeños cambios con gran impacto. Ideal para accesorios o detalles de acento."
+          },
+          "2": {
+            "title": "Entre $2,000 y $6,000 MXN",
+            "description": "Opciones equilibradas para renovar áreas completas sin comprometer el estilo."
+          },
+          "3": {
+            "title": "Más de $6,000 MXN",
+            "description": "Transformaciones integrales con materiales premium y diseños personalizados."
+          }
+        }
+      },
+
+      "style": {
+        "title": "¿Qué estilo prefieres?",
+        "tag": "Estilo",
+        "description": "Tu estilo define el carácter del espacio. Elige el que mejor refleje tu personalidad y forma de habitar.",
+        "options": {
+          "1": {
+            "title": "Clásico",
+            "description": "Formas elegantes, simetría y materiales nobles que nunca pasan de moda."
+          },
+          "2": {
+            "title": "Moderno",
+            "description": "Líneas limpias, superficies lisas y una estética centrada en la funcionalidad."
+          },
+          "3": {
+            "title": "Contemporáneo",
+            "description": "Equilibrio entre tendencia y atemporalidad, con un enfoque versátil y dinámico."
+          },
+          "4": {
+            "title": "Minimalista",
+            "description": "Menos es más: espacios despejados y armonía visual con un toque de calma."
+          },
+          "5": {
+            "title": "Industrial",
+            "description": "Texturas expuestas, metales y madera en contraste para una personalidad audaz y urbana."
+          }
+        }
+      },
+
+      "color": {
+        "title": "¿Qué paleta de color prefieres?",
+        "tag": "Color",
+        "description": "Los tonos que elijas determinarán la atmósfera del espacio. Selecciona según la sensación que quieras proyectar.",
+        "options": {
+          "1": {
+            "title": "Tonos claros",
+            "description": "Amplían visualmente los espacios y aportan una sensación de luminosidad y calma."
+          },
+          "2": {
+            "title": "Tonos oscuros",
+            "description": "Transmiten elegancia, profundidad y carácter. Perfectos para ambientes sofisticados."
+          },
+          "3": {
+            "title": "Neutros y naturales",
+            "description": "Combinaciones suaves que armonizan con cualquier estilo y resaltan la textura de los materiales."
+          }
+        }
+      },
+
+      "materials": {
+        "title": "¿Qué materiales prefieres?",
+        "tag": "Materiales",
+        "description": "Selecciona los materiales que más se alinean con tu estilo y el mantenimiento que deseas.",
+        "options": {
+          "1": {
+            "title": "Madera y piedra",
+            "description": "Acabados cálidos y naturales que aportan textura y sensación de hogar."
+          },
+          "2": {
+            "title": "Metal y vidrio",
+            "description": "Combinación moderna, ideal para diseños limpios y de alta durabilidad."
+          },
+          "3": {
+            "title": "Laminados o compuestos",
+            "description": "Prácticos, resistentes y con múltiples acabados visuales para personalización."
+          }
+        }
+      }
+    }
+  },
     "footer": {
         "contact": "Contacto",
         "privacy_policy": "Política de privacidad",
         "terms": "Términos y condiciones"
     },
-     "policies": {
-    "title": "Aviso de Privacidad",
-    "content":"Estimados clientes y visitantes de {empresa}:\n\nEn {empresa} entendemos la importancia de proteger los datos personales de nuestros clientes y visitantes (en lo sucesivo “Los Titulares”), por lo cual nos comprometemos a tratarlos de manera lícita, confidencial y con apego a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares y demás normatividad aplicable.\n\nRESPONSABLE DEL TRATAMIENTO\n{empresaLegal}, con domicilio en {domicilioEmpresa}, es responsable de recabar, usar y proteger los datos personales de Los Titulares.\n\nCONSENTIMIENTO DEL TITULAR\nSe considerará que Los Titulares han otorgado su consentimiento si no manifiestan oposición expresa al presente Aviso.\n\nDATOS PERSONALES SUJETOS AL TRATAMIENTO\nPodemos recabar datos como: nombre completo, correo electrónico, teléfono, dirección, RFC (para facturación), datos de pago, así como información de acceso a {sitioWeb}. No recabamos datos sensibles salvo que sean estrictamente necesarios para la prestación de servicios.\n\nFINES DEL TRATAMIENTO\nLos datos podrán ser utilizados para:\n1) Prestación de servicios y comercialización de productos de {empresa}.\n2) Creación y administración de cuentas en {sitioWeb}.\n3) Procesamiento de pedidos, pagos y facturación.\n4) Atención a clientes (quejas, dudas, devoluciones).\n5) Cumplimiento de obligaciones legales.\n\nDe forma secundaria, podremos usar los datos para enviar promociones, encuestas, invitaciones a eventos y publicidad relacionada con {empresa}.\n\nTRANSFERENCIA DE DATOS\nLos datos podrán compartirse con:\n- Socios comerciales y proveedores autorizados para la prestación de servicios.\n- Instituciones bancarias para procesar pagos.\n- Autoridades competentes cuando lo exija la ley.\n\nDERECHOS ARCO\nLos Titulares pueden ejercer sus derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO) enviando un correo a {correoDatosPersonales}.\n\nMODIFICACIONES\n{empresa} podrá modificar este Aviso en cualquier momento. Las actualizaciones se publicarán en {sitioWeb}.\n\nCONTACTO\n📧 {correoDatosPersonales}\n📍 {domicilioEmpresa}"
-  },
+    "policies": {
+        "title": "Aviso de Privacidad",
+        "content": "Estimados clientes y visitantes de {empresa}:\n\nEn {empresa} entendemos la importancia de proteger los datos personales de nuestros clientes y visitantes (en lo sucesivo “Los Titulares”), por lo cual nos comprometemos a tratarlos de manera lícita, confidencial y con apego a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares y demás normatividad aplicable.\n\nRESPONSABLE DEL TRATAMIENTO\n{empresaLegal}, con domicilio en {domicilioEmpresa}, es responsable de recabar, usar y proteger los datos personales de Los Titulares.\n\nCONSENTIMIENTO DEL TITULAR\nSe considerará que Los Titulares han otorgado su consentimiento si no manifiestan oposición expresa al presente Aviso.\n\nDATOS PERSONALES SUJETOS AL TRATAMIENTO\nPodemos recabar datos como: nombre completo, correo electrónico, teléfono, dirección, RFC (para facturación), datos de pago, así como información de acceso a {sitioWeb}. No recabamos datos sensibles salvo que sean estrictamente necesarios para la prestación de servicios.\n\nFINES DEL TRATAMIENTO\nLos datos podrán ser utilizados para:\n1) Prestación de servicios y comercialización de productos de {empresa}.\n2) Creación y administración de cuentas en {sitioWeb}.\n3) Procesamiento de pedidos, pagos y facturación.\n4) Atención a clientes (quejas, dudas, devoluciones).\n5) Cumplimiento de obligaciones legales.\n\nDe forma secundaria, podremos usar los datos para enviar promociones, encuestas, invitaciones a eventos y publicidad relacionada con {empresa}.\n\nTRANSFERENCIA DE DATOS\nLos datos podrán compartirse con:\n- Socios comerciales y proveedores autorizados para la prestación de servicios.\n- Instituciones bancarias para procesar pagos.\n- Autoridades competentes cuando lo exija la ley.\n\nDERECHOS ARCO\nLos Titulares pueden ejercer sus derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO) enviando un correo a {correoDatosPersonales}.\n\nMODIFICACIONES\n{empresa} podrá modificar este Aviso en cualquier momento. Las actualizaciones se publicarán en {sitioWeb}.\n\nCONTACTO\n📧 {correoDatosPersonales}\n📍 {domicilioEmpresa}"
+    },
     "terms": {
-  "title": "Términos y Condiciones",
-  "content": "Bienvenido a {empresa}.\n\nAl utilizar nuestro sitio web {sitioWeb}, aceptas estos Términos y Condiciones. Si no estás de acuerdo, por favor no uses el sitio ni proporciones tus datos.\n\nI. Disposiciones generales\n{empresaLegal}, con domicilio en {domicilioEmpresa}, opera este sitio web {sitioWeb}. Este sitio tiene como fin ofrecer información sobre nuestros productos y servicios, así como oportunidades de contacto y generación de prospectos.\n\nTodos los contenidos, incluyendo textos, imágenes, logotipos y marcas, son propiedad de {empresaLegal} y están protegidos por la ley. No se permite su reproducción o uso sin autorización.\n\nII. Obligaciones del usuario\n- Proporcionar información veraz y completa en los formularios del sitio.\n- No difundir virus, malware o contenidos ilegales.\n- No utilizar información de terceros sin autorización.\n- Usar el sitio únicamente con fines legales y conforme a la buena fe.\n\nIII. Uso de datos personales\nEl uso de tus datos personales se rige por nuestro Aviso de Privacidad. Al enviar tus datos a través del sitio, aceptas que los procesemos para fines de contacto, envío de información y generación de prospectos.\n\nIV. Modificaciones\n{empresa} puede actualizar estos Términos y Condiciones en cualquier momento. Las modificaciones se publicarán en {sitioWeb} y serán efectivas a partir de su publicación.\n\nV. Contacto\nPara cualquier duda o comentario sobre estos Términos y Condiciones, puedes contactarnos a {correoContacto}."
-},
-    "sitemap":{
+        "title": "Términos y Condiciones",
+        "content": "Bienvenido a {empresa}.\n\nAl utilizar nuestro sitio web {sitioWeb}, aceptas estos Términos y Condiciones. Si no estás de acuerdo, por favor no uses el sitio ni proporciones tus datos.\n\nI. Disposiciones generales\n{empresaLegal}, con domicilio en {domicilioEmpresa}, opera este sitio web {sitioWeb}. Este sitio tiene como fin ofrecer información sobre nuestros productos y servicios, así como oportunidades de contacto y generación de prospectos.\n\nTodos los contenidos, incluyendo textos, imágenes, logotipos y marcas, son propiedad de {empresaLegal} y están protegidos por la ley. No se permite su reproducción o uso sin autorización.\n\nII. Obligaciones del usuario\n- Proporcionar información veraz y completa en los formularios del sitio.\n- No difundir virus, malware o contenidos ilegales.\n- No utilizar información de terceros sin autorización.\n- Usar el sitio únicamente con fines legales y conforme a la buena fe.\n\nIII. Uso de datos personales\nEl uso de tus datos personales se rige por nuestro Aviso de Privacidad. Al enviar tus datos a través del sitio, aceptas que los procesemos para fines de contacto, envío de información y generación de prospectos.\n\nIV. Modificaciones\n{empresa} puede actualizar estos Términos y Condiciones en cualquier momento. Las modificaciones se publicarán en {sitioWeb} y serán efectivas a partir de su publicación.\n\nV. Contacto\nPara cualquier duda o comentario sobre estos Términos y Condiciones, puedes contactarnos a {correoContacto}."
+    },
+    "sitemap": {
         "main_pages": "Páginas principales",
         "resources": "Recursos"
     }

@@ -14,9 +14,9 @@ export const sitemap: SitemapSection[] = [
     section: "sitemap.main_pages",
     links: [
       { name: "navbar.home", href: "/#top" },
-      { name: "navbar.how_it_works", href: "/#about" },
-      { name: "navbar.catalog", href: "/#catalog" },
-      { name: "navbar.reserve", href: "/#reserve" },
+      { name: "navbar.how_it_works", href: "/#how" },
+      { name: "navbar.search", href: "/products" },
+      { name: "navbar.explore", href: "/explore" },
     ],
   },
   // {

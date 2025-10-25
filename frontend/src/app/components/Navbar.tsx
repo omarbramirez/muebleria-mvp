@@ -1,12 +1,11 @@
 "use client";
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import { LinkItem } from "@/app/components/ui/LinkItem";
 import { ResponsiveMenu } from '@/app/components/ui/ResponsiveMenu';
 import { Menu, X } from "lucide-react";
-
 import LocaleSwitcher from "@/app/components/LocaleSwitcher";
+import { NAVBAR_ITEMS } from "@/config/assets";
 
 const Navbar = () => {
   const t = useTranslations("navbar");
@@ -21,10 +20,13 @@ const Navbar = () => {
       {/* Desktop Menu */}
       <div className="flex items-center justify-between">
       <ul className="hidden sm:flex flex-1 justify-end gap-4" >
-        <li><LinkItem as="a" href="/#top">{t("home")}</LinkItem></li>
-        <li><LinkItem as="a" href="/#how">{t("how_it_works")}</LinkItem></li>
-        <li><LinkItem as="a" href="/#catalog">{t("catalog")}</LinkItem></li>
-        <li><LinkItem as="a" variant="secondary" href="/#reserve">{t("reserve")}</LinkItem></li>
+        {NAVBAR_ITEMS.map((item)=> (
+                      <li key={item.key}>
+              <LinkItem as="a" href={item.href} variant={item.variant}>
+                {t(item.key)}
+              </LinkItem>
+              </li>
+        ))}
       </ul>
       <LocaleSwitcher />
       {/* Mobile Menu */}
