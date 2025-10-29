@@ -1,10 +1,7 @@
 
 import Navbar from "@/app/components/Navbar";
 import Header from "@/app/components/Header";
-import TabMenu from "@/app/components/TabMenu";
-import Contact from "@/app/components/Contact";
-import ProductGrid from "@/app/components/ProductGrid";
-import NewsletterForm from "@/app/components/NewsletterForm";
+import ServiceProcess from "@/app/components/ServiceProcess";
 import Footer from "@/app/components/Footer";
 
 
@@ -13,10 +10,7 @@ export default function Home() {
     <div>
       <Navbar/>
       <Header/>
-      <TabMenu/>  
-      <Contact/>
-      <ProductGrid/>      
-      <NewsletterForm/>
+      <ServiceProcess/>  
       <Footer/> 
     </div>
   );

@@ -28,8 +28,8 @@ export function RevealingAnimation({ children, className }: MotionProps) {
             className={classes}
             style={{ overflow: "hidden", whiteSpace: "nowrap" }}
             initial={{ width: 0 }}
-            whileInView={{ width: "80%" }}
-            transition={{ duration: 2, ease: "easeInOut" }}
+            whileInView={{ width: "100%" }}
+            transition={{ duration: 1, ease: "easeInOut" }}
         >
             {children}
         </motion.div>

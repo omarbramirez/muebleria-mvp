@@ -5,13 +5,16 @@ export * from '@/types/ui/paragraph';
 export * from '@/types/ui/common';
 
 
-
+export type ResponsiveMenuProps = {
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 export * from '@/types/forms/contact';
 
 
 
-export * from '@/types/content/tabs';
+export * from '@/types/content/serviceprocess';
 
 
 export * from '@/types/apis/subscribe/route'

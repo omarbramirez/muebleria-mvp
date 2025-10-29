@@ -2,8 +2,6 @@ import logo from './next.svg';
 import choose from './choose.jpg';
 import customize from './customize.jpg';
 import receive from './receive.jpg'
-
-
 import desks from './desks.jpg';
 import chairs from './chairs.jpg';
 import stools from './stools.jpg'
@@ -14,7 +12,15 @@ import shelves from './shelves.jpg'
 import right_arrow_white from './right-arrow-white.png'
 import { MousePointerClick, ChartCandlestick, PackageCheck, LampDesk, Armchair, Spool,ToolCase } from "lucide-react";
 
-import { Tabs } from '@/types/index';
+
+export const NAVBAR_ITEMS = [
+  { key: "home", href: "/#top", variant: "primary" },
+  { key: "how_it_works", href: "/#how", variant: "primary" },
+  { key: "search", href: "/products", variant: "primary" },
+  { key: "explore", href: "/explore", variant: "secondary" },
+];
+
+import { ServiceProcess } from '@/types/index';
 export const assets = {
   logo,
   choose,
@@ -27,37 +33,35 @@ export const assets = {
   right_arrow_white
 }
 
-export const tabs: Tabs[] = [
+export const serviceProcess: ServiceProcess[] = [
   {
     id: 'choose',
-    label: 'tabs.choose.title',
-    call_to_action: 'tabs.choose.call_to_action',
-    title: 'tabs.choose.title',
-    description: 'tabs.choose.description',
-    button: 'tabs.choose.button',
-    link: 'tabs.choose.link',
+    label: 'processes.choose.title',
+    call_to_action: 'processes.choose.call_to_action',
+    title: 'processes.choose.title',
+    description: 'processes.choose.description',
+    button: 'processes.choose.button',
     img: assets.choose,
     icon: MousePointerClick
   },
   {
     id: 'customize',
-    label: 'tabs.customize.title',
-    call_to_action: 'tabs.customize.call_to_action',
-    title: 'tabs.customize.title',
-    description: 'tabs.customize.description',
-    button: 'tabs.customize.button',
-    link: 'tabs.customize.link',
+    label: 'processes.customize.title',
+    call_to_action: 'processes.customize.call_to_action',
+    title: 'processes.customize.title',
+    description: 'processes.customize.description',
+    button: 'processes.customize.button',
     img: assets.customize,
     icon: ChartCandlestick,
   },
   {
     id: 'receive',
-    label: 'tabs.receive.title',
-    call_to_action: 'tabs.receive.call_to_action',
-    title: 'tabs.receive.title',
-    description: 'tabs.receive.description',
-    button: 'tabs.receive.button',
-    link: 'tabs.receive.link',
+    label: 'processes.receive.title',
+    call_to_action: 'processes.receive.call_to_action',
+    title: 'processes.receive.title',
+    description: 'processes.receive.description',
+    button: 'processes.receive.button',
+    link: 'processes.receive.link',
     img: assets.receive,
     icon: PackageCheck,
   },
@@ -88,4 +92,65 @@ export const categories = [
     cover: assets.shelves,
     icon: ToolCase,
     },
+]
+
+
+export const PREFERENCE_WIZARD_ITEMS = [
+    {
+    key: "roomType",
+    completed: false,
+    title: "title",
+    description: "description",
+    options: [
+      { key: "1" },
+      { key: "2" },
+      { key: "3" },
+      { key: "4" },
+      { key: "5" }
+    ]
+  },
+    {
+    key: "budget",
+    completed: false,
+    title: "title",
+    description: "description",
+    options: [
+      { key: "1" },
+      { key: "2" },
+      { key: "3" }
+    ]
+  },
+    {
+    key: "style",
+    completed: false,
+    title: "title",
+    description: "description",
+    options: [
+      { key: "1" },
+      { key: "2" },
+      { key: "3" },
+      { key: "4" },
+      { key: "5" }
+    ]
+  },
+    {
+    key: "color",
+    completed: false,
+    title: "title",
+    description: "description",
+    options: [
+      { key: "1" },
+      { key: "2" }
+    ]
+  },
+    {
+    key: "materials",
+    completed: false,
+    title: "title",
+    description: "description",
+    options: [
+      { key: "1" },
+      { key: "2" }
+    ]
+  }
 ]

@@ -5,7 +5,7 @@ import { LinkItem } from "@/app/components/ui/LinkItem";
 import { ResponsiveMenu } from '@/app/components/ui/ResponsiveMenu';
 import { Menu, X } from "lucide-react";
 import LocaleSwitcher from "@/app/components/LocaleSwitcher";
-import { NAVBAR_ITEMS } from "@/config/assets";
+import { NAVBAR_ITEMS } from "@/app/assets/assets";
 import { LinkVariant } from "@/types/index";
 
 const Navbar = () => {

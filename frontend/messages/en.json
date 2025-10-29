@@ -11,9 +11,9 @@
         "description": "Design, customize and order your furniture online, ready to be manufactured on demand by specialized workshops.",
         "link": "Reserve"
     },
-    "tab_menu": {
+    "process_menu": {
         "title": "How does it work?",
-        "tabs": {
+        "processes": {
             "choose": {
                 "call_to_action": "Explore the catalog",
                 "title": "Choose",
@@ -38,7 +38,7 @@
         }
     },
     "contact": {
-        "tabs": {
+        "user_types": {
             "clients": {
                 "label": "Clients",
                 "title": "Join the presale",

@@ -431,3 +431,19 @@ Entregables Totales (sábado 25 de Octubre):
 1) Desarrollo avanzado del Prototipo navegable de configuradores para optimizar la personalización del usuario, integrado a la página principal en la sección /products.
 ✅ App de renderizado 3D (Three.js) con nuevas funciones de personalización: selección de color y material.
 3) (Extra) Interacción directa dentro del modelo 3D: el usuario podrá mover objetos con el mouse.
+
+## 28 OCT
+
+todavia tengo que regionalizar los links
+![alt text](image-31.png)
+
+
+tengo en navbar y el responsive navbar separados, debo mejorar eso
+
+![alt text](image-32.png)
+
+aun no me queda clara la logica de negocio, es decir, cómo se va a implementar la última parte de la conversión?
+
+![alt text](image-33.png)
+
+porque seria explore/creation explore/generation explore/planner

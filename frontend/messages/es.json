@@ -14,9 +14,10 @@
         "description": "Diseña, personaliza y ordena tus muebles en línea, listos para fabricarse bajo demanda por talleres especializados.",
         "link": "Reserva"
     },
-    "tab_menu": {
+    "process_menu": {
         "title": "¿Cómo funciona?",
-        "tabs": {
+        "link": "Reserva",
+        "processes": {
             "choose": {
                 "call_to_action": "Explora el catálogo",
                 "title": "Elige",
@@ -41,7 +42,7 @@
         }
     },
     "contact": {
-        "tabs": {
+        "user_types": {
             "clients": {
                 "label": "Clientes",
                 "title": "Únete a la preventa",
