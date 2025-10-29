@@ -447,3 +447,13 @@ aun no me queda clara la logica de negocio, es decir, cómo se va a implementar 
 ![alt text](image-33.png)
 
 porque seria explore/creation explore/generation explore/planner
+
+
+COSAS IMPORTANTES
+
+accesibilidad web (a11y) garantiza que personas con discapacidades visuales, auditivas o motrices
+
+TTI (Time To Interactive) mide cuánto tarda una página en estar completamente interactiva después de comenzar a cargar.
+Es una de las Core Web Vitals indirectas, usada para cuantificar la sensación de rapidez.
+El navegador pinta y reacomoda el contenido constantemente cuando cambian estilos o el layout.
+Estos procesos consumen CPU y son la causa principal de micro-lags o baja fluidez visual en UI complejas (animaciones, scroll, 3D, etc.).
