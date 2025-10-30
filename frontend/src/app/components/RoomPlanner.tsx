@@ -1,4 +1,5 @@
 'use client';
+'use client';
 import React, { useState, useCallback } from "react";
 
 const SCALE = 100; // 1 m = 100 px
@@ -20,6 +21,7 @@ const RoomPlanner: React.FC = () => {
     { x: 100, y: 400 },
   ]);
   const [dragging, setDragging] = useState<number | null>(null);
+  const [lastTap, setLastTap] = useState(0);
 
   // --- Calcular área
   const area = Math.abs(
@@ -30,7 +32,7 @@ const RoomPlanner: React.FC = () => {
   );
   const areaM2 = (area / (SCALE * SCALE)).toFixed(2);
 
-  // --- Longitudes
+  // --- Calcular longitudes
   const distances = points.map((p, i) => {
     const next = points[(i + 1) % points.length];
     const dx = next.x - p.x;
@@ -43,39 +45,53 @@ const RoomPlanner: React.FC = () => {
     };
   });
 
-  // --- Iniciar arrastre (unificado)
-  const handlePointerDown = (i: number, e: React.PointerEvent) => {
-    e.preventDefault();
+  // --- Eliminar vértice (acepta MouseEvent, no PointerEvent)
+  const handleDeleteVertex = (i: number, e: React.MouseEvent<SVGCircleElement>) => {
     e.stopPropagation();
-    (e.target as Element).setPointerCapture(e.pointerId);
-    setDragging(i);
+    setPoints(prev => {
+      if (prev.length <= 3) return prev; // mínimo 3 vértices
+      return prev.filter((_, idx) => idx !== i);
+    });
+  };
+
+  // --- Iniciar arrastre o eliminar por doble tap
+  const handlePointerDown = (i: number, e: React.PointerEvent<SVGCircleElement>) => {
+    const currentTime = Date.now();
+    const tapGap = currentTime - lastTap;
+
+    if (tapGap < 300 && tapGap > 0) {
+      // doble tap detectado (táctil o mouse rápido)
+      handleDeleteVertex(i, e as unknown as React.MouseEvent<SVGCircleElement>);
+    } else {
+      setLastTap(currentTime);
+      setDragging(i);
+    }
   };
 
   // --- Terminar arrastre
-  const handlePointerUp = (e: React.PointerEvent) => {
+  const handlePointerUp = (e: React.PointerEvent<SVGSVGElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    (e.target as Element).releasePointerCapture(e.pointerId);
     setDragging(null);
   };
 
   // --- Movimiento con snapping magnético
   const handlePointerMove = useCallback(
-    (e: React.PointerEvent) => {
+    (e: React.PointerEvent<SVGSVGElement>) => {
       if (dragging === null) return;
       e.preventDefault();
+
       const svgRect = e.currentTarget.getBoundingClientRect();
       let x = e.clientX - svgRect.left;
       let y = e.clientY - svgRect.top;
 
-      setPoints((prev) => {
+      setPoints(prev => {
         const newPoints = [...prev];
 
         prev.forEach((p, i) => {
           if (i === dragging) return;
           const dx = Math.abs(p.x - x);
           const dy = Math.abs(p.y - y);
-
           if (dy < SNAP_THRESHOLD) y = p.y;
           if (dx < SNAP_THRESHOLD) x = p.x;
         });
@@ -88,25 +104,16 @@ const RoomPlanner: React.FC = () => {
   );
 
   // --- Añadir vértice en línea
-  const handleAddVertex = (index: number, e: React.PointerEvent) => {
+  const handleAddVertex = (index: number, e: React.PointerEvent<SVGLineElement>) => {
     e.stopPropagation();
     const svgRect = e.currentTarget.closest("svg")!.getBoundingClientRect();
     const x = e.clientX - svgRect.left;
     const y = e.clientY - svgRect.top;
 
-    setPoints((prev) => {
+    setPoints(prev => {
       const newPoints = [...prev];
       newPoints.splice(index + 1, 0, { x, y });
       return newPoints;
-    });
-  };
-
-  // --- Eliminar vértice con doble click / tap
-  const handleDeleteVertex = (i: number, e: React.PointerEvent) => {
-    e.stopPropagation();
-    setPoints((prev) => {
-      if (prev.length <= 3) return prev; // Mantener mínimo 3 vértices
-      return prev.filter((_, idx) => idx !== i);
     });
   };
 
@@ -130,7 +137,7 @@ const RoomPlanner: React.FC = () => {
 
         {/* Polígono principal */}
         <polygon
-          points={points.map((p) => `${p.x},${p.y}`).join(" ")}
+          points={points.map(p => `${p.x},${p.y}`).join(" ")}
           fill="url(#floor)"
           stroke="#555"
           strokeWidth={6}
