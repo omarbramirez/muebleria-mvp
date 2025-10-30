@@ -1,3 +1,4 @@
+
 import logo from './next.svg';
 import choose from './choose.jpg';
 import customize from './customize.jpg';
@@ -6,11 +7,13 @@ import desks from './desks.jpg';
 import chairs from './chairs.jpg';
 import stools from './stools.jpg'
 import shelves from './shelves.jpg'
+import kitchenSet from './kitchenSet.jpg';
+import bathroomSet from './bathroomSet.jpg';
 
 
 
 import right_arrow_white from './right-arrow-white.png'
-import { MousePointerClick, ChartCandlestick, PackageCheck, LampDesk, Armchair, Spool,ToolCase } from "lucide-react";
+import { MousePointerClick, ChartCandlestick, PackageCheck, LampDesk, Armchair, Spool,ToolCase,Bath, CookingPot } from "lucide-react";
 
 
 export const NAVBAR_ITEMS = [
@@ -20,7 +23,7 @@ export const NAVBAR_ITEMS = [
   { key: "explore", href: "/explore", variant: "secondary" },
 ];
 
-import { ServiceProcess } from '@/types/index';
+import { ServiceProcess, SetCategory  } from '@/types/index';
 export const assets = {
   logo,
   choose,
@@ -30,7 +33,9 @@ export const assets = {
   chairs,
   stools,
   shelves,
-  right_arrow_white
+  right_arrow_white,
+  kitchenSet,
+  bathroomSet
 }
 
 export const serviceProcess: ServiceProcess[] = [
@@ -65,6 +70,29 @@ export const serviceProcess: ServiceProcess[] = [
     img: assets.receive,
     icon: PackageCheck,
   },
+];
+
+export const setCategories: SetCategory[] = [
+  {
+    id: 'kitchen',
+    title: 'kitchen.title',
+    description:'kitchen.description',
+    call_to_action: 'kitchen.call_to_action',
+    button: 'kitchen.button',
+    img: assets.kitchenSet, // asegúrate de tener esta imagen
+    icon: CookingPot,
+    link: '/generation'
+  },
+    {
+    id: 'bathroom',
+    title: 'bathroom.title',
+    description:'bathroom.description',
+    call_to_action: 'bathroom.call_to_action',
+    button: 'bathroom.button',
+    img: assets.bathroomSet, // asegúrate de tener esta imagen
+    icon: Bath,
+    link: '/generation'
+  }
 ];
 
 export const categories = [

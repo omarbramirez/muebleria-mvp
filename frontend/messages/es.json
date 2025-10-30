@@ -8,111 +8,14 @@
         "search": "Buscar",
         "explore": "Explorar"
     },
-    "header": {
-        "call_to_action": "Reserva ahora",
+    "pop_ups":{
+      "space_configuration": {
+                "call_to_action": "Reserva ahora",
         "title": "Muebles personalizables en línea",
         "description": "Diseña, personaliza y ordena tus muebles en línea, listos para fabricarse bajo demanda por talleres especializados.",
         "link": "Reserva"
-    },
-    "process_menu": {
-        "title": "¿Cómo funciona?",
-        "link": "Reserva",
-        "processes": {
-            "choose": {
-                "call_to_action": "Explora el catálogo",
-                "title": "Elige",
-                "description": "Selecciona el producto que mejor se adapte a tus necesidades. Explora nuestra gama de opciones y encuentra el diseño perfecto.",
-                "button": "Catálogo",
-                "link": "#"
-            },
-            "customize": {
-                "call_to_action": "Hazlo a tu medida",
-                "title": "Personaliza",
-                "description": "Personaliza tu producto con colores, materiales y detalles únicos para que refleje tu estilo.",
-                "button": "Apuntarme",
-                "link": "#"
-            },
-            "receive": {
-                "call_to_action": "Finaliza tu pedido",
-                "title": "Recibe",
-                "description": "Recibe tu producto personalizado directamente en tu puerta, listo para usar.",
-                "button": "Reservar",
-                "link": "#"
-            }
-        }
-    },
-    "contact": {
-        "user_types": {
-            "clients": {
-                "label": "Clientes",
-                "title": "Únete a la preventa",
-                "call_to_action": "Sé de los primeros en probar nuestro servicio",
-                "description": "Regístrate y te avisaremos en cuanto nuestra plataforma esté lista. Así podrás personalizar y pedir tus muebles antes que nadie."
-            },
-            "providers": {
-                "label": "Proveedores",
-                "title": "Colabora con nosotros",
-                "call_to_action": "Sé parte de nuestra red de proveedores",
-                "description": "Regístrate y te contactaremos para explorar oportunidades de colaboración. Podrás ofrecer tus productos en nuestra plataforma y llegar a clientes interesados en muebles personalizados."
-            }
-        },
-        "form": {
-            "name": "Nombre completo",
-            "email": "Correo electrónico",
-            "message": "Déjanos tus comentarios",
-            "submit": "Registrarme",
-            "msgOnSuccess": "¡Registro exitoso! Te contactaremos pronto.",
-            "msgOnError": "Algo salió mal, por favor inténtalo de nuevo más tarde."
-        }
-    },
-    "product_grid": {
-        "call_to_action": "Reserva ahora",
-        "title": "Muebles personalizables en línea",
-        "description": "Diseña, personaliza y ordena tus muebles en línea, listos para fabricarse bajo demanda por talleres especializados.",
-        "link": "Reserva",
-        "categories": {
-            "desks": {
-                "id": "desks",
-                "name": "Escritorios"
-            },
-            "chairs": {
-                "id": "chairs",
-                "name": "Sillas"
-            },
-            "stools": {
-                "id": "stools",
-                "name": "Taburetes"
-            },
-            "shelves": {
-                "id": "shelves",
-                "name": "Estanterías"
-            }
-        }
-    },
-    "news_letter_form": {
-        "call_to_action": "Sé parte de esta experiencia exclusiva",
-        "title": "Tu momento es ahora",
-        "description": "Al continuar aceptas recibir noticias y actualizaciones. Puedes darte de baja en cualquier momento.",
-        "email": "Correo electrónico",
-        "button": {
-            "idle": "Reservar",
-            "loading": "Enviando"
-        },
-        "messages": {
-            "msgOnSuccess": "¡Registro exitoso! Te contactaremos pronto",
-            "msgOnError": "Algo salió mal, por favor inténtalo de nuevo más tarde"
-        },
-        "errors": {
-            "EMAIL_REQUIRED": "El correo es obligatorio",
-            "MISSING_ENV": "Error de configuración interna",
-            "ALREADY_SUBSCRIBED": "Este correo ya está suscrito",
-            "MAILCHIMP_ERROR": "Hubo un error con Mailchimp",
-            "SERVER_ERROR": "Error interno del servidor"
-        },
-        "success": "Te has suscrito con éxito 🎉"
-    },
-  "explore": {
-    "wizard": {
+      },
+          "wizard": {
       "roomType": {
         "title": "¿Qué espacio o tipo de producto te interesa optimizar?",
         "tag": "Estancia",
@@ -229,7 +132,138 @@
         }
       }
     }
+    },
+    "header": {
+        "call_to_action": "Reserva ahora",
+        "title": "Muebles personalizables en línea",
+        "description": "Diseña, personaliza y ordena tus muebles en línea, listos para fabricarse bajo demanda por talleres especializados.",
+        "link": "Reserva"
+    },
+    "service_process": {
+        "title": "¿Cómo funciona?",
+        "link": "Reserva",
+        "processes": {
+            "choose": {
+                "call_to_action": "Explora el catálogo",
+                "title": "Elige",
+                "description": "Selecciona el producto que mejor se adapte a tus necesidades. Explora nuestra gama de opciones y encuentra el diseño perfecto.",
+                "button": "Catálogo",
+                "link": "#"
+            },
+            "customize": {
+                "call_to_action": "Hazlo a tu medida",
+                "title": "Personaliza",
+                "description": "Personaliza tu producto con colores, materiales y detalles únicos para que refleje tu estilo.",
+                "button": "Apuntarme",
+                "link": "#"
+            },
+            "receive": {
+                "call_to_action": "Finaliza tu pedido",
+                "title": "Recibe",
+                "description": "Recibe tu producto personalizado directamente en tu puerta, listo para usar.",
+                "button": "Reservar",
+                "link": "#"
+            }
+        }
+    },
+    "sets":{
+      "title": "Nuestros conjuntos",
+         "kitchen":{
+    "id": "kitchen",
+    "title": "Cocinas integrales",
+    "description": "Diseños modulares y funcionales que optimizan tu espacio. Cada cocina integral se fabrica a medida, con materiales personalizables y opciones de distribución adaptadas a tu estilo de vida.",
+    "call_to_action": "Explora cocinas",
+    "button": "Empezar",
+    "img": "assets.kitchenSet",
+    "icon": "CookingPot"
   },
+  "bathroom": {
+    "id": "bathroom",
+    "title": "Baños completos",
+    "description": "Conjuntos de baño listos para instalar, combinando muebles, lavabos y accesorios en una sola propuesta estética. Personaliza acabados, colores y medidas según tus necesidades.",
+    "call_to_action": "Descubre baños",
+    "button": "Empezar",
+    "img": "assets.bathroomSet",
+    "icon": "Bath"
+  }
+    },
+    "contact": {
+        "user_types": {
+            "clients": {
+                "label": "Clientes",
+                "title": "Únete a la preventa",
+                "call_to_action": "Sé de los primeros en probar nuestro servicio",
+                "description": "Regístrate y te avisaremos en cuanto nuestra plataforma esté lista. Así podrás personalizar y pedir tus muebles antes que nadie."
+            },
+            "providers": {
+                "label": "Proveedores",
+                "title": "Colabora con nosotros",
+                "call_to_action": "Sé parte de nuestra red de proveedores",
+                "description": "Regístrate y te contactaremos para explorar oportunidades de colaboración. Podrás ofrecer tus productos en nuestra plataforma y llegar a clientes interesados en muebles personalizados."
+            }
+        },
+        "form": {
+            "name": "Nombre completo",
+            "email": "Correo electrónico",
+            "message": "Déjanos tus comentarios",
+            "submit": "Registrarme",
+            "msgOnSuccess": "¡Registro exitoso! Te contactaremos pronto.",
+            "msgOnError": "Algo salió mal, por favor inténtalo de nuevo más tarde."
+        }
+    },
+    "product_grid": {
+        "call_to_action": "Reserva ahora",
+        "title": "Muebles personalizables en línea",
+        "description": "Diseña, personaliza y ordena tus muebles en línea, listos para fabricarse bajo demanda por talleres especializados.",
+        "link": "Reserva",
+        "categories": {
+            "desks": {
+                "id": "desks",
+                "name": "Escritorios"
+            },
+            "chairs": {
+                "id": "chairs",
+                "name": "Sillas"
+            },
+            "stools": {
+                "id": "stools",
+                "name": "Taburetes"
+            },
+            "shelves": {
+                "id": "shelves",
+                "name": "Estanterías"
+            }
+        }
+    },
+    "news_letter_form": {
+        "call_to_action": "Sé parte de esta experiencia exclusiva",
+        "title": "Tu momento es ahora",
+        "description": "Al continuar aceptas recibir noticias y actualizaciones. Puedes darte de baja en cualquier momento.",
+        "email": "Correo electrónico",
+        "button": {
+            "idle": "Reservar",
+            "loading": "Enviando"
+        },
+        "messages": {
+            "msgOnSuccess": "¡Registro exitoso! Te contactaremos pronto",
+            "msgOnError": "Algo salió mal, por favor inténtalo de nuevo más tarde"
+        },
+        "errors": {
+            "EMAIL_REQUIRED": "El correo es obligatorio",
+            "MISSING_ENV": "Error de configuración interna",
+            "ALREADY_SUBSCRIBED": "Este correo ya está suscrito",
+            "MAILCHIMP_ERROR": "Hubo un error con Mailchimp",
+            "SERVER_ERROR": "Error interno del servidor"
+        },
+        "success": "Te has suscrito con éxito 🎉"
+    },
+  "explore": {
+  "call_to_action": "Crea tu espacio ideal",
+  "title": "Diseña ambientes completos",
+  "description": "Adquiere muebles por unidad o en conjuntos completos como salas, cocinas o baños. Cada pieza se fabrica bajo demanda, con materiales y acabados configurables según tus preferencias.",
+  "link": "Comenzar"
+}
+,
     "footer": {
         "contact": "Contacto",
         "privacy_policy": "Política de privacidad",

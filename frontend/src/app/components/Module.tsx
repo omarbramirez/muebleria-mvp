@@ -1,42 +1,48 @@
 "use client"
-import { serviceProcess } from '@/app/assets/assets';
 import { useTranslations } from 'next-intl';
 import { Heading } from '@/app/components/ui/Heading';
 import Image from 'next/image'
 import { Paragraph } from '@/app/components/ui/Paragraph';
 import { Button } from '@/app/components/ui/Button';
+import { SetCategory  } from '@/types/index';
 
-const ServiceProcess: React.FC = () => {
-  const t = useTranslations('service_process');
+
+interface moduleProps {
+    section: string;
+    asset: SetCategory[];
+}
+
+const Module: React.FC<moduleProps> = ({section, asset}) => {
+  const t = useTranslations(`${section}`);
   return (
     <div id="how" className="w-full h-auto py-20  px-8 sm:px-20 !bg-background-light">
         <Heading as="h1" variant="primary" size='lg' hierarchy='forSection'>{t('title')}</Heading>
       <div className="flex gap-3 flex-col sm:flex-row w-full items-center justify-center mb-20">
       </div>
-      {serviceProcess.map((process) => (
+      {asset.map((asset) => (
         <div
-          id={process.id}
-          key={process.id}
+          id={asset.id}
+          key={asset.id}
           className={`w-full flex flex-col sm:flex-row items-center justify-center sm:p-4 block`}
         >
           <div className="sm:w-2/5 h-1/2 sm:h-full sm:mx-auto my-10">
-            <Image src={process.img} alt='' className='w-full h-full object-cover rounded-2xl' />
+            <Image src={asset.img} alt='' className='w-full h-full object-cover rounded-2xl' />
           </div>
-            <Heading as='h4' variant='secondary' size='sm'>{t(process.call_to_action)}</Heading>
-            <Heading as='h1' variant='primary' size='lg' hierarchy='forContent'>{t(process.title)}</Heading>
+            <Heading as='h4' variant='secondary' size='sm'>{t(asset.call_to_action)}</Heading>
+            <Heading as='h1' variant='primary' size='lg' hierarchy='forContent'>{t(asset.title)}</Heading>
             <Paragraph variant="primary" size="md">
-              {t(process.description)}
+              {t(asset.description)}
             </Paragraph>
-        </div>
-      ))}
-                <Button as="a"
-                  href="/#reserve"
+                            <Button as="a"
+                  href={asset.link}
                   variant='secondary'
                 >
-                  {t("link")}
+                  {t(asset.button)}
                 </Button>
+        </div>
+      ))}
     </div>
   );
 };
 
-export default ServiceProcess;
+export default Module;

@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, {FC} from 'react';
 import { useTranslations } from 'next-intl';
 import Chair from './Chair';
 import { Button } from '@/app/components/ui/Button';
@@ -6,12 +7,15 @@ import { Heading } from '@/app/components/ui/Heading';
 import { Paragraph } from '@/app/components/ui/Paragraph';
 import { SlidingUpAnimation, RevealingAnimation } from '@/app/components/animations/animations'
 
-const Header = () => {
-  const t = useTranslations('header');
+
+interface IntroductionProps {
+  page: string;
+}
+const Introduction: FC<IntroductionProps> = ({page}) => {
+    const t = useTranslations(`${page}`);
   return (
-    <div id="top" className="static w-full h-screen grid grid-rows-2 sm:grid-cols-2 bg-primary">
-      {/* Columna de texto */}
-      <div className="flex flex-col sm:h-screen sm:items-center justify-center z-10 px-10">
+
+      <div className="static w-full h-screen flex flex-col sm:h-screen sm:items-center justify-center z-10 px-10 bg-primary">
             <Heading as='h3' variant='secondary' size='md'>{t('call_to_action')}</Heading>
           <SlidingUpAnimation>
             <Heading as="h1" variant="primaryLight" size='lg' hierarchy='forContent'>{t('title')}</Heading>
@@ -26,11 +30,7 @@ const Header = () => {
             {t("link")}
           </Button>
       </div>
-      <div className="min-h-0 sm:h-screen flex items-center justify-center">
-        <Chair />
-      </div>
-    </div>
-  );
-};
+  )
+}
 
-export default Header;
+export default Introduction

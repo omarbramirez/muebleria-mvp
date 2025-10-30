@@ -15,6 +15,6 @@ export * from '@/types/forms/contact';
 
 
 export * from '@/types/content/serviceprocess';
-
+export * from '@/types/content/setcategory';
 
 export * from '@/types/apis/subscribe/route'
