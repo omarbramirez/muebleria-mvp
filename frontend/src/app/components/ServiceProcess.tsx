@@ -30,7 +30,7 @@ const ServiceProcess: React.FC = () => {
         </div>
       ))}
                 <Button as="a"
-                  href="/#reserve"
+                  href="/preferences"
                   variant='secondary'
                 >
                   {t("link")}

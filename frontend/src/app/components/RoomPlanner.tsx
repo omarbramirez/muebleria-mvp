@@ -1,6 +1,10 @@
 'use client';
-'use client';
 import React, { useState, useCallback } from "react";
+import { Heading } from '@/app/components/ui/Heading';
+import { Paragraph } from '@/app/components/ui/Paragraph';
+import { Button } from '@/app/components/ui/Button';
+import { useTranslations } from "next-intl";
+import { X } from "lucide-react";
 
 const SCALE = 100; // 1 m = 100 px
 const PX_TO_MM = 10;
@@ -11,17 +15,22 @@ interface Point {
   y: number;
 }
 
-const RoomPlanner: React.FC = () => {
+interface roomPlannerProps{
+  link: string;
+}
+
+const RoomPlanner: React.FC<roomPlannerProps> = ({link}) => {
   const [points, setPoints] = useState<Point[]>([
-    { x: 100, y: 100 },
+    { x: 50, y: 100 },
     { x: 450, y: 100 },
     { x: 450, y: 200 },
     { x: 350, y: 200 },
     { x: 350, y: 400 },
-    { x: 100, y: 400 },
+    { x: 50, y: 400 },
   ]);
   const [dragging, setDragging] = useState<number | null>(null);
   const [lastTap, setLastTap] = useState(0);
+  const t = useTranslations("pop_ups.space_configuration");
 
   // --- Calcular área
   const area = Math.abs(
@@ -80,10 +89,22 @@ const RoomPlanner: React.FC = () => {
     (e: React.PointerEvent<SVGSVGElement>) => {
       if (dragging === null) return;
       e.preventDefault();
+      const svg = e.currentTarget;
+      const pt = svg.createSVGPoint();
 
-      const svgRect = e.currentTarget.getBoundingClientRect();
-      let x = e.clientX - svgRect.left;
-      let y = e.clientY - svgRect.top;
+      // Coordenadas reales del puntero
+      pt.x = e.clientX;
+      pt.y = e.clientY;
+
+      // Convertir a coordenadas internas del viewBox
+      const ctm = svg.getScreenCTM();
+      if (!ctm) return;
+
+      const inv = ctm.inverse();
+      const transformed = pt.matrixTransform(inv);
+
+      let x = transformed.x;
+      let y = transformed.y;
 
       setPoints(prev => {
         const newPoints = [...prev];
@@ -106,9 +127,21 @@ const RoomPlanner: React.FC = () => {
   // --- Añadir vértice en línea
   const handleAddVertex = (index: number, e: React.PointerEvent<SVGLineElement>) => {
     e.stopPropagation();
-    const svgRect = e.currentTarget.closest("svg")!.getBoundingClientRect();
-    const x = e.clientX - svgRect.left;
-    const y = e.clientY - svgRect.top;
+
+    const svg = e.currentTarget.closest("svg") as SVGSVGElement;
+    if (!svg) return;
+
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return;
+    const inv = ctm.inverse();
+    const transformed = pt.matrixTransform(inv);
+
+    const x = transformed.x;
+    const y = transformed.y;
 
     setPoints(prev => {
       const newPoints = [...prev];
@@ -118,28 +151,26 @@ const RoomPlanner: React.FC = () => {
   };
 
   return (
-    <div className="flex gap-4 flex-col select-none">
+    <div className="flex gap-2 flex-col select-none bg-[url('http://transparenttextures.com/patterns/grid-me.png')] bg-repeat bg-[length:40px_40px] bg-[#FAFAF8] py-10">
+      <div className="px-5">
+        <Heading as="h1" variant="primary" size='lg' hierarchy='forContent'>
+          {t('title')}
+        </Heading>
+        <Paragraph variant="primary" size="sm" className="max-w-2xl">
+          {t('description')}
+        </Paragraph>
+      </div>
       <svg
-        viewBox="0 0 700 500"
-        className="w-full max-w-4xl aspect-[7/5] border border-gray-300 bg-gray-50 cursor-crosshair touch-none"
+        viewBox="0 0 500 500"
+        className="w-full h-3/4 aspect-[5/5] border cursor-crosshair touch-none select-none"
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
       >
-        <defs>
-          <pattern id="floor" patternUnits="userSpaceOnUse" width="40" height="40">
-            <image
-              href="http://transparenttextures.com/patterns/grid-me.png"
-              width="40"
-              height="40"
-            />
-          </pattern>
-        </defs>
-
         {/* Polígono principal */}
         <polygon
           points={points.map(p => `${p.x},${p.y}`).join(" ")}
           fill="url(#floor)"
-          stroke="#555"
+          stroke="#3E4C59"
           strokeWidth={6}
           strokeLinejoin="round"
         />
@@ -183,8 +214,8 @@ const RoomPlanner: React.FC = () => {
             cx={p.x}
             cy={p.y}
             r={8}
-            fill="#007bff"
-            stroke="#fff"
+            fill="#B98C65"
+            stroke="#FAFAF8"
             strokeWidth={2}
             onPointerDown={(e) => handlePointerDown(i, e)}
             onDoubleClick={(e) => handleDeleteVertex(i, e)}
@@ -198,19 +229,30 @@ const RoomPlanner: React.FC = () => {
           y={250}
           textAnchor="middle"
           fontSize={14}
-          fill="#000"
+          fill="#B98C65"
           fontWeight="bold"
         >
-          Área total: {areaM2} m²
+          {`${t('total_area')}: ${areaM2} m²`}
         </text>
       </svg>
-
-      <div className="p-4 rounded-lg text-sm mt-4 text-left bg-gray-100">
-        <h2 className="font-semibold text-gray-700 mb-2">Datos del plano</h2>
-        <p><strong>Escala:</strong> 1 m = {SCALE}px</p>
-        <p><strong>Área:</strong> {areaM2} m²</p>
-        <p><strong>Vértices:</strong> {points.length}</p>
+      <div className="p-4 rounded-lg text-sm mt-4 text-left ">
+        <Heading as='h2' variant='secondary' size='sm'>{t('planner_info.title')}</Heading>
+        <Paragraph variant="primary" size="md">
+          {`${t('planner_info.scale')}: 1 m = ${SCALE}px`}
+        </Paragraph>
+        <Paragraph variant="primary" size="md">
+          {`${t('planner_info.area')}: ${areaM2} m²`}
+        </Paragraph>
+        <Paragraph variant="primary" size="md">
+          {`${t('planner_info.vertices')}: ${areaM2} m²`}
+        </Paragraph>
       </div>
+      <Button as="a"
+        href={`${link}`}
+        variant='secondary'
+      >
+        {t('link')}
+      </Button>
     </div>
   );
 };

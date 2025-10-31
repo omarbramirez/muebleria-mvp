@@ -24,7 +24,7 @@ const Introduction: FC<IntroductionProps> = ({page}) => {
             {t('description')}
           </Paragraph>
           <Button as="a"
-            href="/#reserve"
+            href="/preferences"
             variant='secondary'
           >
             {t("link")}

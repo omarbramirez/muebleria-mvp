@@ -1,123 +1,85 @@
 'use client'
 import React, { useState } from 'react'
-import PageLayout from "@/app/components/ui/PageLayout";
-import { useTranslations } from "next-intl";
-import { PREFERENCE_WIZARD_ITEMS } from "@/app/assets/assets";
-import { Heading } from '@/app/components/ui/Heading';
-import { Paragraph } from '@/app/components/ui/Paragraph';
-import { LinkItem } from "@/app/components/ui/LinkItem";
 import { Button } from '@/app/components/ui/Button';
-
+import PageLayout from "@/app/components/ui/PageLayout";
+import { Paragraph } from '@/app/components/ui/Paragraph';
+import { useRouter } from 'next/navigation';
 const Generation = () => {
-  const t = useTranslations("pop_ups.wizard");
-  const [activeSection, setActiveSection] = useState(PREFERENCE_WIZARD_ITEMS[0]?.key);
-  const [openWizardSections, setWizardSections] = useState(false)
+  const [budget, setBudget] = useState(25000);
+  const [details, setDetails] = useState(25000);
 
-  function wizardSectionActivator (){
-    openWizardSections ? setWizardSections(false) : setWizardSections(true)
-    console.log(openWizardSections)
-  }
-  
+
+  const router = useRouter()
   return (
     <PageLayout>
-      <div className="w-full min-h-screen flex flex-row items-start justify-between gap-12 relative overflow-hidden px-10 pr-20">
-        <div className=" w-full min-h-screen flex-1 pt-10 text-left">
-          {PREFERENCE_WIZARD_ITEMS.filter(
-            (section) => section.key === activeSection
-          ).map((section, index) => (
-            <section
-              key={`module-${section.key}`}
-              className="animate-fadeIn transition-all duration-500 pt-20 " 
-            >
-              <Heading
-                as="h2"
-                variant="primary"
-                size="lg"
-                hierarchy="forContent"
-                className='text-left'
-              >
-                {t(`${section.key}.title`)}
-              </Heading>
-              <Paragraph variant="primary" size="md" className="mb-6 text-left">
-                {t(`${section.key}.description`)}
+      <div className=" w-full min-h-screen flex flex-col items-center justify-center gap-2">
+        <section>
+          <ul>
+            <li>
+              <label htmlFor="budget" className="text-sm font-medium text-gray-700">
+                Presupuesto:{" "}
+                <span className="font-semibold text-secondary">
+                  ${budget.toLocaleString()}
+                </span>
+              </label>
+              <Paragraph variant="secondary" size="sm" className='text-left' >
+                Limita materiales y cantidad de muebles
               </Paragraph>
+              <input
+                id="budget"
+                type="range"
+                min={10000}
+                max={50000}
+                step={5000}
+                value={budget}
+                onChange={(e) => setBudget(Number(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-secondary"
+              />
+            </li>
 
-              <ul className="space-y-4">
-                {section.options.map((option, index) => (
-                  <li
-                    key={`option-${index}`}
-                    className="p-4 rounded-2xl hover:bg-neutral-200 cursor-pointer transition-all"
-                  >
-                    <input type="checkbox" id={section.key} value="second_checkbox" />
-                    <label htmlFor='cbox2' >{t(`${section.key}.options.${option.key}.title`)}</label>
+            <li>
+              <label htmlFor="details" className="text-sm font-medium text-gray-700">
+                Nivel de detalle
+              </label>
+              <Paragraph variant="secondary" size="sm" className='text-left' >
+                Controla densidad de objetos decorativos
+              </Paragraph>
+              <input
+                id="details"
+                type="range"
+                min={10000}
+                max={50000}
+                step={5000}
+                value={details}
+                onChange={(e) => setDetails(Number(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-secondary"
+              />
+            </li>
+          </ul>
+        </section>
 
 
+        <div className='flex flex-row justify-between w-full'>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => router.push('/render')}
+          >
+            Confirmar
+          </Button>
 
-                    {/* <Button
-                      variant="primary"
-                      size="sm"
-                    >
-                      {t(`${section.key}.options.${option.key}.title`)}
-                    </Button> */}
-
-
-                    <Paragraph variant="primary" size="sm" className='text-left' >
-                      {t(`${section.key}.options.${option.key}.description`)}
-                    </Paragraph>
-                  </li>
-                ))}
-              </ul>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => setActiveSection(`${PREFERENCE_WIZARD_ITEMS[PREFERENCE_WIZARD_ITEMS.indexOf(section) + 1].key}`)}
-              >
-                Siguiente
-              </Button>
-            </section>
-          ))}
-          {/* <section id="ia-model-creator"
-              className="animate-fadeIn transition-all duration-500"
-            >
-              <Heading
-                as="h3"
-                variant="primary"
-                size="md"
-                hierarchy="forContent"
-              >
-               Crea tu espacio ideal con IA
-              </Heading>
-                <textarea defaultValue="Cuéntanos más..."> </textarea>
-            </section> */}
-
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => router.push('/configurators')}
+          >
+            Modificar
+          </Button>
         </div>
-
-        {/* MÓDULO DERECHO: navegación de secciones */}
-        
-        
-        <aside id="wizard-sections" className={`w-64 h-full flex flex-col gap-4 bg-red-500 absolute top-0 py-20 drop-shadow-xl  ${openWizardSections ? 'right-0' : 'right-[-50%]'}`} onClick={()=>wizardSectionActivator()}>
-            {PREFERENCE_WIZARD_ITEMS.map((section) => {
-              const isActive = activeSection === section.key;
-              return (
-                <LinkItem
-                  key={`nav-${section.key}`}
-                  as="button"
-                  size="lg"
-                  variant={isActive ? "secondary" : "primary"}
-                  onClick={() => setActiveSection(section.key)}
-                  className={`text-left transition-all `}
-                >
-                  {t(`${section.key}.tag`)}
-                </LinkItem>
-              );
-            })}
-        </aside>
-
       </div>
-
     </PageLayout>
-  );
+
+  )
 }
 
-export default Generation;
-
+export default Generation

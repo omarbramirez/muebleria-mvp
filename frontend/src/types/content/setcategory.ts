@@ -7,8 +7,10 @@ export interface SetCategory {
   title: string;
   description: string;
   call_to_action: string;
-  button: string;
+  button_create: string;
+  button_generate: string;
   img: StaticImageData;
   icon: React.ElementType;
-  link?: string;
+  link_create?: string;
+  link_generate?: string;
 }

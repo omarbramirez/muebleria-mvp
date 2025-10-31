@@ -9,11 +9,12 @@ import stools from './stools.jpg'
 import shelves from './shelves.jpg'
 import kitchenSet from './kitchenSet.jpg';
 import bathroomSet from './bathroomSet.jpg';
-
+import generate from './generate.jpg'
+import preview from './preview.jpg'
 
 
 import right_arrow_white from './right-arrow-white.png'
-import { MousePointerClick, ChartCandlestick, PackageCheck, LampDesk, Armchair, Spool,ToolCase,Bath, CookingPot } from "lucide-react";
+import { MousePointerClick, ChartCandlestick, PackageCheck, LampDesk, Armchair, Spool, ToolCase, Bath, CookingPot } from "lucide-react";
 
 
 export const NAVBAR_ITEMS = [
@@ -23,7 +24,7 @@ export const NAVBAR_ITEMS = [
   { key: "explore", href: "/explore", variant: "secondary" },
 ];
 
-import { ServiceProcess, SetCategory  } from '@/types/index';
+import { ServiceProcess, SetCategory } from '@/types/index';
 export const assets = {
   logo,
   choose,
@@ -35,63 +36,76 @@ export const assets = {
   shelves,
   right_arrow_white,
   kitchenSet,
-  bathroomSet
+  bathroomSet,
+  generate,
+  preview
 }
 
 export const serviceProcess: ServiceProcess[] = [
   {
-    id: 'choose',
-    label: 'processes.choose.title',
-    call_to_action: 'processes.choose.call_to_action',
-    title: 'processes.choose.title',
-    description: 'processes.choose.description',
-    button: 'processes.choose.button',
-    img: assets.choose,
+    id: 'generate',
+    label: 'processes.generate.title',
+    call_to_action: 'processes.generate.call_to_action',
+    title: 'processes.generate.title',
+    description: 'processes.generate.description',
+    img: assets.generate,
     icon: MousePointerClick
   },
   {
-    id: 'customize',
-    label: 'processes.customize.title',
-    call_to_action: 'processes.customize.call_to_action',
-    title: 'processes.customize.title',
-    description: 'processes.customize.description',
-    button: 'processes.customize.button',
+    id: 'adjust',
+    label: 'processes.adjust.title',
+    call_to_action: 'processes.adjust.call_to_action',
+    title: 'processes.adjust.title',
+    description: 'processes.adjust.description',
     img: assets.customize,
     icon: ChartCandlestick,
   },
   {
-    id: 'receive',
-    label: 'processes.receive.title',
-    call_to_action: 'processes.receive.call_to_action',
-    title: 'processes.receive.title',
-    description: 'processes.receive.description',
-    button: 'processes.receive.button',
-    link: 'processes.receive.link',
-    img: assets.receive,
+    id: 'preview',
+    label: 'processes.preview.title',
+    call_to_action: 'processes.preview.call_to_action',
+    title: 'processes.preview.title',
+    description: 'processes.preview.description',
+    link: 'processes.preview.link',
+    img: assets.preview,
     icon: PackageCheck,
   },
+    {
+    id: 'reserve',
+    label: 'processes.reserve.title',
+    call_to_action: 'processes.reserve.call_to_action',
+    title: 'processes.reserve.title',
+    description: 'processes.reserve.description',
+    link: 'processes.reserve.link',
+    img: assets.receive,
+    icon: PackageCheck,
+  }
 ];
 
 export const setCategories: SetCategory[] = [
   {
     id: 'kitchen',
     title: 'kitchen.title',
-    description:'kitchen.description',
+    description: 'kitchen.description',
     call_to_action: 'kitchen.call_to_action',
-    button: 'kitchen.button',
+    button_create: 'kitchen.button_create',
+    button_generate: 'kitchen.button_generate',
     img: assets.kitchenSet, // asegúrate de tener esta imagen
     icon: CookingPot,
-    link: '/generation'
+    link_create: '/creation/area',
+    link_generate: '/preferences'
   },
-    {
+  {
     id: 'bathroom',
     title: 'bathroom.title',
-    description:'bathroom.description',
+    description: 'bathroom.description',
     call_to_action: 'bathroom.call_to_action',
-    button: 'bathroom.button',
+    button_create: 'bathroom.button_create',
+    button_generate: 'bathroom.button_generate',
     img: assets.bathroomSet, // asegúrate de tener esta imagen
     icon: Bath,
-    link: '/generation'
+    link_create: '/creation/area',
+    link_generate: '/preferences'
   }
 ];
 
@@ -107,24 +121,24 @@ export const categories = [
     name: "categories.chairs.name",
     cover: assets.chairs,
     icon: Armchair,
-    },
+  },
   {
     id: "stools",
     name: "categories.stools.name",
     cover: assets.stools,
     icon: Spool,
-    },
+  },
   {
     id: "shelves",
     name: "categories.shelves.name",
     cover: assets.shelves,
     icon: ToolCase,
-    },
+  },
 ]
 
 
 export const PREFERENCE_WIZARD_ITEMS = [
-    {
+  {
     key: "roomType",
     completed: false,
     title: "title",
@@ -132,12 +146,10 @@ export const PREFERENCE_WIZARD_ITEMS = [
     options: [
       { key: "1" },
       { key: "2" },
-      { key: "3" },
-      { key: "4" },
-      { key: "5" }
+      { key: "3" }
     ]
   },
-    {
+  {
     key: "budget",
     completed: false,
     title: "title",
@@ -148,7 +160,19 @@ export const PREFERENCE_WIZARD_ITEMS = [
       { key: "3" }
     ]
   },
-    {
+  {
+    key: "space_size",
+    completed: false,
+    title: "title",
+    description: "description",
+    options: [
+      { key: "1" },
+      { key: "2" },
+      { key: "3" },
+      { key: "4" }
+    ]
+  },
+  {
     key: "style",
     completed: false,
     title: "title",
@@ -161,7 +185,7 @@ export const PREFERENCE_WIZARD_ITEMS = [
       { key: "5" }
     ]
   },
-    {
+  {
     key: "color",
     completed: false,
     title: "title",
@@ -171,11 +195,13 @@ export const PREFERENCE_WIZARD_ITEMS = [
       { key: "2" }
     ]
   },
-    {
+  {
     key: "materials",
     completed: false,
     title: "title",
     description: "description",
+    button: "button",
+    link: "link",
     options: [
       { key: "1" },
       { key: "2" }

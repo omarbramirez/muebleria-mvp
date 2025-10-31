@@ -1,21 +1,27 @@
 {
-    "locale_switcher": {
-        "label": "Elige tu idioma"
+  "locale_switcher": {
+    "label": "Elige tu idioma"
+  },
+  "navbar": {
+    "home": "Inicio",
+    "how_it_works": "Cómo funciona",
+    "search": "Buscar",
+    "explore": "Explorar"
+  },
+  "pop_ups": {
+    "space_configuration": {
+      "title": "Editor Interactivo de Planos",
+      "description": " Dibuja y modifica el contorno de tu espacio directamente sobre el plano. Toca o haz clic en las líneas para añadir vértices, arrastra los puntos para ajustar las medidas y realiza doble toque o doble clic sobre un vértice para eliminarlo. La escala y el área total se actualizan automáticamente en tiempo real.",
+      "link": "Confirmar",
+      "total_area": "Área total",
+      "planner_info": {
+        "title": "Datos del plano",
+        "scale": "Escala",
+        "area": "Área",
+        "vertices": "Vértices"
+      }
     },
-    "navbar": {
-        "home": "Inicio",
-        "how_it_works": "Cómo funciona",
-        "search": "Buscar",
-        "explore": "Explorar"
-    },
-    "pop_ups":{
-      "space_configuration": {
-                "call_to_action": "Reserva ahora",
-        "title": "Muebles personalizables en línea",
-        "description": "Diseña, personaliza y ordena tus muebles en línea, listos para fabricarse bajo demanda por talleres especializados.",
-        "link": "Reserva"
-      },
-          "wizard": {
+    "wizard": {
       "roomType": {
         "title": "¿Qué espacio o tipo de producto te interesa optimizar?",
         "tag": "Estancia",
@@ -30,40 +36,30 @@
             "description": "Convierte tu baño en un espacio funcional y relajante, con combinaciones que equilibran confort y estética."
           },
           "3": {
-            "title": "Sala / Comedor",
-            "description": "Crea un ambiente acogedor para compartir y disfrutar, con piezas que reflejan tu estilo de vida."
-          },
-          "4": {
-            "title": "Oficina / Estudio",
-            "description": "Diseña un entorno que potencie tu concentración y creatividad, optimizando espacio y ergonomía."
-          },
-          "5": {
             "title": "Otro",
             "description": "Selecciona esta opción si buscas soluciones para otro tipo de espacio o deseas una recomendación más abierta."
           }
         }
       },
-
       "budget": {
         "title": "¿Cuál es tu rango aproximado de presupuesto?",
         "tag": "Presupuesto",
         "description": "Selecciona el rango que más se acerque a tu inversión planeada. Te ayudaremos a encontrar productos que equilibren calidad y costo.",
         "options": {
           "1": {
-            "title": "Menos de $2,000 MXN",
+            "title": "Menos de $12,000 MXN",
             "description": "Pequeños cambios con gran impacto. Ideal para accesorios o detalles de acento."
           },
           "2": {
-            "title": "Entre $2,000 y $6,000 MXN",
+            "title": "Entre $15,000 y $20,000 MXN",
             "description": "Opciones equilibradas para renovar áreas completas sin comprometer el estilo."
           },
           "3": {
-            "title": "Más de $6,000 MXN",
+            "title": "Más de $25,000 MXN",
             "description": "Transformaciones integrales con materiales premium y diseños personalizados."
           }
         }
       },
-
       "style": {
         "title": "¿Qué estilo prefieres?",
         "tag": "Estilo",
@@ -91,7 +87,6 @@
           }
         }
       },
-
       "color": {
         "title": "¿Qué paleta de color prefieres?",
         "tag": "Color",
@@ -111,10 +106,11 @@
           }
         }
       },
-
       "materials": {
         "title": "¿Qué materiales prefieres?",
         "tag": "Materiales",
+        "button": "Finalizar",
+    "link": "/area",
         "description": "Selecciona los materiales que más se alinean con tu estilo y el mantenimiento que deseas.",
         "options": {
           "1": {
@@ -130,155 +126,186 @@
             "description": "Prácticos, resistentes y con múltiples acabados visuales para personalización."
           }
         }
+      },
+      "space_size": {
+  "title": "¿Cómo está compuesta tu familia?",
+  "tag": "Tamaño del espacio",
+  "description": "Selecciona la opción que mejor describa a las personas que habitan el hogar. Esto nos ayudará a estimar el tamaño ideal del espacio y la cantidad de muebles necesarios.",
+  "options": {
+    "1": {
+      "title": "Soltero(a)",
+      "description": "Espacios compactos, funcionales y fáciles de mantener. Se prioriza el diseño multifuncional, el almacenamiento vertical y la integración de áreas."
+    },
+    "2": {
+      "title": "Pareja o pareja con mascota",
+      "description": "Tamaño medio, con áreas compartidas y flexibles. Requiere muebles cómodos, modulares y con capacidad para adaptarse a distintos estilos de vida."
+    },
+    "3": {
+      "title": "Familia con hijos",
+      "description": "Espacios amplios con zonas bien definidas para convivencia, descanso y almacenamiento. Se recomiendan materiales duraderos y mobiliario resistente al uso diario."
+    },
+    "4": {
+      "title": "Familia extensa o vivienda compartida",
+      "description": "Superficie grande, con múltiples áreas comunes y alto flujo de personas. Ideal para integrar muebles de gran capacidad y soluciones de organización inteligente."
+    }
+  }
+}
+    }
+  },
+  "header": {
+    "call_to_action": "Reserva ahora",
+    "title": "Muebles personalizables en línea",
+    "description": "Diseña, personaliza y ordena tus muebles en línea, listos para fabricarse bajo demanda por talleres especializados.",
+    "link": "Explorar"
+  },
+"service_process": {
+  "title": "¿Cómo funciona?",
+  "link": "Empezar",
+  "processes": {
+    "generate": {
+      "call_to_action": "Inicia tu configuración",
+      "title": "Genera tu conjunto",
+      "description": "Nuestro sistema analiza tus preferencias y el espacio disponible para crear automáticamente una propuesta inicial de diseño. Obtén en segundos un conjunto adaptado a ti.",
+      "button": "Comenzar",
+      "link": "#"
+    },
+    "adjust": {
+      "call_to_action": "Afina los detalles",
+      "title": "Personaliza en línea",
+      "description": "Modifica materiales, colores y distribución directamente desde el configurador 3D. Cada cambio actualiza tu conjunto en tiempo real con sugerencias inteligentes.",
+      "button": "Personalizar",
+      "link": "#"
+    },
+    "preview": {
+      "call_to_action": "Visualiza tu resultado",
+      "title": "Previsualiza tu espacio",
+      "description": "Explora una vista interactiva del diseño final. Verás medidas, combinaciones y recomendaciones optimizadas según tu perfil familiar y el uso del espacio.",
+      "button": "Visualizar",
+      "link": "#"
+    },
+    "reserve": {
+      "call_to_action": "Confirma tu pedido",
+      "title": "Reserva o solicita asesoría",
+      "description": "Guarda tu configuración, solicita una cotización o agenda una asesoría con nuestro equipo para afinar los últimos detalles antes de la producción.",
+      "button": "Reservar",
+      "link": "#"
+    }
+  }
+},
+  "sets": {
+    "title": "Nuestros conjuntos",
+    "kitchen": {
+      "id": "kitchen",
+      "title": "Cocinas integrales",
+      "description": "Diseños modulares y funcionales que optimizan tu espacio. Cada cocina integral se fabrica a medida, con materiales personalizables y opciones de distribución adaptadas a tu estilo de vida.",
+      "call_to_action": "Explora cocinas",
+      "button_create": "Crear",
+      "button_generate": "Generar",
+      "img": "assets.kitchenSet",
+      "icon": "CookingPot"
+    },
+    "bathroom": {
+      "id": "bathroom",
+      "title": "Baños completos",
+      "description": "Conjuntos de baño listos para instalar, combinando muebles, lavabos y accesorios en una sola propuesta estética. Personaliza acabados, colores y medidas según tus necesidades.",
+      "call_to_action": "Descubre baños",
+            "button_create": "Crear",
+      "button_generate": "Generar",
+      "img": "assets.bathroomSet",
+      "icon": "Bath"
+    }
+  },
+  "contact": {
+    "user_types": {
+      "clients": {
+        "label": "Clientes",
+        "title": "Únete a la preventa",
+        "call_to_action": "Sé de los primeros en probar nuestro servicio",
+        "description": "Regístrate y te avisaremos en cuanto nuestra plataforma esté lista. Así podrás personalizar y pedir tus muebles antes que nadie."
+      },
+      "providers": {
+        "label": "Proveedores",
+        "title": "Colabora con nosotros",
+        "call_to_action": "Sé parte de nuestra red de proveedores",
+        "description": "Regístrate y te contactaremos para explorar oportunidades de colaboración. Podrás ofrecer tus productos en nuestra plataforma y llegar a clientes interesados en muebles personalizados."
+      }
+    },
+    "form": {
+      "name": "Nombre completo",
+      "email": "Correo electrónico",
+      "message": "Déjanos tus comentarios",
+      "submit": "Registrarme",
+      "msgOnSuccess": "¡Registro exitoso! Te contactaremos pronto.",
+      "msgOnError": "Algo salió mal, por favor inténtalo de nuevo más tarde."
+    }
+  },
+  "product_grid": {
+    "call_to_action": "Reserva ahora",
+    "title": "Muebles personalizables en línea",
+    "description": "Diseña, personaliza y ordena tus muebles en línea, listos para fabricarse bajo demanda por talleres especializados.",
+    "link": "Reserva",
+    "categories": {
+      "desks": {
+        "id": "desks",
+        "name": "Escritorios"
+      },
+      "chairs": {
+        "id": "chairs",
+        "name": "Sillas"
+      },
+      "stools": {
+        "id": "stools",
+        "name": "Taburetes"
+      },
+      "shelves": {
+        "id": "shelves",
+        "name": "Estanterías"
       }
     }
-    },
-    "header": {
-        "call_to_action": "Reserva ahora",
-        "title": "Muebles personalizables en línea",
-        "description": "Diseña, personaliza y ordena tus muebles en línea, listos para fabricarse bajo demanda por talleres especializados.",
-        "link": "Reserva"
-    },
-    "service_process": {
-        "title": "¿Cómo funciona?",
-        "link": "Reserva",
-        "processes": {
-            "choose": {
-                "call_to_action": "Explora el catálogo",
-                "title": "Elige",
-                "description": "Selecciona el producto que mejor se adapte a tus necesidades. Explora nuestra gama de opciones y encuentra el diseño perfecto.",
-                "button": "Catálogo",
-                "link": "#"
-            },
-            "customize": {
-                "call_to_action": "Hazlo a tu medida",
-                "title": "Personaliza",
-                "description": "Personaliza tu producto con colores, materiales y detalles únicos para que refleje tu estilo.",
-                "button": "Apuntarme",
-                "link": "#"
-            },
-            "receive": {
-                "call_to_action": "Finaliza tu pedido",
-                "title": "Recibe",
-                "description": "Recibe tu producto personalizado directamente en tu puerta, listo para usar.",
-                "button": "Reservar",
-                "link": "#"
-            }
-        }
-    },
-    "sets":{
-      "title": "Nuestros conjuntos",
-         "kitchen":{
-    "id": "kitchen",
-    "title": "Cocinas integrales",
-    "description": "Diseños modulares y funcionales que optimizan tu espacio. Cada cocina integral se fabrica a medida, con materiales personalizables y opciones de distribución adaptadas a tu estilo de vida.",
-    "call_to_action": "Explora cocinas",
-    "button": "Empezar",
-    "img": "assets.kitchenSet",
-    "icon": "CookingPot"
   },
-  "bathroom": {
-    "id": "bathroom",
-    "title": "Baños completos",
-    "description": "Conjuntos de baño listos para instalar, combinando muebles, lavabos y accesorios en una sola propuesta estética. Personaliza acabados, colores y medidas según tus necesidades.",
-    "call_to_action": "Descubre baños",
-    "button": "Empezar",
-    "img": "assets.bathroomSet",
-    "icon": "Bath"
-  }
+  "news_letter_form": {
+    "call_to_action": "Sé parte de esta experiencia exclusiva",
+    "title": "Tu momento es ahora",
+    "description": "Al continuar aceptas recibir noticias y actualizaciones. Puedes darte de baja en cualquier momento.",
+    "email": "Correo electrónico",
+    "button": {
+      "idle": "Reservar",
+      "loading": "Enviando"
     },
-    "contact": {
-        "user_types": {
-            "clients": {
-                "label": "Clientes",
-                "title": "Únete a la preventa",
-                "call_to_action": "Sé de los primeros en probar nuestro servicio",
-                "description": "Regístrate y te avisaremos en cuanto nuestra plataforma esté lista. Así podrás personalizar y pedir tus muebles antes que nadie."
-            },
-            "providers": {
-                "label": "Proveedores",
-                "title": "Colabora con nosotros",
-                "call_to_action": "Sé parte de nuestra red de proveedores",
-                "description": "Regístrate y te contactaremos para explorar oportunidades de colaboración. Podrás ofrecer tus productos en nuestra plataforma y llegar a clientes interesados en muebles personalizados."
-            }
-        },
-        "form": {
-            "name": "Nombre completo",
-            "email": "Correo electrónico",
-            "message": "Déjanos tus comentarios",
-            "submit": "Registrarme",
-            "msgOnSuccess": "¡Registro exitoso! Te contactaremos pronto.",
-            "msgOnError": "Algo salió mal, por favor inténtalo de nuevo más tarde."
-        }
+    "messages": {
+      "msgOnSuccess": "¡Registro exitoso! Te contactaremos pronto",
+      "msgOnError": "Algo salió mal, por favor inténtalo de nuevo más tarde"
     },
-    "product_grid": {
-        "call_to_action": "Reserva ahora",
-        "title": "Muebles personalizables en línea",
-        "description": "Diseña, personaliza y ordena tus muebles en línea, listos para fabricarse bajo demanda por talleres especializados.",
-        "link": "Reserva",
-        "categories": {
-            "desks": {
-                "id": "desks",
-                "name": "Escritorios"
-            },
-            "chairs": {
-                "id": "chairs",
-                "name": "Sillas"
-            },
-            "stools": {
-                "id": "stools",
-                "name": "Taburetes"
-            },
-            "shelves": {
-                "id": "shelves",
-                "name": "Estanterías"
-            }
-        }
+    "errors": {
+      "EMAIL_REQUIRED": "El correo es obligatorio",
+      "MISSING_ENV": "Error de configuración interna",
+      "ALREADY_SUBSCRIBED": "Este correo ya está suscrito",
+      "MAILCHIMP_ERROR": "Hubo un error con Mailchimp",
+      "SERVER_ERROR": "Error interno del servidor"
     },
-    "news_letter_form": {
-        "call_to_action": "Sé parte de esta experiencia exclusiva",
-        "title": "Tu momento es ahora",
-        "description": "Al continuar aceptas recibir noticias y actualizaciones. Puedes darte de baja en cualquier momento.",
-        "email": "Correo electrónico",
-        "button": {
-            "idle": "Reservar",
-            "loading": "Enviando"
-        },
-        "messages": {
-            "msgOnSuccess": "¡Registro exitoso! Te contactaremos pronto",
-            "msgOnError": "Algo salió mal, por favor inténtalo de nuevo más tarde"
-        },
-        "errors": {
-            "EMAIL_REQUIRED": "El correo es obligatorio",
-            "MISSING_ENV": "Error de configuración interna",
-            "ALREADY_SUBSCRIBED": "Este correo ya está suscrito",
-            "MAILCHIMP_ERROR": "Hubo un error con Mailchimp",
-            "SERVER_ERROR": "Error interno del servidor"
-        },
-        "success": "Te has suscrito con éxito 🎉"
-    },
+    "success": "Te has suscrito con éxito 🎉"
+  },
   "explore": {
-  "call_to_action": "Crea tu espacio ideal",
-  "title": "Diseña ambientes completos",
-  "description": "Adquiere muebles por unidad o en conjuntos completos como salas, cocinas o baños. Cada pieza se fabrica bajo demanda, con materiales y acabados configurables según tus preferencias.",
-  "link": "Comenzar"
-}
-,
-    "footer": {
-        "contact": "Contacto",
-        "privacy_policy": "Política de privacidad",
-        "terms": "Términos y condiciones"
-    },
-    "policies": {
-        "title": "Aviso de Privacidad",
-        "content": "Estimados clientes y visitantes de {empresa}:\n\nEn {empresa} entendemos la importancia de proteger los datos personales de nuestros clientes y visitantes (en lo sucesivo “Los Titulares”), por lo cual nos comprometemos a tratarlos de manera lícita, confidencial y con apego a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares y demás normatividad aplicable.\n\nRESPONSABLE DEL TRATAMIENTO\n{empresaLegal}, con domicilio en {domicilioEmpresa}, es responsable de recabar, usar y proteger los datos personales de Los Titulares.\n\nCONSENTIMIENTO DEL TITULAR\nSe considerará que Los Titulares han otorgado su consentimiento si no manifiestan oposición expresa al presente Aviso.\n\nDATOS PERSONALES SUJETOS AL TRATAMIENTO\nPodemos recabar datos como: nombre completo, correo electrónico, teléfono, dirección, RFC (para facturación), datos de pago, así como información de acceso a {sitioWeb}. No recabamos datos sensibles salvo que sean estrictamente necesarios para la prestación de servicios.\n\nFINES DEL TRATAMIENTO\nLos datos podrán ser utilizados para:\n1) Prestación de servicios y comercialización de productos de {empresa}.\n2) Creación y administración de cuentas en {sitioWeb}.\n3) Procesamiento de pedidos, pagos y facturación.\n4) Atención a clientes (quejas, dudas, devoluciones).\n5) Cumplimiento de obligaciones legales.\n\nDe forma secundaria, podremos usar los datos para enviar promociones, encuestas, invitaciones a eventos y publicidad relacionada con {empresa}.\n\nTRANSFERENCIA DE DATOS\nLos datos podrán compartirse con:\n- Socios comerciales y proveedores autorizados para la prestación de servicios.\n- Instituciones bancarias para procesar pagos.\n- Autoridades competentes cuando lo exija la ley.\n\nDERECHOS ARCO\nLos Titulares pueden ejercer sus derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO) enviando un correo a {correoDatosPersonales}.\n\nMODIFICACIONES\n{empresa} podrá modificar este Aviso en cualquier momento. Las actualizaciones se publicarán en {sitioWeb}.\n\nCONTACTO\n📧 {correoDatosPersonales}\n📍 {domicilioEmpresa}"
-    },
-    "terms": {
-        "title": "Términos y Condiciones",
-        "content": "Bienvenido a {empresa}.\n\nAl utilizar nuestro sitio web {sitioWeb}, aceptas estos Términos y Condiciones. Si no estás de acuerdo, por favor no uses el sitio ni proporciones tus datos.\n\nI. Disposiciones generales\n{empresaLegal}, con domicilio en {domicilioEmpresa}, opera este sitio web {sitioWeb}. Este sitio tiene como fin ofrecer información sobre nuestros productos y servicios, así como oportunidades de contacto y generación de prospectos.\n\nTodos los contenidos, incluyendo textos, imágenes, logotipos y marcas, son propiedad de {empresaLegal} y están protegidos por la ley. No se permite su reproducción o uso sin autorización.\n\nII. Obligaciones del usuario\n- Proporcionar información veraz y completa en los formularios del sitio.\n- No difundir virus, malware o contenidos ilegales.\n- No utilizar información de terceros sin autorización.\n- Usar el sitio únicamente con fines legales y conforme a la buena fe.\n\nIII. Uso de datos personales\nEl uso de tus datos personales se rige por nuestro Aviso de Privacidad. Al enviar tus datos a través del sitio, aceptas que los procesemos para fines de contacto, envío de información y generación de prospectos.\n\nIV. Modificaciones\n{empresa} puede actualizar estos Términos y Condiciones en cualquier momento. Las modificaciones se publicarán en {sitioWeb} y serán efectivas a partir de su publicación.\n\nV. Contacto\nPara cualquier duda o comentario sobre estos Términos y Condiciones, puedes contactarnos a {correoContacto}."
-    },
-    "sitemap": {
-        "main_pages": "Páginas principales",
-        "resources": "Recursos"
-    }
+    "call_to_action": "Cada pieza se fabrica bajo demanda",
+    "title": "Adquiere muebles por conjuntos completos como salas, cocinas o baños",
+    "description": "Diseña tus espacios de forma personalizada o genera una propuesta automáticamente completando unos pocos pasos.",
+    "link": "Comenzar"
+  },
+  "footer": {
+    "contact": "Contacto",
+    "privacy_policy": "Política de privacidad",
+    "terms": "Términos y condiciones"
+  },
+  "policies": {
+    "title": "Aviso de Privacidad",
+    "content": "Estimados clientes y visitantes de {empresa}:\n\nEn {empresa} entendemos la importancia de proteger los datos personales de nuestros clientes y visitantes (en lo sucesivo “Los Titulares”), por lo cual nos comprometemos a tratarlos de manera lícita, confidencial y con apego a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares y demás normatividad aplicable.\n\nRESPONSABLE DEL TRATAMIENTO\n{empresaLegal}, con domicilio en {domicilioEmpresa}, es responsable de recabar, usar y proteger los datos personales de Los Titulares.\n\nCONSENTIMIENTO DEL TITULAR\nSe considerará que Los Titulares han otorgado su consentimiento si no manifiestan oposición expresa al presente Aviso.\n\nDATOS PERSONALES SUJETOS AL TRATAMIENTO\nPodemos recabar datos como: nombre completo, correo electrónico, teléfono, dirección, RFC (para facturación), datos de pago, así como información de acceso a {sitioWeb}. No recabamos datos sensibles salvo que sean estrictamente necesarios para la prestación de servicios.\n\nFINES DEL TRATAMIENTO\nLos datos podrán ser utilizados para:\n1) Prestación de servicios y comercialización de productos de {empresa}.\n2) Creación y administración de cuentas en {sitioWeb}.\n3) Procesamiento de pedidos, pagos y facturación.\n4) Atención a clientes (quejas, dudas, devoluciones).\n5) Cumplimiento de obligaciones legales.\n\nDe forma secundaria, podremos usar los datos para enviar promociones, encuestas, invitaciones a eventos y publicidad relacionada con {empresa}.\n\nTRANSFERENCIA DE DATOS\nLos datos podrán compartirse con:\n- Socios comerciales y proveedores autorizados para la prestación de servicios.\n- Instituciones bancarias para procesar pagos.\n- Autoridades competentes cuando lo exija la ley.\n\nDERECHOS ARCO\nLos Titulares pueden ejercer sus derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO) enviando un correo a {correoDatosPersonales}.\n\nMODIFICACIONES\n{empresa} podrá modificar este Aviso en cualquier momento. Las actualizaciones se publicarán en {sitioWeb}.\n\nCONTACTO\n📧 {correoDatosPersonales}\n📍 {domicilioEmpresa}"
+  },
+  "terms": {
+    "title": "Términos y Condiciones",
+    "content": "Bienvenido a {empresa}.\n\nAl utilizar nuestro sitio web {sitioWeb}, aceptas estos Términos y Condiciones. Si no estás de acuerdo, por favor no uses el sitio ni proporciones tus datos.\n\nI. Disposiciones generales\n{empresaLegal}, con domicilio en {domicilioEmpresa}, opera este sitio web {sitioWeb}. Este sitio tiene como fin ofrecer información sobre nuestros productos y servicios, así como oportunidades de contacto y generación de prospectos.\n\nTodos los contenidos, incluyendo textos, imágenes, logotipos y marcas, son propiedad de {empresaLegal} y están protegidos por la ley. No se permite su reproducción o uso sin autorización.\n\nII. Obligaciones del usuario\n- Proporcionar información veraz y completa en los formularios del sitio.\n- No difundir virus, malware o contenidos ilegales.\n- No utilizar información de terceros sin autorización.\n- Usar el sitio únicamente con fines legales y conforme a la buena fe.\n\nIII. Uso de datos personales\nEl uso de tus datos personales se rige por nuestro Aviso de Privacidad. Al enviar tus datos a través del sitio, aceptas que los procesemos para fines de contacto, envío de información y generación de prospectos.\n\nIV. Modificaciones\n{empresa} puede actualizar estos Términos y Condiciones en cualquier momento. Las modificaciones se publicarán en {sitioWeb} y serán efectivas a partir de su publicación.\n\nV. Contacto\nPara cualquier duda o comentario sobre estos Términos y Condiciones, puedes contactarnos a {correoContacto}."
+  },
+  "sitemap": {
+    "main_pages": "Páginas principales",
+    "resources": "Recursos"
+  }
 }
