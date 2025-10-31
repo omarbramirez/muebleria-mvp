@@ -10,11 +10,20 @@ interface KitchenModelProps {
   selectedColor?: "red" | "blue";
 }
 
-const textures = {
+interface Textures {
+  cardboard: string;
+  wood: string;
+}
+
+const textures:Textures  = {
   cardboard: "/models/kitchen/textures/pale-textile.jpg",
   wood: "/models/kitchen/textures/brown-wood.jpg",
 };
 
+interface Colors {
+  red: THREE.Color;
+  blue: THREE.Color;
+}
 const colors = {
   red: new THREE.Color(0xff4444),
   blue: new THREE.Color(0x3366ff),
