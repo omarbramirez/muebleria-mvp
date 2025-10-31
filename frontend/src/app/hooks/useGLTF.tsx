@@ -1,12 +1,10 @@
 "use client";
 import React, {
-  Suspense,
   memo,
   useMemo,
   useRef,
-  useEffect
+  useEffect,
 } from "react";
-import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 
@@ -32,27 +30,26 @@ const KitchenModelComponent: React.FC<KitchenModelProps> = ({
   const groupRef = useRef<THREE.Group>(null!);
   const { scene } = useGLTF("/models/kitchen/scene.gltf");
 
-  // 🔹 Guardar texturas originales de cada mesh
+  // Guardar texturas originales de cada mesh
   const originalProps = useMemo(() => {
     const map = new Map<
       string,
       { color: THREE.Color; map: THREE.Texture | null }
     >();
-scene.traverse((child) => {
-  if ((child as THREE.Mesh).isMesh) {
-    const mesh = child as THREE.Mesh;
-    const material = mesh.material as THREE.MeshStandardMaterial;
-    originalProps.set(mesh.uuid, {
-      map: material.map,
-      color: material.color.clone(),
+    scene.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        const material = mesh.material as THREE.MeshStandardMaterial;
+        map.set(mesh.uuid, {
+          map: material.map,
+          color: material.color.clone(),
+        });
+      }
     });
-  }
-});
-
     return map;
   }, [scene]);
 
-  // 🔹 Cargar texturas personalizadas
+  // Cargar texturas personalizadas solo una vez
   const loadedTextures = useMemo(() => {
     const loader = new THREE.TextureLoader();
     return {
@@ -61,40 +58,43 @@ scene.traverse((child) => {
     };
   }, []);
 
-  // 🔹 Actualizar materiales dinámicamente
-groupRef.current.traverse((child) => {
-  if ((child as THREE.Mesh).isMesh) {
-    const mesh = child as THREE.Mesh;
-    const material = mesh.material as THREE.MeshStandardMaterial;
+  // 🧠 APLICAR cambios en materiales dinámicamente (solo cuando hay grupo)
+  useEffect(() => {
+    const group = groupRef.current;
+    if (!group) return;
 
-    // Aplicar textura seleccionada
-    if (selectedTexture && loadedTextures[selectedTexture]) {
-      material.map = loadedTextures[selectedTexture];
-    } else {
-      material.map = originalProps.get(mesh.uuid)?.map || null;
-    }
+    group.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        const material = mesh.material as THREE.MeshStandardMaterial;
 
-    // Aplicar color seleccionado
-    if (selectedColor && COLORS[selectedColor]) {
-      material.color = COLORS[selectedColor].clone();
-    } else {
-      const original = originalProps.get(mesh.uuid);
-      if (original) material.color.copy(original.color);
-    }
+        // Textura
+        if (selectedTexture && loadedTextures[selectedTexture]) {
+          material.map = loadedTextures[selectedTexture];
+        } else {
+          material.map = originalProps.get(mesh.uuid)?.map || null;
+        }
 
-    material.needsUpdate = true;
-  }
-});
+        // Color
+        if (selectedColor && COLORS[selectedColor]) {
+          material.color = COLORS[selectedColor].clone();
+        } else {
+          const original = originalProps.get(mesh.uuid);
+          if (original) material.color.copy(original.color);
+        }
 
+        material.needsUpdate = true;
+      }
+    });
+  }, [selectedTexture, selectedColor, loadedTextures, originalProps]);
 
-  // 🔹 Añadir el modelo al grupo principal
+  // Añadir el modelo al grupo principal
   useEffect(() => {
     const group = groupRef.current;
     if (!group || !scene) return;
 
     group.add(scene);
 
-    // Limpieza opcional si el componente se desmonta o recarga
     return () => {
       group.remove(scene);
     };

@@ -1,6 +1,10 @@
 "use client";
 import { useState } from "react";
-import KitchenScene from "@/app/components/scenes/scene";
+import dynamic from "next/dynamic";
+
+const KitchenScene = dynamic(() => import("@/app/components/scenes/scene"), {
+  ssr: false,
+});
 
 export default function SetPlanner() {
   const [texture, setTexture] = useState<string>("");
