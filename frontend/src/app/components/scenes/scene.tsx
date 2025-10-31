@@ -49,7 +49,8 @@ const KitchenScene: React.FC<{ texture: string; color: string }> = ({ texture, c
 
         <Suspense fallback={null}>
           <Environment preset="apartment" background={false} />
-          <KitchenModel selectedTexture={texture as any} selectedColor={color as any} />
+          <KitchenModel   selectedTexture={texture as "cardboard" | "wood"}
+  selectedColor={color as "red" | "blue"} />
         </Suspense>
 
         <OrbitControls enableDamping target={[0, 0, 0]} />
