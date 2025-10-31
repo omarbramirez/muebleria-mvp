@@ -38,14 +38,17 @@ const KitchenModelComponent: React.FC<KitchenModelProps> = ({
       string,
       { color: THREE.Color; map: THREE.Texture | null }
     >();
-    scene.traverse((child: any) => {
-      if (child.isMesh && child.material) {
-        map.set(child.uuid, {
-          map: child.material.map,
-          color: child.material.color.clone(),
-        });
-      }
+scene.traverse((child) => {
+  if ((child as THREE.Mesh).isMesh) {
+    const mesh = child as THREE.Mesh;
+    const material = mesh.material as THREE.MeshStandardMaterial;
+    originalProps.set(mesh.uuid, {
+      map: material.map,
+      color: material.color.clone(),
     });
+  }
+});
+
     return map;
   }, [scene]);
 
@@ -59,29 +62,30 @@ const KitchenModelComponent: React.FC<KitchenModelProps> = ({
   }, []);
 
   // 🔹 Actualizar materiales dinámicamente
-  useFrame(() => {
-    if (!groupRef.current) return;
-    groupRef.current.traverse((child: any) => {
-      if (child.isMesh && child.material) {
-        // Aplicar textura seleccionada
-        if (selectedTexture && loadedTextures[selectedTexture]) {
-          child.material.map = loadedTextures[selectedTexture];
-        } else {
-          child.material.map = originalProps.get(child.uuid)?.map || null;
-        }
+groupRef.current.traverse((child) => {
+  if ((child as THREE.Mesh).isMesh) {
+    const mesh = child as THREE.Mesh;
+    const material = mesh.material as THREE.MeshStandardMaterial;
 
-        // Aplicar color seleccionado
-        if (selectedColor && COLORS[selectedColor]) {
-          child.material.color = COLORS[selectedColor].clone();
-        } else {
-          const original = originalProps.get(child.uuid);
-          if (original) child.material.color.copy(original.color);
-        }
+    // Aplicar textura seleccionada
+    if (selectedTexture && loadedTextures[selectedTexture]) {
+      material.map = loadedTextures[selectedTexture];
+    } else {
+      material.map = originalProps.get(mesh.uuid)?.map || null;
+    }
 
-        child.material.needsUpdate = true;
-      }
-    });
-  });
+    // Aplicar color seleccionado
+    if (selectedColor && COLORS[selectedColor]) {
+      material.color = COLORS[selectedColor].clone();
+    } else {
+      const original = originalProps.get(mesh.uuid);
+      if (original) material.color.copy(original.color);
+    }
+
+    material.needsUpdate = true;
+  }
+});
+
 
   // 🔹 Añadir el modelo al grupo principal
   useEffect(() => {
