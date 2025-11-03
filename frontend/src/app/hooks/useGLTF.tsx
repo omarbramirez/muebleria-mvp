@@ -54,7 +54,7 @@ export const KitchenModel: React.FC<KitchenModelProps> = memo(
       return map;
     }, [scene]);
 
-    KitchenModel.displayName = "KitchenModel";
+
 
     // Cargar texturas
     const loadedTextures = useMemo(() => {
@@ -199,5 +199,5 @@ export const KitchenModel: React.FC<KitchenModelProps> = memo(
     return <group ref={groupRef} onClick={handleClick}/>;
   }
 );
-
+    KitchenModel.displayName = "KitchenModel";
 useGLTF.preload("/models/kitchen/scene.gltf");
