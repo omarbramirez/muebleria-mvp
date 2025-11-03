@@ -6,8 +6,12 @@ import Header from '@/app/components/Header';
 import { X } from 'lucide-react';
 import {filters} from '@/app/assets/assets'
 
-const Filters = ({setIsOpen}) => {
+interface FiltersProps {
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
+
+const Filters:React.FC<FiltersProps> = ({setIsOpen}) => {
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-start justify-start bg-primary bg-opacity-90 h-screen py-5">
         <div className='flex flex-row content-between w-full justify-center'>
