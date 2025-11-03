@@ -285,6 +285,12 @@
     },
     "success": "Te has suscrito con éxito 🎉"
   },
+  "catalog": {
+  "call_to_action": "Cada pieza combina diseño y funcionalidad",
+  "title": "Explora muebles únicos creados para adaptarse a tu espacio",
+  "description": "Desde mesas y gabinetes hasta estanterías modulares, encuentra inspiración en nuestra colección cuidadosamente diseñada para entornos modernos.",
+  "link": ""
+},
   "explore": {
     "call_to_action": "Cada pieza se fabrica bajo demanda",
     "title": "Adquiere muebles por conjuntos completos como salas, cocinas o baños",

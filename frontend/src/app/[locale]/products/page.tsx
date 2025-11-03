@@ -6,16 +6,16 @@ import { PREFERENCE_WIZARD_ITEMS } from "@/app/assets/assets";
 import { Heading } from '@/app/components/ui/Heading';
 import { Paragraph } from '@/app/components/ui/Paragraph';
 import { LinkItem } from "@/app/components/ui/LinkItem";
-import { div } from 'motion/react-client';
 import Header from '@/app/components/Header';
+import ProductCatalog from '@/app/components/Catalog';
+import Introduction from '@/app/components/Introduction'
+
 
 const Products = () => {
-  const t = useTranslations("explore.wizard");
-  const [activeSection, setActiveSection] = useState(PREFERENCE_WIZARD_ITEMS[0]?.key); 
-
 return (
   <PageLayout>
-  <Header/>
+    <Introduction page='catalog'/>
+  <ProductCatalog/>
   </PageLayout>
   
   );

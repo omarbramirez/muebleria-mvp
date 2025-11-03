@@ -4,6 +4,7 @@ import React, {
   useMemo,
   useRef,
   useEffect,
+  useState,
 } from "react";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
@@ -11,6 +12,7 @@ import * as THREE from "three";
 interface KitchenModelProps {
   selectedTexture?: "cardboard" | "wood";
   selectedColor?: "red" | "blue";
+  hiddenPart?: string; // ← nombre del mesh que quieres ocultar (ej. "Divanus")
 }
 
 const TEXTURE_PATHS = {
@@ -18,90 +20,181 @@ const TEXTURE_PATHS = {
   wood: "/models/kitchen/textures/brown-wood.jpg",
 };
 
-const COLORS = {
+const COLORS: Record<"red" | "blue", THREE.Color> = {
   red: new THREE.Color(0xff4444),
   blue: new THREE.Color(0x3366ff),
 };
 
-const KitchenModelComponent: React.FC<KitchenModelProps> = ({
-  selectedTexture,
-  selectedColor,
-}) => {
-  const groupRef = useRef<THREE.Group>(null!);
-  const { scene } = useGLTF("/models/kitchen/scene.gltf");
+export const KitchenModel: React.FC<KitchenModelProps> = memo(
+  ({ selectedTexture, selectedColor, hiddenPart }) => {
+    const groupRef = useRef<THREE.Group>(null!);
+    const { scene, nodes } = useGLTF("/models/kitchen/scene.gltf");
 
-  // Guardar texturas originales de cada mesh
-  const originalProps = useMemo(() => {
-    const map = new Map<
-      string,
-      { color: THREE.Color; map: THREE.Texture | null }
-    >();
-    scene.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const mesh = child as THREE.Mesh;
-        const material = mesh.material as THREE.MeshStandardMaterial;
-        map.set(mesh.uuid, {
-          map: material.map,
-          color: material.color.clone(),
-        });
-      }
-    });
-    return map;
-  }, [scene]);
+    const [parts, setParts] = useState<Record<string, THREE.Mesh>>({});
 
-  // Cargar texturas personalizadas solo una vez
-  const loadedTextures = useMemo(() => {
-    const loader = new THREE.TextureLoader();
-    return {
-      cardboard: loader.load(TEXTURE_PATHS.cardboard),
-      wood: loader.load(TEXTURE_PATHS.wood),
-    };
-  }, []);
-
-  // 🧠 APLICAR cambios en materiales dinámicamente (solo cuando hay grupo)
-  useEffect(() => {
-    const group = groupRef.current;
-    if (!group) return;
-
-    group.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const mesh = child as THREE.Mesh;
-        const material = mesh.material as THREE.MeshStandardMaterial;
-
-        // Textura
-        if (selectedTexture && loadedTextures[selectedTexture]) {
-          material.map = loadedTextures[selectedTexture];
-        } else {
-          material.map = originalProps.get(mesh.uuid)?.map || null;
+    // Guardar props originales
+    const originalProps = useMemo(() => {
+      const map = new Map<
+        string,
+        { color: THREE.Color; map: THREE.Texture | null; visible: boolean }
+      >();
+      scene.traverse((child) => {
+        // console.log(child.name)
+        if ((child as THREE.Mesh).isMesh) {
+          const mesh = child as THREE.Mesh;
+          const material = mesh.material as THREE.MeshStandardMaterial;
+          map.set(mesh.uuid, {
+            map: material.map,
+            color: material.color.clone(),
+            visible: mesh.visible,
+          });
         }
+      });
+      return map;
+    }, [scene]);
 
-        // Color
-        if (selectedColor && COLORS[selectedColor]) {
-          material.color = COLORS[selectedColor].clone();
-        } else {
-          const original = originalProps.get(mesh.uuid);
-          if (original) material.color.copy(original.color);
+    // Cargar texturas
+    const loadedTextures = useMemo(() => {
+      const loader = new THREE.TextureLoader();
+      return {
+        cardboard: loader.load(TEXTURE_PATHS.cardboard),
+        wood: loader.load(TEXTURE_PATHS.wood),
+      };
+    }, []);
+
+    // Configurar modelo
+    useEffect(() => {
+      const group = groupRef.current;
+      if (!group || !scene) return;
+
+      group.add(scene);
+
+      // Clonar materiales
+      scene.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          const mesh = child as THREE.Mesh;
+          mesh.material = (mesh.material as THREE.Material).clone();
         }
+      });
 
-        material.needsUpdate = true;
+      // Mapeo de partes por nombre
+      const map: Record<string, THREE.Mesh> = {};
+      scene.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          map[child.name] = child as THREE.Mesh;
+        }
+      });
+      setParts(map);
+
+      // Centrar modelo
+      const box = new THREE.Box3().setFromObject(scene);
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      scene.position.sub(center);
+
+      return () => {
+        group.remove(scene);
+      };
+      
+    }, [scene]);
+
+    // Aplicar textura global
+    useEffect(() => {
+      const group = groupRef.current;
+      if (!group) return;
+      group.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          const mesh = child as THREE.Mesh;
+          const material = mesh.material as THREE.MeshStandardMaterial;
+
+          if (selectedTexture && loadedTextures[selectedTexture]) {
+            material.map = loadedTextures[selectedTexture];
+          } else {
+            material.map = originalProps.get(mesh.uuid)?.map || null;
+          }
+
+          material.needsUpdate = true;
+        }
+      });
+    }, [selectedTexture, loadedTextures, originalProps]);
+
+    // Cambiar color del Cabinet_01
+    // useEffect(() => {
+    //   const colouredPart = parts["Polka_standardSurface1_0"];
+    //   if (!colouredPart) return;
+
+    //   const material = colouredPart.material as THREE.MeshStandardMaterial;
+    //   colouredPart.material = material.clone();
+
+    //   const color =
+    //     selectedColor && COLORS[selectedColor]
+    //       ? COLORS[selectedColor]
+    //       : originalProps.get(colouredPart.uuid)?.color;
+
+    //   if (color) {
+    //     (colouredPart.material as THREE.MeshStandardMaterial).color.copy(color);
+    //     colouredPart.material.needsUpdate = true;
+    //   }
+    // }, [selectedColor, parts, originalProps]);
+
+    // 🔥 Ocultar un objeto específico (por name)
+    useEffect(() => {
+
+      // Restaurar visibilidad original de todos antes
+      Object.values(parts).forEach((mesh) => {
+        const original = originalProps.get(mesh.uuid);
+        if (original) mesh.visible = original.visible;
+      });
+      if (hiddenPart && parts[hiddenPart]) {
+        parts[hiddenPart].visible = false; 
       }
-    });
-  }, [selectedTexture, selectedColor, loadedTextures, originalProps]);
+      
+    }, [hiddenPart, parts, originalProps]);
 
-  // Añadir el modelo al grupo principal
-  useEffect(() => {
-    const group = groupRef.current;
-    if (!group || !scene) return;
 
-    group.add(scene);
+      const handleClick = (event: any) => {
+    event.stopPropagation(); // evita burbujeo del evento
+    const clickedObject = event.object;
+    console.log("Nombre del elemento clicado:", clickedObject.name);
 
-    return () => {
-      group.remove(scene);
-    };
-  }, [scene]);
+     const divanus = scene.getObjectByName("Divanus");
+    if (divanus) {
+      divanus.children.forEach((child) => {
+        console.log("→", child.name);
+            if (parts[`${child.name}_standardSurface1_0`].visible) {
+        console.log(parts[`${child.name}_standardSurface1_0`].visible)
+        parts[`${child.name}_standardSurface1_0`].visible = false; 
+      }
+      });
+    }
+  };
 
-  return <group ref={groupRef} />;
-};
 
-export const KitchenModel = memo(KitchenModelComponent);
+
+//   useEffect(() => {
+//     const divanus = scene.getObjectByName("Divanus");
+//  console.log("Objeto Divanus:", divanus);
+//     if (divanus) {
+//       divanus.children.forEach((child) => {
+//         console.log("→", child.name);
+
+//         Object.values(parts).forEach((mesh) => {
+//         const original = originalProps.get(mesh.uuid);
+//         if (original) mesh.visible = original.visible;
+//       });
+//       if (parts[`${child.name}_standardSurface1_0`]) {
+//         console.log(parts[`${child.name}_standardSurface1_0`].visible)
+//         parts[child.name].visible = false; 
+//       }
+
+
+//       });
+//     }
+    
+//   }, [scene]);
+
+    return <group ref={groupRef} onClick={handleClick}/>;
+  }
+);
+
 useGLTF.preload("/models/kitchen/scene.gltf");

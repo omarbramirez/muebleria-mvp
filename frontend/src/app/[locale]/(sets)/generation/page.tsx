@@ -4,15 +4,19 @@ import { Button } from '@/app/components/ui/Button';
 import PageLayout from "@/app/components/ui/PageLayout";
 import { Paragraph } from '@/app/components/ui/Paragraph';
 import { useRouter } from 'next/navigation';
+import SetPlanner from '@/app/components/SetPlanner';
 const Generation = () => {
-  const [budget, setBudget] = useState(25000);
+  const [budget, setBudget] = useState(55000);
   const [details, setDetails] = useState(25000);
 
 
   const router = useRouter()
   return (
     <PageLayout>
-      <div className=" w-full min-h-screen flex flex-col items-center justify-center gap-2">
+      <div className={`w-full min-h-screen flex flex-col items-center justify-center gap-2 bg-[url('http://transparenttextures.com/patterns/grid-me.png')]`}>
+        <section className={`h-1/2 `}>
+        <SetPlanner/>
+        </section>
         <section>
           <ul>
             <li>
@@ -29,7 +33,7 @@ const Generation = () => {
                 id="budget"
                 type="range"
                 min={10000}
-                max={50000}
+                max={80000}
                 step={5000}
                 value={budget}
                 onChange={(e) => setBudget(Number(e.target.value))}
@@ -63,7 +67,7 @@ const Generation = () => {
           <Button
             variant="primary"
             size="sm"
-            onClick={() => router.push('/render')}
+            onClick={() => router.push('/summary')}
           >
             Confirmar
           </Button>

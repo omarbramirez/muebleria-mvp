@@ -8,6 +8,7 @@ import {KitchenModel} from '@/app/hooks/useGLTF'
 interface KitchenModelProps {
   selectedTexture?: "cardboard" | "wood";
   selectedColor?: "red" | "blue";
+  hiddenPart?: string;
 }
 
 interface Textures {
@@ -30,11 +31,11 @@ const colors = {
 };
 
 
-const KitchenScene: React.FC<{ texture: string; color: string }> = ({ texture, color }) => {
+const KitchenScene: React.FC<{ texture: string; color: string; hiddenPart: string}> = ({ texture, color, hiddenPart }) => {
   return (
     <div style={{ width: "100%", height: "100%" }}>
       <Canvas
-        camera={{ position: [1, 1, 1], fov: 45, near: 0.1, far: 100 }}
+        camera={{ position: [1, 1, 1], fov: 8, near: 0.1, far: 100 }}
         gl={{
           antialias: true,
           toneMapping: THREE.ACESFilmicToneMapping,
@@ -42,7 +43,7 @@ const KitchenScene: React.FC<{ texture: string; color: string }> = ({ texture, c
           powerPreference: "high-performance",
         }}
       >
-        <color attach="background" args={["skyblue"]} />
+        {/* <color attach="background" args={["skyblue"]} /> */}
         <ambientLight intensity={0.4} />
         <directionalLight position={[5, 10, 7]} intensity={1.5} />
         <directionalLight position={[-5, 3, -5]} intensity={0.3} />
@@ -50,10 +51,19 @@ const KitchenScene: React.FC<{ texture: string; color: string }> = ({ texture, c
         <Suspense fallback={null}>
           <Environment preset="apartment" background={false} />
           <KitchenModel   selectedTexture={texture as "cardboard" | "wood"}
-  selectedColor={color as "red" | "blue"} />
+  selectedColor={color as "red" | "blue"} hiddenPart={hiddenPart as string}/>
         </Suspense>
+        <OrbitControls
+          enableDamping
+  dampingFactor={0.05}
+  target={[0, 0, 0]} 
+  minDistance={1}    
+  maxDistance={4}      
+  minPolarAngle={Math.PI / 4}  
+  maxPolarAngle={Math.PI / 2.2}
 
-        <OrbitControls enableDamping target={[0, 0, 0]} />
+  />
+        {/* <OrbitControls enableDamping target={[0, 0, 0]} /> */}
       </Canvas>
     </div>
   );
