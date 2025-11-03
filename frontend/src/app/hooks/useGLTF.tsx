@@ -54,6 +54,8 @@ export const KitchenModel: React.FC<KitchenModelProps> = memo(
       return map;
     }, [scene]);
 
+    KitchenModel.displayName = "KitchenModel";
+
     // Cargar texturas
     const loadedTextures = useMemo(() => {
       const loader = new THREE.TextureLoader();
