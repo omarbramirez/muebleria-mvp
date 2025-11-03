@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import { ThreeEvent } from '@react-three/fiber';
 
 interface KitchenModelProps {
   selectedTexture?: "cardboard" | "wood";
@@ -152,7 +153,7 @@ export const KitchenModel: React.FC<KitchenModelProps> = memo(
     }, [hiddenPart, parts, originalProps]);
 
 
-      const handleClick = (event: any) => {
+     const handleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation(); // evita burbujeo del evento
     const clickedObject = event.object;
     console.log("Nombre del elemento clicado:", clickedObject.name);
