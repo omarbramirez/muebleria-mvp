@@ -481,3 +481,7 @@ solo dos en presupuesto, quitar estanterias y banco en detalle
 Agregar altura,
 Agregar ventanas y puertas
 Hacer que el modelo se mueve ? en un plano isometrico
+
+
+
+Testing
