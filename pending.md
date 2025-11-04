@@ -457,3 +457,7 @@ TTI (Time To Interactive) mide cuánto tarda una página en estar completamente 
 Es una de las Core Web Vitals indirectas, usada para cuantificar la sensación de rapidez.
 El navegador pinta y reacomoda el contenido constantemente cuando cambian estilos o el layout.
 Estos procesos consumen CPU y son la causa principal de micro-lags o baja fluidez visual en UI complejas (animaciones, scroll, 3D, etc.).
+
+## 03 NOV 
+
+1) motor de ensamblado inteligente

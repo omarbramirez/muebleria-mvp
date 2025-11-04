@@ -15,6 +15,7 @@ export function SlidingUpAnimation({ children, className }: MotionProps) {
             initial={{ y: 25, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
+            viewport={{ once: true }}
         >
             {children}
         </motion.div>
@@ -30,6 +31,7 @@ export function RevealingAnimation({ children, className }: MotionProps) {
             initial={{ width: 0 }}
             whileInView={{ width: "100%" }}
             transition={{ duration: 1, ease: "easeInOut" }}
+            viewport={{ once: true }}
         >
             {children}
         </motion.div>
@@ -43,6 +45,7 @@ export function HoveringAnimation ({ children, className }: MotionProps){
         className={classes}
         whileHover={{ scale: 1.1 }}
   transition={{ type: "spring", delay: 0.1,stiffness: 400, damping: 10 }}
+  viewport={{ once: true }}
         >
             {children}
         </motion.div>
