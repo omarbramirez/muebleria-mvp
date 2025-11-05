@@ -480,4 +480,13 @@ necesito refactorizar esto para usar params y router.get("from") en flujos con c
 ![alt text](image-36.png)
 
 solo dos en presupuesto, quitar estanterias y banco en detalle
->>>>>>> 05e771225fa4f125cf7ae7ae19ce944e29208561
+
+## 3 NOV
+
+Agregar altura,
+Agregar ventanas y puertas
+Hacer que el modelo se mueve ? en un plano isometrico
+
+
+
+Testing
