@@ -490,3 +490,7 @@ Hacer que el modelo se mueve ? en un plano isometrico
 
 
 Testing
+
+## 4 NOV
+
+Testeando
