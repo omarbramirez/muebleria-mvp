@@ -40,7 +40,7 @@ useEffect(() => {
   return (
     <div ref={menuRef} className="w-auto md:hidden z-50" onClick={() => setIsOpen(false)}>
       {isOpen && (
-        <ul className="w-auto absolute top-16 left-0 w-full bg-background-light shadow-lg flex flex-col gap-4 p-6" >
+        <ul className="w-auto absolute top-14 left-0 w-full bg-background-light shadow-lg flex flex-col gap-4 p-6 opacity-95 " >
   
                    {NAVBAR_ITEMS.map((item) => (
                      <li key={item.key}>

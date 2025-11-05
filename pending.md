@@ -458,6 +458,26 @@ Es una de las Core Web Vitals indirectas, usada para cuantificar la sensación d
 El navegador pinta y reacomoda el contenido constantemente cuando cambian estilos o el layout.
 Estos procesos consumen CPU y son la causa principal de micro-lags o baja fluidez visual en UI complejas (animaciones, scroll, 3D, etc.).
 
+<<<<<<< HEAD
 ## 03 NOV 
 
 1) motor de ensamblado inteligente
+=======
+##  30 OCT
+
+ya debería estar seleccionada la cocina o baño si se accede desde sus botones
+
+![alt text](image-34.png)
+
+necesito refactorizar esto para usar params y router.get("from") en flujos con componentes compartidos como el area
+
+![alt text](image-35.png)
+
+
+
+## 1 NOV
+
+![alt text](image-36.png)
+
+solo dos en presupuesto, quitar estanterias y banco en detalle
+>>>>>>> 05e771225fa4f125cf7ae7ae19ce944e29208561

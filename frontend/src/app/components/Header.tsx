@@ -8,23 +8,19 @@ import { SlidingUpAnimation, RevealingAnimation } from '@/app/components/animati
 
 const Header = () => {
   const t = useTranslations('header');
-
   return (
     <div id="top" className="static w-full h-screen grid grid-rows-2 sm:grid-cols-2 bg-primary">
       {/* Columna de texto */}
       <div className="flex flex-col sm:h-screen sm:items-center justify-center z-10 px-10">
-          <RevealingAnimation>
             <Heading as='h3' variant='secondary' size='md'>{t('call_to_action')}</Heading>
-          </RevealingAnimation>
           <SlidingUpAnimation>
             <Heading as="h1" variant="primaryLight" size='lg' hierarchy='forContent'>{t('title')}</Heading>
           </SlidingUpAnimation>
           <Paragraph variant="primaryWhite" size="md" className="max-w-2xl">
             {t('description')}
           </Paragraph>
-
           <Button as="a"
-            href="/#reserve"
+            href="/explore"
             variant='secondary'
           >
             {t("link")}

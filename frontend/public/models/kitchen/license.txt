@@ -1,0 +1,8 @@
+Model Information:
+* title:	Kitchen
+* source:	https://sketchfab.com/3d-models/kitchen-fea3cd29ef4d4981b7b698a35405ab09
+* author:	WeSVa (https://sketchfab.com/WSVideoCarta)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works

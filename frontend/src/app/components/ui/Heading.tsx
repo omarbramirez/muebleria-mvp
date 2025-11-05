@@ -27,7 +27,7 @@ const byTag: Record<HeadingTag, string> = {
 
 const byHierarchy : Record<HeadingHierarchy, string> = {
     forContent: 'text-center sm:text-left my-1',
-    forSection: 'text-center my-15'
+    forSection: 'text-center'
 }
 
 export function Heading({

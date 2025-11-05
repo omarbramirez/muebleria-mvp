@@ -6,8 +6,8 @@ import Image from 'next/image'
 import { Paragraph } from '@/app/components/ui/Paragraph';
 import { Button } from '@/app/components/ui/Button';
 
-const ProcessMenu: React.FC = () => {
-  const t = useTranslations('process_menu');
+const ServiceProcess: React.FC = () => {
+  const t = useTranslations('service_process');
   return (
     <div id="how" className="w-full h-auto py-20  px-8 sm:px-20 !bg-background-light">
         <Heading as="h1" variant="primary" size='lg' hierarchy='forSection'>{t('title')}</Heading>
@@ -30,7 +30,7 @@ const ProcessMenu: React.FC = () => {
         </div>
       ))}
                 <Button as="a"
-                  href="/#reserve"
+                  href="/preferences"
                   variant='secondary'
                 >
                   {t("link")}
@@ -39,4 +39,4 @@ const ProcessMenu: React.FC = () => {
   );
 };
 
-export default ProcessMenu;
+export default ServiceProcess;

@@ -10,8 +10,8 @@ const PageLayout = ({ children }: PageLayoutProps) => {
   return (
     <>
       <Navbar />
-      <section className="w-full h-auto py-20  px-8 sm:px-20 !bg-background-light">
-        <div className="flex flex-col items-center">{children}</div>
+      <section className="w-full h-auto sm:px-20 !bg-background-light">
+        <div className="flex flex-col items-start">{children}</div>
       </section>
       <Footer />
     </>

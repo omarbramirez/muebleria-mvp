@@ -51,7 +51,7 @@ const ProductGrid: React.FC = () => {
 
   {/* Content */}
   <div className="relative z-10 flex flex-col items-center justify-center text-white transition-transform duration-500 group-hover:scale-105 group-hover:-translate-y-1">
-    <cat.icon className="w-10 h-10 mb-2 transition-transform duration-500 group-hover:scale-110  " />
+
     <Heading as='h4' variant='secondary' size='md' className='!text-center !cursor-pointer group-hover:text-foreground-white'>
       {t(cat.name)}
     </Heading>

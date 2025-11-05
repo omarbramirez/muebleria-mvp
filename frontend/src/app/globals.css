@@ -102,6 +102,14 @@ textarea {
   }
 }
 
+label {
+      font-size: 1rem;
+    line-height: 1rem;
+    font-family: var(--font-body);
+    color: var(--color-primary);
+    margin-left: 5px;
+}
+
 /* Componentes reutilizables */
 /* @layer components {
 
@@ -112,3 +120,24 @@ textarea {
     
   }
 } */
+
+#wizard-sections{
+   background: var(--color-foreground-white);
+}
+
+#wizard-sections::before{
+  content: '⪡';
+  position: sticky;
+  top: 10%;
+  left: 0;
+  margin-left: -2rem;
+  font-size: 2rem;
+  width: 2rem;
+  transform: translateY(-50%);
+  color: aqua;
+  background: var(--color-primary);
+  padding: 10px 0px;
+
+}
+
+        /* <aside id="wizard-sections" className="w-64 h-full flex flex-col gap-4 bg-red-500 absolute top-0 right-0 py-20 "> */
