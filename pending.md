@@ -491,10 +491,9 @@ Hacer que el modelo se mueve ? en un plano isometrico
 
 Testing
 
-## 4 NOV
+## 07 NOV
 
-Testeando
-
-vamos a testear esto
-vamos a testear esto por tercera vez
-vamos a testear esto por cuarta vez
+he estado trabajando hoy en 3 nuevas características:
+1) Asignación de altura
+2) Asignación de puertas y ventanas
+3) Perspectiva isométrica simplificada
