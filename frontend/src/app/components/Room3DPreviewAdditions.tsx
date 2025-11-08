@@ -44,7 +44,50 @@ export default function Room3DPreview({ points, height }: Room3DPreviewProps) {
 
         const extrudeSettings = { depth: height / 10, bevelEnabled: false };
 
+/////////////////////////////////////////////////////////////
 
+// Material base transparente
+const baseWallMaterial = new THREE.MeshStandardMaterial({
+    color: 0xd6d3d1,
+    transparent: true,
+    opacity: 0.3, // transparencia
+    side: THREE.DoubleSide,
+    flatShading: true,
+});
+
+// Material de resaltado
+const highlightMaterial = new THREE.MeshStandardMaterial({
+    color: 0xffc107,
+    side: THREE.DoubleSide,
+    flatShading: true,
+});
+
+// Crear paredes individuales
+const wallMeshes: THREE.Mesh[] = [];
+
+for (let i = 0; i < points.length; i++) {
+    const p1 = points[i];
+    const p2 = points[(i + 1) % points.length];
+
+    const wallShape = new THREE.Shape();
+    wallShape.moveTo(0, 0);
+    wallShape.lineTo(p2.x - p1.x, 0);
+    wallShape.lineTo(p2.x - p1.x, -height / 10);
+    wallShape.lineTo(0, -height / 10);
+    wallShape.closePath();
+
+    const wallGeom = new THREE.ExtrudeGeometry(wallShape, { depth: 0.1, bevelEnabled: false });
+    const wallMesh = new THREE.Mesh(wallGeom, baseWallMaterial.clone());
+
+    wallMesh.position.set(p1.x, 0, -p1.y);
+    wallMesh.rotation.x = -Math.PI / 2;
+
+    scene.add(wallMesh);
+    wallMeshes.push(wallMesh);
+}
+
+
+////////////////////////////////////////////////////////////
 
         const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
 
@@ -126,7 +169,48 @@ camera.lookAt(0,0,0);
         };
 
         window.addEventListener("resize", handleResize);
+        
+///////////////////////////////////////////////////////////////////
 
+
+// Raycaster
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+let lastSelected: THREE.Mesh | null = null;
+
+const onMouseClick = (event: MouseEvent) => {
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(wallMeshes, false);
+
+    if (intersects.length > 0) {
+        const selected = intersects[0].object as THREE.Mesh;
+
+        // Restaurar pared anterior si existía
+        if (lastSelected && lastSelected !== selected) {
+            lastSelected.material = baseWallMaterial.clone();
+        }
+
+        // Resaltar pared clickeada
+        selected.material = highlightMaterial;
+        lastSelected = selected;
+
+        // Restaurar tras 0.6s
+        setTimeout(() => {
+            if (lastSelected === selected) selected.material = baseWallMaterial.clone();
+            lastSelected = null;
+        }, 600);
+    }
+};
+
+renderer.domElement.addEventListener("click", onMouseClick);
+
+
+//////////////////////////////////////////////////////////////////
         // --- Limpieza
         return () => {
             window.removeEventListener("resize", handleResize);

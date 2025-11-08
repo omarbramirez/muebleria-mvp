@@ -6,7 +6,7 @@ import { Button } from '@/app/components/ui/Button';
 import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 import Room3DPreview from '@/app/components/Room3DPreview'
-
+import Room3DPreviewAdditions from '@/app/components/Room3DPreviewAdditions'
 const SCALE = 100; // 1 m = 100 px
 const PX_TO_MM = 10;
 const SNAP_THRESHOLD = 10;
@@ -173,7 +173,8 @@ const RoomPlannerHeight: React.FC<roomPlannerProps> = ({ link }) => {
                 </Paragraph>
             </div>
             <div>
-                <Room3DPreview points={points} height={heightMm} />
+                {/* <Room3DPreview points={points} height={heightMm} /> */}
+                <Room3DPreviewAdditions points={points} height={heightMm} />
             </div>
             <svg
                 viewBox="0 0 500 500"
