@@ -497,3 +497,24 @@ he estado trabajando hoy en 3 nuevas características:
 1) Asignación de altura
 2) Asignación de puertas y ventanas
 3) Perspectiva isométrica simplificada
+
+![alt text](image-37.png)
+
+![alt text](image-38.png)
+
+![alt text](image-39.png)
+
+![alt text](image-40.png)
+
+![alt text](image-41.png)
+
+![alt text](image-42.png)
+
+![alt text](image-43.png)
+
+![alt text](image-44.png)
+
+![alt text](image-45.png)
+
+![alt text](image-46.png)
+
