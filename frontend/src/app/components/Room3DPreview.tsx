@@ -1,60 +1,92 @@
+
 "use client";
 import * as THREE from "three";
 import { useEffect, useRef } from "react";
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 interface Point {
-    x: number;
-    y: number;
+  x: number;
+  y: number;
 }
 
 interface Room3DPreviewProps {
-    points: Point[];
-    height: number;
+  points: Point[];
+  height: number;
 }
 
 export default function Room3DPreview({ points, height }: Room3DPreviewProps) {
-    const mountRef = useRef<HTMLDivElement>(null);
+  const mountRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const container = mountRef.current;
-        if (!container) return;
+  useEffect(() => {
+    const container = mountRef.current;
+    if (!container) return;
 
-        const width = container.clientWidth;
-        const heightPx = container.clientHeight;
+    const width = container.clientWidth;
+    const heightPx = container.clientHeight;
 
-        // --- Escena
-        const scene = new THREE.Scene();
-        scene.background = null;
-        // --- Renderizador
-        // 🔹 Renderizador
-        const renderer = new THREE.WebGLRenderer({ alpha: true,antialias: true });
-        renderer.setClearColor(0x000000, 0);
-        renderer.setSize(width, heightPx)
-        renderer.setPixelRatio(window.devicePixelRatio)
-        container.appendChild(renderer.domElement);
+    // --- Escena ---
+    const scene = new THREE.Scene();
+    scene.background = null;
 
+    // --- Renderizador ---
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setClearColor(0x000000, 0);
+    renderer.setSize(width, heightPx);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
 
-        // --- Crear geometría a partir de puntos
-        const shape = new THREE.Shape();
-        points.forEach((p, i) => {
-            if (i === 0) shape.moveTo(p.x, -p.y);
-            else shape.lineTo(p.x, -p.y);
-        });
-        shape.closePath();
+    // --- Luz ambiental suave ---
+    const light = new THREE.AmbientLight(0xffffff, 1.2);
+    scene.add(light);
 
-        const extrudeSettings = { depth: height / 10, bevelEnabled: false };
+    // --- Material “fantasma” colisionable ---
+    const wallMaterial = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.25, // casi invisible, pero sólido
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      roughness: 1,
+      metalness: 0
+    });
 
+    // --- Crear paredes dinámicas ---
+    const walls: THREE.Mesh[] = [];
 
+    for (let i = 0; i < points.length; i++) {
+      const current = points[i];
+      const next = points[(i + 1) % points.length];
 
-        const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+      const wallWidth = Math.hypot(next.x - current.x, next.y - current.y);
+      const wallHeight = height / 10;
 
-        // --- Crear malla de líneas (wireframe estructural)
-        const edges = new THREE.EdgesGeometry(geometry);
-        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00000, linewidth: 1 });
-        const wireframe = new THREE.LineSegments(edges, lineMaterial);
-        wireframe.rotation.x = -Math.PI / 2; // rotar a vista superior realista
-        scene.add(wireframe);
+      const geometry = new THREE.PlaneGeometry(wallWidth, wallHeight);
 
+      const mesh = new THREE.Mesh(geometry, wallMaterial.clone());
+
+      // Posicionar centro del muro
+      const midX = (current.x + next.x) / 2;
+      const midY = (current.y + next.y) / 2;
+      mesh.position.set(midX, 0, midY);
+
+      // Calcular rotación hacia el siguiente punto
+      const angle = Math.atan2(next.y - current.y, next.x - current.x);
+      mesh.rotation.y = -angle;
+
+      scene.add(mesh);
+      walls.push(mesh);
+    }
+
+    // --- Wireframe superior (opcional para visualizar estructura) ---
+    const shape = new THREE.Shape();
+    points.forEach((p, i) => (i === 0 ? shape.moveTo(p.x, -p.y) : shape.lineTo(p.x, -p.y)));
+    shape.closePath();
+    const edgesGeometry = new THREE.EdgesGeometry(new THREE.ShapeGeometry(shape));
+    const wireMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+    const wireframe = new THREE.LineSegments(edgesGeometry, wireMaterial);
+    wireframe.rotation.x = -Math.PI / 2;
+    scene.add(wireframe);
+wireframe.position.y = -((height / 10)/2);
 
 
         // --- Crear la base (solo el shape original) ---
@@ -67,73 +99,204 @@ export default function Room3DPreview({ points, height }: Room3DPreviewProps) {
 
         // Colocamos la base en el fondo del extrude
         baseMesh.rotation.x = -Math.PI / 2;
-        baseMesh.position.y = 0; // coincide con el origen de la extrusión
+        baseMesh.position.y = -((height / 10)/2); // coincide con el origen de la extrusión
         scene.add(baseMesh);
 
 
-        // --- Calcular límites de la geometría
-        geometry.computeBoundingBox();
-        const bbox = geometry.boundingBox!;
-        const size = new THREE.Vector3();
-        bbox.getSize(size);
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const center = new THREE.Vector3();
-        bbox.getCenter(center);
+    // --- Cámara ortográfica ---
+    const bbox = new THREE.Box3().setFromObject(scene);
+    const size = bbox.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const aspect = width / heightPx;
+    const marginFactor = 0.8;
+    const viewSize = maxDim * marginFactor;
 
-        // --- Cámara ortográfica
-        const aspect = width / heightPx;
-       const marginFactor = 0.8; // deja 20% de aire visual
-const viewSize = maxDim * marginFactor; // escala base (ajustable)
-        const camera = new THREE.OrthographicCamera(
-            -viewSize * aspect,
-            viewSize * aspect,
-            viewSize,
-            -viewSize,
-   -1000,
-  3000
-        )
+    const camera = new THREE.OrthographicCamera(
+      -viewSize * aspect,
+      viewSize * aspect,
+      viewSize,
+      -viewSize,
+      -1000,
+      3000
+    );
 
-        // 🔹 Posición isométrica: 35° y 45°
-        const angle = Math.PI / 4
-        const elevation = THREE.MathUtils.degToRad(35)
-        // --- Posicionar cámara en vista isométrica fija respecto al centro
-const distance = maxDim * 2.5;
-camera.position.set(
-  center.x + distance * Math.cos(angle),
-  center.y + distance * Math.sin(angle),
-  center.z + distance * Math.tan(elevation)
-);
-camera.lookAt(0,0,0);
+    const center = bbox.getCenter(new THREE.Vector3());
+    const distance = maxDim * 2.5;
+    const angle = Math.PI / 4;
+    const elevation = THREE.MathUtils.degToRad(35);
+    camera.position.set(
+      center.x + distance * Math.cos(angle),
+      center.y + distance * Math.sin(angle),
+      center.z + distance * Math.tan(elevation)
+    );
+    camera.lookAt(center);
 
-        // --- Render loop fijo
-        const renderScene = () => {
-            renderer.render(scene, camera);
-        };
-        renderScene();
 
-        // --- Responsividad
-        const handleResize = () => {
-            const w = mountRef.current?.clientWidth || 1;
-            const h = mountRef.current?.clientHeight || 1;
-            const aspect = w / h
-            camera.left = -viewSize * aspect
-            camera.right = viewSize * aspect
-            camera.top = viewSize
-            camera.bottom = -viewSize
-            camera.updateProjectionMatrix()
-            renderer.setSize(w, h)
-            renderScene();
-        };
+// --- Controles de cámara (rotación, zoom, paneo) ---
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;       // suaviza el movimiento
+controls.dampingFactor = 0.05;
+controls.enableZoom = true;          // permite hacer zoom
+controls.enablePan = false;          // desactiva el paneo lateral
+controls.rotateSpeed = 0.8;          // velocidad de rotación con el mouse
+controls.zoomSpeed = 1.0;
+controls.target.copy(center);        // apunta al centro del modelo
 
-        window.addEventListener("resize", handleResize);
 
-        // --- Limpieza
-        return () => {
-            window.removeEventListener("resize", handleResize);
-            renderer.dispose();
-            container?.removeChild(renderer.domElement);
-        };
-    }, [points, height]);
 
-    return <div ref={mountRef} style={{ width: "100%", height: "100%", minHeight: "400px" }} />;
+    // --- Raycaster ---
+// --- Raycaster ---
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+let selectedWall: THREE.Mesh | null = null;
+const originalStates = new Map<
+  THREE.Mesh,
+  { opacity: number; transparent: boolean }
+>();
+
+// Estado del modo “agregar rectángulos”
+let addMode = false;
+
+const rectDefaults = {
+  width: 200,
+  height: 400,
+  color: 0x3399ff,
+};
+
+// --- Evento click principal ---
+const onPointerDown = (event: MouseEvent) => {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+
+  const intersects = raycaster.intersectObjects(walls, true);
+
+  if (intersects.length > 0) {
+    const hit = intersects[0];
+    const wall = hit.object as THREE.Mesh;
+    const material = wall.material as THREE.MeshStandardMaterial;
+
+    // --- Si hay una pared seleccionada y estamos en modo “agregar” ---
+if (selectedWall === wall && addMode) {
+  // Punto de impacto en coordenadas locales de la pared
+  const localPoint = wall.worldToLocal(hit.point.clone());
+
+  const rectGeometry = new THREE.PlaneGeometry(rectDefaults.width, rectDefaults.height);
+const rectMaterial = new THREE.MeshBasicMaterial({
+  color: 0xff0000,   // rojo
+  transparent: false, // opaco
+  opacity: 0.95,      // casi totalmente opaco
+  side: THREE.DoubleSide,
+});
+
+  const rectMesh = new THREE.Mesh(rectGeometry, rectMaterial);
+
+  // Posición en espacio LOCAL del muro
+  rectMesh.position.copy(localPoint);
+
+  // Alinearlo con el plano de la pared (en espacio local, la plane está en XY,
+  // así que dejamos rotacion en 0). Si la pared tiene escala, se heredará.
+  rectMesh.rotation.set(0, 0, 0);
+
+  // Empujar levemente en el eje local Z para evitar z-fighting (hacia "afuera" del muro).
+  rectMesh.position.z -= 0.09; // valor en unidades locales (ajusta si lo necesitas)
+
+  // Opcional: marcar userData para identificarlo luego
+  rectMesh.userData = { type: "opening", width: rectDefaults.width, height: rectDefaults.height };
+
+  // Añadir como hijo del muro (heredará transformaciones)
+  wall.add(rectMesh);
+
+  console.log("Rectángulo agregado a pared (local):", wall.uuid, rectMesh.position);
+  return;
+}
+
+
+
+
+
+    // --- Restaurar pared anterior ---
+    if (selectedWall && originalStates.has(selectedWall)) {
+      const { opacity, transparent } = originalStates.get(selectedWall)!;
+      const mat = selectedWall.material as THREE.MeshStandardMaterial;
+      mat.opacity = opacity;
+      mat.transparent = transparent;
+    }
+
+    // --- Guardar estado original ---
+    if (!originalStates.has(wall)) {
+      originalStates.set(wall, {
+        opacity: material.opacity,
+        transparent: material.transparent,
+      });
+    }
+
+    // --- Aplicar efecto de selección ---
+    material.transparent = true;
+    material.opacity = 0.7;
+
+    selectedWall = wall;
+    console.log("Pared seleccionada:", wall.uuid);
+    renderScene();
+  } else {
+    // --- Deseleccionar ---
+    if (selectedWall && originalStates.has(selectedWall)) {
+      const { opacity, transparent } = originalStates.get(selectedWall)!;
+      const mat = selectedWall.material as THREE.MeshStandardMaterial;
+      mat.opacity = opacity;
+      mat.transparent = transparent;
+    }
+    selectedWall = null;
+  }
+};
+
+// --- Activar o desactivar modo de agregar rectángulos (por ejemplo con tecla) ---
+window.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "a") {
+    addMode = !addMode;
+    console.log("Modo agregar:", addMode);
+  }
+});
+
+
+    renderer.domElement.addEventListener("pointerdown", onPointerDown);
+
+    // --- Render loop ---
+const renderScene = () => {
+  controls.update(); // ← actualiza suavizado de OrbitControls
+  renderer.render(scene, camera);
+  requestAnimationFrame(renderScene); // ← mantiene animación fluida
+};
+renderScene();
+
+    // --- Responsividad ---
+    const handleResize = () => {
+      const w = mountRef.current?.clientWidth || 1;
+      const h = mountRef.current?.clientHeight || 1;
+      const aspect = w / h;
+      camera.left = -viewSize * aspect;
+      camera.right = viewSize * aspect;
+      camera.top = viewSize;
+      camera.bottom = -viewSize;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+      renderScene();
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // --- Limpieza ---
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      renderer.domElement.removeEventListener("pointerdown", onPointerDown);
+      renderer.dispose();
+      controls.dispose();
+      container.removeChild(renderer.domElement);
+      
+    };
+  }, [points, height]);
+
+  return <div ref={mountRef} style={{ width: "100%", height: "100%", minHeight: "400px" }} />;
 }

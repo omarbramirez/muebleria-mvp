@@ -274,7 +274,7 @@ const RoomPlannerHeight: React.FC<roomPlannerProps> = ({ link }) => {
                     step="50"
                     value={heightMm}
                     onChange={(e) => setHeightMm(Number(e.target.value))}
-                    className="w-20 text-center border border-gray-300 rounded-md"
+                    className="w-20 text-center border border-gray-300 rounded-md text-black"
                 />
             </div>
 
