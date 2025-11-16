@@ -404,5 +404,5 @@ const Room3DPreview = forwardRef<OpeningMethods, Room3DPreviewProps>(
     return <div ref={mountRef} style={{ width: "100%", height: "100%", minHeight: "400px" }} />;
   }
 );
-
+Room3DPreview.displayName = "Room3DPreview";
 export default Room3DPreview;
