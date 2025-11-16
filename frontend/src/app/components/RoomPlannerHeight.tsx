@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Heading } from '@/app/components/ui/Heading';
 import { Paragraph } from '@/app/components/ui/Paragraph';
 import { Button } from '@/app/components/ui/Button';
@@ -19,8 +19,15 @@ interface Point {
 interface roomPlannerProps {
     link: string;
 }
+interface OpeningConfig {
+    width: number;
+    height: number;
+    color?: number;
+}
 
 const RoomPlannerHeight: React.FC<roomPlannerProps> = ({ link }) => {
+
+    
     const [points, setPoints] = useState<Point[]>([
         { x: 50, y: 100 },
         { x: 450, y: 100 },
@@ -33,13 +40,30 @@ const RoomPlannerHeight: React.FC<roomPlannerProps> = ({ link }) => {
     // Nuevo estado para altura en milímetros
     const [heightMm, setHeightMm] = useState<number>(2500);
 
+    const [openings, setOpenings] = useState<OpeningConfig[]>([
+        { width: 80, height: 50, color: 0x66ccff },  // ventana pequeña
+    ])
 
+    const [rectWidth, setRectWidth] = useState<number>(100);
+    const [rectHeight, setRectHeight] = useState<number>(100);
 
 
     const [dragging, setDragging] = useState<number | null>(null);
     const [lastTap, setLastTap] = useState(0);
     const t = useTranslations("pop_ups.space_configuration");
 
+    const openingIndexRef = useRef(0);
+
+    const handleAddOpening = () => {
+        setOpenings(prev => [
+            ...prev,
+            {
+                width: rectWidth,
+                height: rectHeight,
+                color: 0xff0000, // o dinámico
+            },
+        ]);
+    };
     // --- Calcular área
     const area = Math.abs(
         points.reduce((acc, curr, i) => {
@@ -67,7 +91,7 @@ const RoomPlannerHeight: React.FC<roomPlannerProps> = ({ link }) => {
     });
 
     // --- Eliminar vértice (acepta MouseEvent, no PointerEvent)
-    const handleDeleteVertex = (i: number, e: React.MouseEvent<SVGCircleElement>) => {
+    const handleDeleteVertex = (i: number, e: React.MouseEvent<SVGCircleElement> | React.PointerEvent<SVGCircleElement>) => {
         e.stopPropagation();
         setPoints(prev => {
             if (prev.length <= 3) return prev; // mínimo 3 vértices
@@ -120,18 +144,17 @@ const RoomPlannerHeight: React.FC<roomPlannerProps> = ({ link }) => {
 
             setPoints(prev => {
                 const newPoints = [...prev];
-
-                prev.forEach((p, i) => {
-                    if (i === dragging) return;
-                    const dx = Math.abs(p.x - x);
-                    const dy = Math.abs(p.y - y);
-                    if (dy < SNAP_THRESHOLD) y = p.y;
-                    if (dx < SNAP_THRESHOLD) x = p.x;
-                });
-
+                for (let i = 0; i < prev.length; i++) {
+                    if (i === dragging) continue;
+                    const dx = Math.abs(prev[i].x - x);
+                    const dy = Math.abs(prev[i].y - y);
+                    if (dy < SNAP_THRESHOLD) y = prev[i].y;
+                    if (dx < SNAP_THRESHOLD) x = prev[i].x;
+                }
                 newPoints[dragging] = { x, y };
                 return newPoints;
             });
+
         },
         [dragging]
     );
@@ -164,17 +187,49 @@ const RoomPlannerHeight: React.FC<roomPlannerProps> = ({ link }) => {
 
     return (
         <div className="flex gap-2 flex-col select-none bg-[url('http://transparenttextures.com/patterns/grid-me.png')] bg-repeat bg-[length:40px_40px] bg-[#FAFAF8] py-10">
-            <div className="px-5">
-                <Heading as="h1" variant="primary" size='lg' hierarchy='forContent'>
-                    {t('title')}
-                </Heading>
-                <Paragraph variant="primary" size="sm" className="max-w-2xl">
-                    {t('description')}
-                </Paragraph>
+            // Dentro del return, justo después de los inputs de altura
+
+            <div className="flex flex-wrap items-center gap-4 px-5 mt-4">
+                <label className="text-sm font-medium text-gray-700">
+                    Ancho del rectángulo (mm):
+                </label>
+                <input
+                    type="number"
+                    min="100"
+                    max="2000"
+                    step="10"
+                    value={rectWidth}
+                    onChange={(e) => setRectWidth(Number(e.target.value))}
+                    className="w-24 text-center border border-gray-300 rounded-md text-black"
+                />
+
+                <label className="text-sm font-medium text-gray-700 ml-6">
+                    Altura del rectángulo (mm):
+                </label>
+                <input
+                    type="number"
+                    min="100"
+                    max="2500"
+                    step="10"
+                    value={rectHeight}
+                    onChange={(e) => setRectHeight(Number(e.target.value))}
+                    className="w-24 text-center border border-gray-300 rounded-md text-black"
+                />
+
+                {/* === BOTÓN PARA AGREGAR AL ARRAY === */}
+                <button
+                    onClick={handleAddOpening}
+                    className="px-3 py-1 bg-blue-600 text-white rounded-md"
+                >
+                    Agregar
+                </button>
             </div>
+
+
             <div>
                 {/* <Room3DPreview points={points} height={heightMm} /> */}
-                <Room3DPreviewAdditions points={points} height={heightMm} />
+                <Room3DPreviewAdditions points={points} height={heightMm} openings={openings}
+                />
             </div>
             <svg
                 viewBox="0 0 500 500"
@@ -283,11 +338,11 @@ const RoomPlannerHeight: React.FC<roomPlannerProps> = ({ link }) => {
 
             <div className="p-4 rounded-lg text-sm mt-4 text-left ">
                 <Paragraph variant="primary" size="md">
-  {`Altura: ${(heightMm / 1000).toFixed(2)} m`}
-</Paragraph>
-<Paragraph variant="primary" size="md">
-  {`Volumen: ${volumeM3} m³`}
-</Paragraph>
+                    {`Altura: ${(heightMm / 1000).toFixed(2)} m`}
+                </Paragraph>
+                <Paragraph variant="primary" size="md">
+                    {`Volumen: ${volumeM3} m³`}
+                </Paragraph>
 
                 <Heading as='h2' variant='secondary' size='sm'>{t('planner_info.title')}</Heading>
                 <Paragraph variant="primary" size="md">
@@ -297,7 +352,7 @@ const RoomPlannerHeight: React.FC<roomPlannerProps> = ({ link }) => {
                     {`${t('planner_info.area')}: ${areaM2} m²`}
                 </Paragraph>
                 <Paragraph variant="primary" size="md">
-                    {`${t('planner_info.vertices')}: ${areaM2} m²`}
+                    {`${t('planner_info.vertices')}: ${points.length}`}
                 </Paragraph>
             </div>
             <Button as="a"
