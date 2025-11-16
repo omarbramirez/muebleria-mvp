@@ -187,7 +187,7 @@ const RoomPlannerHeight: React.FC<roomPlannerProps> = ({ link }) => {
 
     return (
         <div className="flex gap-2 flex-col select-none bg-[url('http://transparenttextures.com/patterns/grid-me.png')] bg-repeat bg-[length:40px_40px] bg-[#FAFAF8] py-10">
-            // Dentro del return, justo después de los inputs de altura
+            {/* Dentro del return, justo después de los inputs de altura */}
 
             <div className="flex flex-wrap items-center gap-4 px-5 mt-4">
                 <label className="text-sm font-medium text-gray-700">
