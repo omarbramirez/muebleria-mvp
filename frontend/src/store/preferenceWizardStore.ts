@@ -1,11 +1,26 @@
 import { create } from 'zustand';
 
-// 1. Definimos las claves permitidas para anidación (para evitar errores con las funciones)
+// 1. Tipado Estricto de los Valores Permitidos
+// En lugar de 'any', definimos explícitamente qué tipos de datos puede manejar tu store.
+// Esto satisface al linter y protege tu lógica.
+export type WizardStoreValue = 
+  | string 
+  | number 
+  | boolean 
+  | string[] 
+  | File[] 
+  | null
+  | undefined
+  // Permitimos objetos genéricos controlados para sub-configuraciones, 
+  // usando 'unknown' en lugar de 'any' para obligar a verificar el tipo antes de usarlo si fuera necesario.
+  | Record<string, unknown>; 
+
+// 2. Claves permitidas para anidación
 type NestedCategory = 'space' | 'budget' | 'style';
 
-// Definir la estructura REAL que necesita tu motor de diseño
+// 3. Estructura del Store
 interface WizardState {
-  // --- DATOS ESTRUCTURADOS ---
+  // --- DATOS ESTRUCTURADOS (Tipado Fuerte) ---
   space: {
     dimensions: { width: number; length: number; height: number };
     constraints: { windowWall: string; doorWall: string };
@@ -21,14 +36,15 @@ interface WizardState {
     palette: string;
   };
   
-  // --- ESTADO PLANO (Legacy/Rápido) ---
-  values: Record<string, any>; 
+  // --- ESTADO PLANO (Legacy/Dinámico) ---
+  // Reemplazamos Record<string, any> por Record<string, WizardStoreValue>
+  values: Record<string, WizardStoreValue>; 
   
   // --- ACCIONES ---
-  setValue: (key: string, value: any) => void;
+  // El valor de entrada ahora está restringido por nuestro tipo
+  setValue: (key: string, value: WizardStoreValue) => void;
   
-  // Corregimos el tipo de 'category' para que sea seguro
-  setNestedValue: (category: NestedCategory, key: string, value: any) => void; 
+  setNestedValue: (category: NestedCategory, key: string, value: WizardStoreValue) => void; 
 }
 
 export const usePreferenceWizardStore = create<WizardState>((set) => ({
@@ -48,10 +64,14 @@ export const usePreferenceWizardStore = create<WizardState>((set) => ({
     values: { ...state.values, [key]: value }
   })),
 
-  // Setter Anidado (Corregido para TS)
+  // Setter Anidado
   setNestedValue: (category, key, value) => set((state) => {
-    // Recuperamos el objeto actual de esa categoría (ej. state.space)
-    const currentCategoryState = state[category] as Record<string, any>;
+    // INGENIERÍA: Casting Seguro
+    // TypeScript necesita saber que state[category] es un objeto que se puede expandir (...spread).
+    // Usamos 'Record<string, unknown>' que es la versión segura de 'any' para objetos.
+    // Esto le dice al compilador: "Sé que esto es un objeto con claves strings, 
+    // aunque no conozco la forma exacta de sus valores en este momento genérico".
+    const currentCategoryState = state[category] as Record<string, unknown>;
     
     return {
       [category]: { 
