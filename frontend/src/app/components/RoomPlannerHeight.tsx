@@ -30,6 +30,12 @@ interface OpeningConfig {
     color?: number;
 }
 
+// Agregar esto junto a tus otras interfaces
+interface Point {
+    x: number;
+    y: number;
+}
+
 // Mapeo de Módulos (Reemplazamos o añadimos Geometría)
 const MODULES: Record<string, React.ReactNode> = {
     "Geometría": <RoomGeometryPlanner />, // Aquí vive la lógica del SVG y Altura
@@ -53,9 +59,9 @@ const RoomPlannerHeight: React.FC<roomPlannerProps> = ({ link }) => {
     // 1. CONEXIÓN CON EL STORE (Solo lectura aquí)
     const { values } = usePreferenceWizardStore();
 
-    // Obtenemos los valores del store, o usamos los defaults si es la primera carga
-    const points = values.room_points || DEFAULT_POINTS;
-    const heightMm = values.room_height || DEFAULT_HEIGHT;
+// Hacemos cast a 'Point[]' y a 'number' explícitamente
+const points = (values.room_points as unknown as Point[]) || DEFAULT_POINTS;
+const heightMm = (values.room_height as number) || DEFAULT_HEIGHT;
 
     // Estado de UI (Menús, Vistas, etc.)
     const [activeLayout, setActiveLayout] = useState<number>(1);
