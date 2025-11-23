@@ -137,7 +137,7 @@ const Appliances = () => {
   }, [appliances, setValue]);
 
   // Sub-componente de Tarjeta
-  const renderApplianceCard = (key: string, icon: React.ReactNode, title: string, presets: any[]) => {
+  const renderApplianceCard = (key: string, icon: React.ReactNode, title: string, presets: AppliancePreset[]) => {
     // FIX APLICADO: Ahora 'app' está garantizado a existir porque todas las claves
     // fueron incluidas en la inicialización de 'appliances' con defaultAppliances.
     const app = appliances[key]; 
