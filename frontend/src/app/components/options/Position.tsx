@@ -13,11 +13,10 @@ import {
     Layers
 } from "lucide-react";
 
-// ... imports ...
-import { usePreferenceWizardStore } from "@/store/preferenceWizardStore";
+// Importamos el hook Y EL TIPO para el casting estricto
+import { usePreferenceWizardStore, WizardStoreValue } from "@/store/preferenceWizardStore";
 
 // --- 1. CATÁLOGO DE PIEZAS DISPONIBLES ---
-// Esto simula tu base de datos de productos "Standard"
 const CATALOG = [
     { id: 'base_60', name: 'Módulo Base 60cm', type: 'Base', w: 600, h: 900, d: 600, icon: <Box className="w-4 h-4" /> },
     { id: 'drawer_60', name: 'Cajonera 3 Niveles', type: 'Base', w: 600, h: 900, d: 600, icon: <Layers className="w-4 h-4" /> },
@@ -27,7 +26,7 @@ const CATALOG = [
 
 // Tipo para el estado local de la lista
 interface PlacedItem {
-    uid: string; // Unique ID para el render (ej. base_60_timestamp)
+    uid: string;
     catalogId: string;
     name: string;
     position: { x: number, y: number, z: number };
@@ -37,12 +36,15 @@ interface PlacedItem {
 const LayoutManager = () => {
 
     // "State Object" universal en Zustand
-    // Estrategia de Integración (El Patrón "Sync")
     const { values, setValue } = usePreferenceWizardStore();
 
     // --- ESTADO LOCAL (Simulando Zustand para este componente) ---
-    // Lista de muebles colocados en la escena
-    const [items, setItems] = useState<PlacedItem[]>(values.layout_items || []);
+    
+    // CORRECCIÓN 1: Lectura Segura (Double Assertion)
+    const [items, setItems] = useState<PlacedItem[]>(
+        (values.layout_items as unknown as PlacedItem[]) || []
+    );
+
     // ID del mueble seleccionado actualmente para mover
     const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -54,12 +56,11 @@ const LayoutManager = () => {
             uid: `${catalogItem.id}_${Date.now()}`,
             catalogId: catalogItem.id,
             name: catalogItem.name,
-            // Posición inicial inteligente (ej. centro del room o siguiente disponible)
             position: { x: 500 + (items.length * 650), y: 0, z: catalogItem.type === 'Wall' ? 1450 : 0 },
             rotation: 0
         };
         setItems([...items, newItem]);
-        setSelectedId(newItem.uid); // Auto-seleccionar el nuevo
+        setSelectedId(newItem.uid); 
     };
 
     // 2. ELIMINAR
@@ -69,7 +70,7 @@ const LayoutManager = () => {
         setSelectedId(null);
     };
 
-    // 3. MOVER (La lógica de tu Position.tsx anterior)
+    // 3. MOVER
     const updatePos = (axis: 'x' | 'y' | 'z', delta: number) => {
         if (!selectedId) return;
         setItems(items.map(item => {
@@ -94,12 +95,15 @@ const LayoutManager = () => {
 
     // 2. SYNC: Guardamos cada movimiento
     useEffect(() => {
-        setValue('layout_items', items);
+        // CORRECCIÓN 2: Escritura Segura
+        // Convertimos el array de PlacedItem[] a WizardStoreValue[]
+        setValue('layout_items', items as unknown as WizardStoreValue[]);
 
-        // Opcional: Calcular métricas derivadas para la IA
-        // Ej: ¿Cuántos metros lineales de cocina hay?
+        // Opcional: Calcular métricas
         const totalLinearMeters = items.reduce((acc, item) => acc + (item.name.includes('Base') ? 0.6 : 0), 0);
-        setValue('layout_metrics', { total_linear_meters: totalLinearMeters, total_items: items.length });
+        
+        // CORRECCIÓN 3: Escritura Segura para métricas
+        setValue('layout_metrics', { total_linear_meters: totalLinearMeters, total_items: items.length } as unknown as WizardStoreValue);
 
     }, [items, setValue]);
 
@@ -147,7 +151,7 @@ const LayoutManager = () => {
                         >
                             <div className="text-xs font-bold text-gray-700 truncate">{item.name}</div>
                             <div className="text-[10px] text-gray-400 mt-0.5">
-                                X:{item.position.x} Y:{item.position.z} {/* Nota: Z visual es Y en plano 2D a veces, depende tu lógica */}
+                                X:{item.position.x} Y:{item.position.z}
                             </div>
                             {/* Indicador de activo */}
                             {selectedId === item.uid && <div className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full" />}
@@ -165,7 +169,7 @@ const LayoutManager = () => {
                     </div>
 
                     <div className="flex gap-4">
-                        {/* D-PAD (Reutilizado de tu componente anterior) */}
+                        {/* D-PAD */}
                         <div className="grid grid-cols-3 gap-1 w-24 shrink-0">
                             <div />
                             <button onClick={() => updatePos('z', -10)} className="btn-control"><ArrowUp className="icon-sm" /></button>
@@ -225,7 +229,7 @@ const LayoutManager = () => {
                 </div>
             </div>
 
-            {/* Estilos locales para el ejemplo (puedes moverlos a tu CSS) */}
+            {/* Estilos locales */}
             <style jsx>{`
             .btn-control {
                 @apply bg-white border shadow-sm p-1.5 rounded hover:bg-blue-50 active:bg-blue-100 flex justify-center text-slate-600;
@@ -238,4 +242,4 @@ const LayoutManager = () => {
     )
 }
 
-export default LayoutManager
+export default LayoutManager;
