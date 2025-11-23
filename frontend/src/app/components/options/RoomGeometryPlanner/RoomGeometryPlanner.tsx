@@ -8,13 +8,12 @@ import {
   DoorOpen,
   AppWindow,
   Trash2,
-  ArrowLeftRight,
-  Hammer, // Icono para modo estructura
-  MousePointer2 // Icono para modo selección/aberturas
+  Hammer, 
+  MousePointer2 
 } from "lucide-react";
 
-// ... imports ...
-import { usePreferenceWizardStore } from "@/store/preferenceWizardStore";
+// Importamos el hook Y EL TIPO para el casting estricto
+import { usePreferenceWizardStore, WizardStoreValue } from "@/store/preferenceWizardStore";
 
 
 // --- CONSTANTES ---
@@ -37,7 +36,7 @@ export interface WallOpening {
   sillHeight: number;
 }
 
-const DEFAULT_POINTS = [
+const DEFAULT_POINTS: Point[] = [
   { x: 50, y: 100 }, { x: 450, y: 100 },
   { x: 450, y: 400 }, { x: 50, y: 400 },
 ];
@@ -45,28 +44,46 @@ const DEFAULT_POINTS = [
 const RoomGeometryPlanner = () => {
   
       // "State Object" universal en Zustand
-      // Estrategia de Integración (El Patrón "Sync")
       const { values, setValue } = usePreferenceWizardStore();
 
-  // --- ESTADO ---
-  const [points, setPoints] = useState<Point[]>(values.room_points || DEFAULT_POINTS);
-  const [roomHeight, setRoomHeight] = useState(values.room_height || DEFAULT_HEIGHT_MM);
-  const [openings, setOpenings] = useState<WallOpening[]>(values.room_openings || []);
+  // --- ESTADO (CORRECCIÓN DE TIPADO ESTRICTO) ---
+  
+  // 1. Puntos: Casting doble para asegurar que es Point[]
+  const [points, setPoints] = useState<Point[]>(
+    (values.room_points as unknown as Point[]) || DEFAULT_POINTS
+  );
+
+  // 2. Altura: Casting doble para asegurar que es number
+  const [roomHeight, setRoomHeight] = useState(
+    (values.room_height as unknown as number) || DEFAULT_HEIGHT_MM
+  );
+
+  // 3. Aberturas: Casting doble para asegurar que es WallOpening[]
+  const [openings, setOpenings] = useState<WallOpening[]>(
+    (values.room_openings as unknown as WallOpening[]) || []
+  );
 
   // Estado de Interacción
   const [dragging, setDragging] = useState<number | null>(null);
   const [lastTap, setLastTap] = useState(0);
   const [selectedWallIndex, setSelectedWallIndex] = useState<number | null>(null);
 
-  // NUEVO: MODO DE EDICIÓN
+  // MODO DE EDICIÓN
   const [editMode, setEditMode] = useState<'geometry' | 'openings'>('geometry');
 
-  // --- SINCRONIZACIÓN ---
-  useEffect(() => { setValue("room_points", points); }, [points, setValue]);
-  useEffect(() => { setValue("room_height", roomHeight); }, [roomHeight, setValue]);
-  useEffect(() => { setValue("room_openings", openings); }, [openings, setValue]);
+  // --- SINCRONIZACIÓN (ESCRITURA SEGURA) ---
+  useEffect(() => { 
+      setValue("room_points", points as unknown as WizardStoreValue); 
+  }, [points, setValue]);
 
-  // --- CÁLCULOS ---
+  useEffect(() => { 
+      setValue("room_height", roomHeight as unknown as WizardStoreValue); 
+  }, [roomHeight, setValue]);
+
+  useEffect(() => { 
+      setValue("room_openings", openings as unknown as WizardStoreValue); 
+  }, [openings, setValue]);
+
   // --- CÁLCULOS AVANZADOS ---
 
   // 1. Área de Piso (Planta) - Shoelace Formula
@@ -114,11 +131,11 @@ const RoomGeometryPlanner = () => {
     });
   }, [points]);
 
-  // --- LÓGICA DE GEOMETRÍA (Restaurada) ---
+  // --- LÓGICA DE GEOMETRÍA ---
 
   const handleAddVertex = (index: number, e: React.PointerEvent<SVGLineElement>) => {
     e.stopPropagation();
-    e.preventDefault(); // Importante para evitar comportamientos dobles
+    e.preventDefault(); 
 
     const svg = e.currentTarget.closest("svg") as SVGSVGElement;
     if (!svg) return;
@@ -146,14 +163,12 @@ const RoomGeometryPlanner = () => {
 
   const handlePointerDownPoint = (i: number, e: React.PointerEvent<SVGCircleElement>) => {
     e.stopPropagation();
-    // Si estamos en modo aberturas, no permitimos mover puntos para no romper referencias
     if (editMode === 'openings') return;
 
     const currentTime = Date.now();
     const tapGap = currentTime - lastTap;
 
     if (tapGap < 300 && tapGap > 0) {
-      // Doble tap/click para borrar
       handleDeleteVertex(i, e as unknown as React.MouseEvent<SVGCircleElement>);
     } else {
       setLastTap(currentTime);
@@ -253,7 +268,7 @@ const RoomGeometryPlanner = () => {
           </p>
         </div>
 
-        {/* SWITCHER DE MODO (LA SOLUCIÓN UX) */}
+        {/* SWITCHER DE MODO */}
         <div className="bg-gray-100 p-1 rounded-lg flex gap-1">
           <button
             onClick={() => { setEditMode('geometry'); setSelectedWallIndex(null); }}
@@ -309,7 +324,6 @@ const RoomGeometryPlanner = () => {
                   <line
                     x1={p.x} y1={p.y} x2={next.x} y2={next.y}
                     stroke="transparent" strokeWidth={30}
-                    // LÓGICA CONDICIONAL DE EVENTOS
                     onPointerDown={(e) => editMode === 'geometry' && handleAddVertex(i, e)}
                     onClick={(e) => {
                       if (editMode === 'openings') {
@@ -340,7 +354,6 @@ const RoomGeometryPlanner = () => {
                 key={`p-${i}`} cx={p.x} cy={p.y} r={editMode === 'geometry' ? 8 : 4}
                 fill={editMode === 'geometry' ? "#F59E0B" : "#9CA3AF"}
                 stroke="white" strokeWidth={2}
-                // Solo permitir mover/borrar en modo Geometría
                 onPointerDown={(e) => handlePointerDownPoint(i, e)}
                 style={{ cursor: editMode === 'geometry' ? "grab" : "not-allowed" }}
               />
@@ -359,7 +372,7 @@ const RoomGeometryPlanner = () => {
           </svg>
         </div>
 
-        {/* COLUMNA 2: PANEL LATERAL (Lógica Condicional) */}
+        {/* COLUMNA 2: PANEL LATERAL */}
         <div className="sm:w-80 flex flex-col gap-4 h-full overflow-y-auto">
 
           {/* MODO ESTRUCTURA */}
@@ -410,10 +423,9 @@ const RoomGeometryPlanner = () => {
             </div>
           )}
 
-          {/* EDITOR DE MURO (Solo si hay selección en modo aberturas) */}
+          {/* EDITOR DE MURO */}
           {editMode === 'openings' && selectedWallIndex !== null && (
             <div className="flex flex-col h-full animate-in slide-in-from-right-4 fade-in duration-200">
-              {/* ... (Mismo código de editor de muro que te di antes) ... */}
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-sm font-bold text-blue-800 flex items-center gap-2">
                   <Ruler className="w-4 h-4" /> Muro #{selectedWallIndex + 1}
@@ -446,48 +458,49 @@ const RoomGeometryPlanner = () => {
             </div>
           )}
         </div>
-{/* Resumen de Métricas Avanzado */}
-  <div className="space-y-3 p-4 border rounded-lg bg-blue-50 mt-auto"> {/* mt-auto para empujarlo al fondo si hay espacio */}
-      <h3 className="text-sm font-bold text-blue-800 flex items-center gap-2 border-b border-blue-200 pb-2">
-          <Move3D className="w-4 h-4"/>
-          Cómputo Métrico
-      </h3>
-      <div className="text-xs space-y-2">
-          {/* Grupo: Superficies Horizontales */}
-          <div className="flex justify-between font-medium text-gray-600">
-              <span>Área Piso (Planta):</span>
-              <span className="font-bold text-gray-900">{floorAreaM2} m²</span>
-          </div>
-          
-          {/* Grupo: Volumen */}
-          <div className="flex justify-between font-medium text-gray-600">
-              <span>Volumen Aire:</span>
-              <span className="font-bold text-gray-900">{(parseFloat(floorAreaM2) * (roomHeight / 1000)).toFixed(2)} m³</span>
-          </div>
+        
+        {/* Resumen de Métricas Avanzado */}
+        <div className="space-y-3 p-4 border rounded-lg bg-blue-50 mt-auto">
+            <h3 className="text-sm font-bold text-blue-800 flex items-center gap-2 border-b border-blue-200 pb-2">
+                <Move3D className="w-4 h-4"/>
+                Cómputo Métrico
+            </h3>
+            <div className="text-xs space-y-2">
+                {/* Grupo: Superficies Horizontales */}
+                <div className="flex justify-between font-medium text-gray-600">
+                    <span>Área Piso (Planta):</span>
+                    <span className="font-bold text-gray-900">{floorAreaM2} m²</span>
+                </div>
+                
+                {/* Grupo: Volumen */}
+                <div className="flex justify-between font-medium text-gray-600">
+                    <span>Volumen Aire:</span>
+                    <span className="font-bold text-gray-900">{(parseFloat(floorAreaM2) * (roomHeight / 1000)).toFixed(2)} m³</span>
+                </div>
 
-          <div className="border-t border-blue-200 my-1"></div>
+                <div className="border-t border-blue-200 my-1"></div>
 
-          {/* Grupo: Superficies Verticales (Muros) */}
-          <div className="flex justify-between font-medium text-gray-600">
-              <span>Muros (Bruto):</span>
-              <span className="text-gray-500">{wallAreaGrossM2.toFixed(2)} m²</span>
-          </div>
-          
-          {/* Resta de huecos (Feedback Visual) */}
-          {openings.length > 0 && (
-              <div className="flex justify-between font-medium text-red-400 pl-2 border-l-2 border-red-200">
-                  <span>- {openings.length} Vanos:</span>
-                  <span>-{openingsAreaM2.toFixed(2)} m²</span>
-              </div>
-          )}
+                {/* Grupo: Superficies Verticales (Muros) */}
+                <div className="flex justify-between font-medium text-gray-600">
+                    <span>Muros (Bruto):</span>
+                    <span className="text-gray-500">{wallAreaGrossM2.toFixed(2)} m²</span>
+                </div>
+                
+                {/* Resta de huecos (Feedback Visual) */}
+                {openings.length > 0 && (
+                    <div className="flex justify-between font-medium text-red-400 pl-2 border-l-2 border-red-200">
+                        <span>- {openings.length} Vanos:</span>
+                        <span>-{openingsAreaM2.toFixed(2)} m²</span>
+                    </div>
+                )}
 
-          {/* Resultado Neto */}
-          <div className="flex justify-between font-bold text-blue-900 bg-blue-100/50 p-1 rounded">
-              <span>Muros (Neto):</span>
-              <span>{wallAreaNetM2} m²</span>
-          </div>
-      </div>
-  </div>
+                {/* Resultado Neto */}
+                <div className="flex justify-between font-bold text-blue-900 bg-blue-100/50 p-1 rounded">
+                    <span>Muros (Neto):</span>
+                    <span>{wallAreaNetM2} m²</span>
+                </div>
+            </div>
+        </div>
 
         {/* Consejos de Usabilidad */}
         <div className="bg-gray-100 p-3 rounded-lg text-xs text-gray-600">
