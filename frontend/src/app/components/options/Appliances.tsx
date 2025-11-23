@@ -65,9 +65,9 @@ const Move3DIcon = ({ className }: { className?: string }) => (
 
 const Appliances = () => {
 // Simulacro de Store Context para hacer el código autocontenido
-  const [storeValues, setStoreValues] = useState<string, unknown>({});
+  const [storeValues, setStoreValues] = useState<Record<string, unknown>>({});
   const values = storeValues;
-  const setValue = (key: string, value: any) => {
+  const setValue = (key: string, value: unknown) => {
     setStoreValues(prev => ({ ...prev, [key]: value }));
   };
 // Fin Simulacro
