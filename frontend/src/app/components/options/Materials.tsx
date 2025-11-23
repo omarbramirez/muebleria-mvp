@@ -2,14 +2,11 @@ import React, { useState, useEffect } from 'react';
 import {
     Paintbrush,
     Layers,
-    Box,
-    Info,
-    CheckCircle2,
-    DollarSign
+    CheckCircle2
 } from "lucide-react";
 
-// ... imports ...
-import { usePreferenceWizardStore } from "@/store/preferenceWizardStore";
+// Importamos el hook Y EL TIPO para el casting estricto
+import { usePreferenceWizardStore, WizardStoreValue } from "@/store/preferenceWizardStore";
 
 // Tipos de datos para escalabilidad
 type MaterialCategory = 'cabinets' | 'countertops' | 'details';
@@ -54,28 +51,32 @@ const MATERIALS_DB: Record<MaterialCategory, MaterialOption[]> = {
 const Materials = () => {
 
     // "State Object" universal en Zustand
-    // Estrategia de Integración (El Patrón "Sync")
     const { values, setValue } = usePreferenceWizardStore();
 
-    // Defaults definidos en tu archivo anterior
+    // Defaults
     const defaultSelections = {
         cabinets: MATERIALS_DB.cabinets[1],
         countertops: MATERIALS_DB.countertops[1],
         details: MATERIALS_DB.details[0]
     };
 
-    // 1. HYDRATION
-    const [selections, setSelections] = useState<MaterialSelections>(values.materials_config || defaultSelections);
+    // 1. HYDRATION (LECTURA SEGURA)
+    // CORRECCIÓN 1: Usamos 'as unknown as MaterialSelections' para filtrar el tipo genérico del store
+    const [selections, setSelections] = useState<MaterialSelections>(
+        (values.materials_config as unknown as MaterialSelections) || defaultSelections
+    );
+    
     const [activeTab, setActiveTab] = useState<MaterialCategory>('cabinets');
 
     const handleSelect = (category: MaterialCategory, material: MaterialOption) => {
         setSelections(prev => ({ ...prev, [category]: material }));
     };
 
-    // 2. SYNC
-  useEffect(() => {
-    setValue('materials_config', selections);
-  }, [selections, setValue]);
+    // 2. SYNC (ESCRITURA SEGURA)
+    useEffect(() => {
+        // CORRECCIÓN 2: Casting de salida 'as unknown as WizardStoreValue'
+        setValue('materials_config', selections as unknown as WizardStoreValue);
+    }, [selections, setValue]);
 
     // Helper para renderizar indicadores de costo ($ $$ $$$)
     const renderPriceTier = (tier: number) => (
@@ -203,4 +204,4 @@ const Materials = () => {
     )
 }
 
-export default Materials
+export default Materials;
