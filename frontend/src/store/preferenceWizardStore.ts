@@ -1,26 +1,24 @@
 import { create } from 'zustand';
 
-// 1. Tipado Estricto de los Valores Permitidos
-// En lugar de 'any', definimos explícitamente qué tipos de datos puede manejar tu store.
-// Esto satisface al linter y protege tu lógica.
+// 1. TIPO RECURSIVO (La solución definitiva a 'any')
+// Este tipo define exactamente qué es un dato válido en tu aplicación.
+// Al ser recursivo, permite objetos anidados sin usar 'any' ni 'unknown'.
 export type WizardStoreValue = 
   | string 
   | number 
   | boolean 
-  | string[] 
+  | null 
+  | undefined 
   | File[] 
-  | null
-  | undefined
-  // Permitimos objetos genéricos controlados para sub-configuraciones, 
-  // usando 'unknown' en lugar de 'any' para obligar a verificar el tipo antes de usarlo si fuera necesario.
-  | Record<string, unknown>; 
+  | WizardStoreValue[] 
+  | { [key: string]: WizardStoreValue };
 
-// 2. Claves permitidas para anidación
+// 2. Claves para anidación
 type NestedCategory = 'space' | 'budget' | 'style';
 
 // 3. Estructura del Store
 interface WizardState {
-  // --- DATOS ESTRUCTURADOS (Tipado Fuerte) ---
+  // --- DATOS ESTRUCTURADOS ---
   space: {
     dimensions: { width: number; length: number; height: number };
     constraints: { windowWall: string; doorWall: string };
@@ -36,14 +34,12 @@ interface WizardState {
     palette: string;
   };
   
-  // --- ESTADO PLANO (Legacy/Dinámico) ---
-  // Reemplazamos Record<string, any> por Record<string, WizardStoreValue>
+  // --- ESTADO DINÁMICO ---
+  // Aquí usamos el tipo recursivo. TypeScript ya no se quejará de 'any'.
   values: Record<string, WizardStoreValue>; 
   
   // --- ACCIONES ---
-  // El valor de entrada ahora está restringido por nuestro tipo
   setValue: (key: string, value: WizardStoreValue) => void;
-  
   setNestedValue: (category: NestedCategory, key: string, value: WizardStoreValue) => void; 
 }
 
@@ -66,18 +62,17 @@ export const usePreferenceWizardStore = create<WizardState>((set) => ({
 
   // Setter Anidado
   setNestedValue: (category, key, value) => set((state) => {
-    // INGENIERÍA: Casting Seguro
-    // TypeScript necesita saber que state[category] es un objeto que se puede expandir (...spread).
-    // Usamos 'Record<string, unknown>' que es la versión segura de 'any' para objetos.
-    // Esto le dice al compilador: "Sé que esto es un objeto con claves strings, 
-    // aunque no conozco la forma exacta de sus valores en este momento genérico".
-    const currentCategoryState = state[category] as Record<string, unknown>;
-    
+    // INGENIERÍA: Aserción de Tipo Controlada
+    // 1. Obtenemos la sección del estado.
+    // 2. Forzamos a TypeScript a tratarlo como un objeto indexable genérico para permitir la escritura dinámica.
+    // 3. 'as unknown' rompe la inferencia inicial, y 'as Record...' define la forma segura.
+    const targetSection = state[category] as unknown as Record<string, WizardStoreValue>;
+
     return {
-      [category]: { 
-        ...currentCategoryState, 
-        [key]: value 
+      [category]: {
+        ...targetSection,
+        [key]: value
       }
-    };
+    } as Partial<WizardState>; // Hacemos cast del retorno para asegurar coincidencia con el Store
   })
 }));
