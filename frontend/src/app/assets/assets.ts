@@ -1,3 +1,4 @@
+import { StaticImageData } from 'next/image';
 
 import logo from './next.svg';
 import choose from './choose.jpg';
@@ -21,7 +22,41 @@ import lower_kitchen_units from './lower_kitchen_units.jpg'
 import upper_kitchen_units from './upper_kitchen_units.jpg'
 import open_shelf from './open_shelf.jpg'
 
+// src/app/assets/assets.ts
 
+// 1. Definimos la forma de una "Opción" (El botón seleccionable)
+export interface WizardOption {
+  key: string;
+  label: string;
+  description?: string;
+  imageUrl?: string | StaticImageData; // <--- Permite ambos formatos
+}
+
+// 2. Definimos la forma de un "Electrodoméstico" (Para la sección perdida que recuperamos)
+export interface ApplianceOption {
+  key: string;
+  label: string;
+  fields?: string[]; // ej: ["ancho", "alto"]
+}
+
+// 3. Definimos la forma de un "Campo de Texto" (Inputs numéricos)
+export interface WizardField {
+  name: string;
+  label: string;
+  type: 'text' | 'number' | 'email';
+}
+
+// 4. Definimos la forma de una "Sección" (El paso completo del wizard)
+export interface WizardSection {
+  key: string;
+  completed: boolean;
+  title: string;
+  description: string;
+  upload?: boolean;
+  options?: WizardOption[];     // Array de opciones seleccionables
+  fields?: WizardField[];       // Array de inputs manuales
+  appliances?: ApplianceOption[]; // Array especial de electrodomésticos
+}
 
 
 import right_arrow_white from './right-arrow-white.png'
@@ -121,105 +156,310 @@ export const setCategories: SetCategory[] = [
   }
 ];
 
-// export const categories = [
-//   {
-//     id: "desks",
-//     name: "categories.desks.name",
-//     cover: assets.desks,
-//     icon: LampDesk,
-//   },
-//   {
-//     id: "chairs",
-//     name: "categories.chairs.name",
-//     cover: assets.chairs,
-//     icon: Armchair,
-//   },
-//   {
-//     id: "stools",
-//     name: "categories.stools.name",
-//     cover: assets.stools,
-//     icon: Spool,
-//   },
-//   {
-//     id: "shelves",
-//     name: "categories.shelves.name",
-//     cover: assets.shelves,
-//     icon: ToolCase,
-//   },
-// ]
 
-
-export const PREFERENCE_WIZARD_ITEMS = [
+export const PREFERENCE_WIZARD_ITEMS:WizardSection[] = [
+  /* -------------------------------------------------------------------------- */
+  /* 1. Perfil de uso y tipo de proyecto                                        */
+  /* -------------------------------------------------------------------------- */
   {
-    key: "roomType",
+    key: "project_type",
     completed: false,
-    title: "title",
-    description: "description",
+    title: "Tipo de proyecto",
+    description: "Indique si requiere una cocina nueva o una remodelación del espacio existente.",
     options: [
-      { key: "1" },
-      { key: "2" },
-      { key: "3" }
+      { key: "nueva_cocina", label: "Cocina nueva (sin instalaciones previas)" },
+      { key: "remodelacion", label: "Remodelación (cambiar diseño existente)" }
     ]
   },
+
+  {
+    key: "usage_profile",
+    completed: false,
+    title: "Perfil de uso",
+    description: "Seleccione el tipo de uso y la intensidad operativa de la cocina para determinar requerimientos funcionales y materiales adecuados.",
+    options: [
+      { key: "gourmet", label: "Uso intensivo / cocina gourmet" },
+      { key: "familiar", label: "Uso familiar estándar" },
+      { key: "minimal", label: "Uso ligero / preparación básica" },
+      { key: "airbnb", label: "Renta temporal (Airbnb u hospedaje)" }
+    ]
+  },
+
+  /* -------------------------------------------------------------------------- */
+  /* 2. Presupuesto                                                             */
+  /* -------------------------------------------------------------------------- */
   {
     key: "budget",
     completed: false,
-    title: "title",
-    description: "description",
+    title: "Presupuesto estimado",
+    description: "Seleccione el rango de inversión aproximado para orientar la selección de materiales, accesorios y acabados.",
     options: [
-      { key: "1" },
-      { key: "2" },
-      { key: "3" }
+      { key: "economico", label: "Entre $25,000 y $60,000 MXN" },
+      { key: "medio", label: "Entre $60,000 y $120,000 MXN" },
+      { key: "alto", label: "Entre $120,000 y $250,000 MXN" },
+      { key: "premium", label: "Más de $250,000 MXN" },
+      { key: "indefinido", label: "Aún no tengo un presupuesto claro" }
     ]
   },
+
+  /* -------------------------------------------------------------------------- */
+  /* 3. Medidas del espacio / Planos                                            */
+  /* -------------------------------------------------------------------------- */
   {
-    key: "space_size",
+    key: "space_dimensions",
     completed: false,
-    title: "title",
-    description: "description",
+    title: "Dimensiones del espacio",
+    description: "Proporcione las dimensiones aproximadas o exactas del área destinada a la cocina. Si dispone de planos o fotografías, puede subirlos.",
+    options: [],
+    fields: [
+      { name: "ancho_m", label: "Ancho (m)", type: "number" },
+      { name: "largo_m", label: "Largo (m)", type: "number" },
+      { name: "altura_m", label: "Altura libre (m)", type: "number" }
+    ],
+    upload: true
+  },
+
+  {
+    key: "existing_plans",
+    completed: false,
+    title: "Planos, fotografías y documentación",
+    description: "Suba cualquier plano, fotografía o documento técnico que permita comprender mejor el espacio existente.",
+    upload: true,
+    options: []
+  },
+
+  /* -------------------------------------------------------------------------- */
+  /* 4. Características arquitectónicas                                         */
+  /* -------------------------------------------------------------------------- */
+  {
+    key: "room_type",
+    completed: false,
+    title: "Configuración arquitectónica del espacio",
+    description: "Seleccione el tipo de distribución general del área donde se ubicará la cocina.",
     options: [
-      { key: "1" },
-      { key: "2" },
-      { key: "3" },
-      { key: "4" }
+      { key: "lineal", label: "Lineal" },
+      { key: "doble_linea", label: "Doble línea" },
+      { key: "en_l", label: "En L" },
+      { key: "en_u", label: "En U" },
+      { key: "con_isla", label: "Con isla central" },
+      { key: "abierta", label: "Cocina abierta hacia sala/comedor" }
     ]
   },
+
+  {
+    key: "wall_type",
+    completed: false,
+    title: "Tipo de muro",
+    description: "Indique el tipo de muro principal para determinar métodos de fijación, instalación de mobiliario y paso de instalaciones.",
+    options: [
+      { key: "tablaroca", label: "Tablaroca" },
+      { key: "block", label: "Block" },
+      { key: "concreto", label: "Concreto" },
+      { key: "mixto", label: "Mixto (varios tipos)" },
+      { key: "desconocido", label: "No lo sé" }
+    ]
+  },
+
+  {
+    key: "orientation",
+    completed: false,
+    title: "Orientación y luz natural",
+    description: "Seleccione la orientación aproximada del espacio para determinar condiciones de iluminación y temperatura.",
+    options: [
+      { key: "norte", label: "Norte" },
+      { key: "sur", label: "Sur" },
+      { key: "este", label: "Este" },
+      { key: "oeste", label: "Oeste" },
+      { key: "desconocido", label: "No lo sé" }
+    ]
+  },
+
+  /* -------------------------------------------------------------------------- */
+  /* 5. Instalaciones                                                            */
+  /* -------------------------------------------------------------------------- */
+  {
+    key: "utilities",
+    completed: false,
+    title: "Instalaciones existentes",
+    description: "Indique qué instalaciones están presentes y, si es posible, su ubicación. Esto es crucial para la distribución correcta del mobiliario.",
+    options: [
+      { key: "agua", label: "Salida de agua fría/caliente" },
+      { key: "desague", label: "Desagüe" },
+      { key: "gas_lp", label: "Gas LP" },
+      { key: "gas_natural", label: "Gas natural" },
+      { key: "electrica", label: "Contactos eléctricos existentes" },
+      { key: "ducto_campana", label: "Salida para campana extractora" }
+    ]
+  },
+
+  /* -------------------------------------------------------------------------- */
+  /* 6. Equipos existentes y nuevos                                             */
+  /* -------------------------------------------------------------------------- */
+  {
+    key: "appliances",
+    completed: false,
+    title: "Electrodomésticos existentes",
+    description: "Indique qué equipos ya posee para integrarlos al diseño. Las medidas son necesarias para asegurar compatibilidad.",
+    appliances: [
+      { key: "refrigerador", label: "Refrigerador (medidas)", fields: ["ancho_cm", "alto_cm", "fondo_cm"] },
+      { key: "estufa", label: "Estufa / parrilla", fields: ["ancho_cm", "alto_cm", "fondo_cm"] },
+      { key: "campana", label: "Campana extractora" },
+      { key: "microondas", label: "Microondas" },
+      { key: "lavavajillas", label: "Lavavajillas" }
+    ]
+  },
+
+  {
+    key: "new_appliances",
+    completed: false,
+    title: "Electrodomésticos deseados",
+    description: "Seleccione los equipos que desea incluir en su nueva cocina.",
+    options: [
+      { key: "ne_refrigerador", label: "Refrigerador" },
+      { key: "ne_estufa", label: "Estufa / parrilla" },
+      { key: "ne_campana", label: "Campana extractora" },
+      { key: "ne_microondas", label: "Microondas" },
+      { key: "ne_horno", label: "Horno independiente" },
+      { key: "ne_lavavajillas", label: "Lavavajillas" },
+      { key: "ne_tarja_doble", label: "Tarja doble" }
+    ]
+  },
+
+  /* -------------------------------------------------------------------------- */
+  /* 7. Estilo, color y referencias visuales                                    */
+  /* -------------------------------------------------------------------------- */
   {
     key: "style",
     completed: false,
-    title: "title",
-    description: "description",
+    title: "Estilo general",
+    description: "Seleccione el estilo predominante que desea lograr en la cocina.",
     options: [
-      { key: "1" },
-      { key: "2" },
-      { key: "3" },
-      { key: "4" },
-      { key: "5" }
+      { key: "minimalista", label: "Minimalista" },
+      { key: "moderno", label: "Moderno contemporáneo" },
+      { key: "industrial", label: "Industrial" },
+      { key: "clasico", label: "Clásico / tradicional" },
+      { key: "nordico", label: "Escandinavo / nórdico" }
     ]
   },
+
   {
-    key: "color",
+    key: "color_palette",
     completed: false,
-    title: "title",
-    description: "description",
+    title: "Paleta de color",
+    description: "Seleccione la paleta cromática preferida para la cocina.",
     options: [
-      { key: "1" },
-      { key: "2" }
+      { key: "claros", label: "Tonos claros (blancos, beige, arena)" },
+      { key: "oscuros", label: "Tonos oscuros (negro, grafito, nogal oscuro)" },
+      { key: "mixto", label: "Combinación equilibrada (claro + oscuro)" }
     ]
   },
+
+  {
+    key: "visual_references",
+    completed: false,
+    title: "Referencias visuales",
+    description: "Suba imágenes o ligas externas que representen el estilo, atmósfera o materiales que desea.",
+    upload: true,
+    options: []
+  },
+
+  /* -------------------------------------------------------------------------- */
+  /* 8. Materiales y acabados                                                   */
+  /* -------------------------------------------------------------------------- */
   {
     key: "materials",
     completed: false,
-    title: "title",
-    description: "description",
-    button: "button",
-    link: "link",
+    title: "Materiales para módulos y superficies",
+    description: "Seleccione los materiales principales para los muebles, cubiertas y acabados.",
     options: [
-      { key: "1" },
-      { key: "2" }
+      { key: "mdf_melamina", label: "MDF con melamina" },
+      { key: "mdf_lacado", label: "MDF lacado" },
+      { key: "madera_solida", label: "Madera sólida" },
+      { key: "cuarzo", label: "Cubierta de cuarzo" },
+      { key: "granito", label: "Cubierta de granito" },
+      { key: "porcelanico", label: "Superficie porcelánica" }
     ]
-  }
-]
+  },
+
+  {
+    key: "handles",
+    completed: false,
+    title: "Tipo de jaladera o sistema de apertura",
+    description: "Seleccione el tipo de jaladera o mecanismo de apertura para puertas y cajones.",
+    options: [
+      { key: "integrada", label: "Jaladera integrada (perfil)" },
+      { key: "sobremontada", label: "Jaladera sobrepuesta" },
+      { key: "push_open", label: "Sistema push-open sin jaladera" }
+    ]
+  },
+
+  /* -------------------------------------------------------------------------- */
+  /* 9. Iluminación                                                             */
+  /* -------------------------------------------------------------------------- */
+  {
+    key: "lighting",
+    completed: false,
+    title: "Iluminación",
+    description: "Seleccione los tipos de iluminación que desea integrar en la cocina.",
+    options: [
+      { key: "empotrada", label: "Lámparas empotradas en techo" },
+      { key: "bajo_mueble", label: "Iluminación LED bajo mueble" },
+      { key: "decorativa", label: "Iluminación decorativa (colgantes / lineales)" },
+      { key: "indirecta", label: "Iluminación indirecta (cintas LED)" }
+    ]
+  },
+
+  /* -------------------------------------------------------------------------- */
+  /* 10. Accesorios funcionales                                                 */
+  /* -------------------------------------------------------------------------- */
+  {
+    key: "functional_accessories",
+    completed: false,
+    title: "Accesorios funcionales",
+    description: "Seleccione accesorios que mejoren la ergonomía, organización y funcionalidad de la cocina.",
+    options: [
+      { key: "organizador_cubiertos", label: "Organizador de cubiertos" },
+      { key: "despensa_extraible", label: "Despensa extraíble vertical" },
+      { key: "bote_integrado", label: "Bote de basura integrado" },
+      { key: "porta_especias", label: "Porta-especias" },
+      { key: "cajon_ollas", label: "Cajón profundo para ollas" },
+      { key: "tomas_usb", label: "Tomas eléctricas con USB" },
+      { key: "carga_oculta", label: "Estación de carga oculta" }
+    ]
+  },
+  /* -------------------------------------------------------------------------- */
+  /* 3.5 Ergonomía y Usuarios (NUEVO)                                           */
+  /* -------------------------------------------------------------------------- */
+  {
+    key: "ergonomics",
+    completed: false,
+    title: "Ergonomía y Usuarios",
+    description: "Datos clave para ajustar alturas de encimeras y anchos de pasillo para su comodidad.",
+    options: [
+      { key: "height_low", label: "Usuario principal estatura baja (< 1.60m)", description: "Sugeriremos zoclos más bajos." },
+      { key: "height_avg", label: "Estatura promedio (1.60m - 1.75m)", description: "Altura estándar de 90cm." },
+      { key: "height_tall", label: "Usuario principal alto (> 1.75m)", description: "Sugeriremos encimeras elevadas (92-95cm)." }
+    ],
+    fields: [
+      { name: "num_users", label: "Personas cocinando simultáneamente", type: "number" } // Si >1, pasillos de 1.20m
+    ]
+  },
+  /* -------------------------------------------------------------------------- */
+  /* 3.6 Restricciones Físicas (NUEVO - CRÍTICO)                                */
+  /* -------------------------------------------------------------------------- */
+  {
+    key: "constraints",
+    completed: false,
+    title: "Restricciones arquitectónicas",
+    description: "Identifique elementos que no se pueden mover fácilmente.",
+    options: [], // Se llena con inputs
+    fields: [
+      { name: "window_wall", label: "¿En qué muro está la ventana? (1-4)", type: "number" },
+      { name: "window_sill_height", label: "Altura del piso a la ventana (cm)", type: "number" }, // Si < 90, no poner muebles base
+      { name: "door_wall", label: "¿En qué muro está la puerta de acceso? (1-4)", type: "number" }
+    ]
+  },
+];
 
 
 

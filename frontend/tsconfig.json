@@ -19,7 +19,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "types": ["@react-three/fiber"],
+    "types": ["@react-three/fiber","vitest/globals", "@testing-library/jest-dom"],
     "plugins": [
       {
         "name": "next"

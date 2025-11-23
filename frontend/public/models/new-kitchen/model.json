@@ -1,0 +1,61 @@
+{
+  "sceneUnits": "meters",
+  "objects": [
+    {
+      "id": "island",
+      "type": "furniture",
+      "color": "blue",
+      "dimensions": { "width": 1.20, "depth": 0.90, "height": 0.90 },
+      "position": { "x": 0.20, "y": 0.00, "z": 0.00 }
+    },
+    {
+      "id": "cooktop",
+      "type": "appliance",
+      "color": "yellow",
+      "dimensions": { "width": 0.60, "depth": 0.60, "height": 0.10 },
+      "position": { "x": 0.30, "y": 0.00, "z": 0.90 }
+    },
+    {
+      "id": "lower_cabinets_main",
+      "type": "furniture",
+      "color": "blue",
+      "dimensions": { "width": 1.80, "depth": 0.60, "height": 0.90 },
+      "position": { "x": 1.40, "y": 0.00, "z": 0.00 }
+    },
+    {
+      "id": "sink",
+      "type": "appliance",
+      "color": "yellow",
+      "dimensions": { "width": 0.55, "depth": 0.45, "height": 0.20 },
+      "position": { "x": 2.15, "y": 0.00, "z": 0.90 }
+    },
+    {
+      "id": "upper_cabinets_left",
+      "type": "furniture",
+      "color": "blue",
+      "dimensions": { "width": 0.90, "depth": 0.35, "height": 0.90 },
+      "position": { "x": 1.40, "y": 0.00, "z": 1.60 }
+    },
+    {
+      "id": "upper_cabinets_right",
+      "type": "furniture",
+      "color": "blue",
+      "dimensions": { "width": 1.10, "depth": 0.35, "height": 0.90 },
+      "position": { "x": 2.30, "y": 0.00, "z": 1.60 }
+    },
+    {
+      "id": "open_shelf_left",
+      "type": "furniture",
+      "color": "blue",
+      "dimensions": { "width": 0.90, "depth": 0.25, "height": 0.30 },
+      "position": { "x": 1.00, "y": 0.00, "z": 1.70 }
+    },
+    {
+      "id": "oven_column",
+      "type": "appliance",
+      "color": "yellow",
+      "dimensions": { "width": 0.60, "depth": 0.60, "height": 2.40 },
+      "position": { "x": 3.40, "y": 0.00, "z": 0.00 }
+    }
+  ]
+}

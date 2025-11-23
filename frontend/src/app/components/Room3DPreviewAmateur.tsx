@@ -29,7 +29,7 @@ export interface OpeningMethods {
  * Room3DPreview: componente Three.js con API imperativa.
  * Expuesto mediante forwardRef para que el padre pueda invocar setOpeningIndex.
  */
-const Room3DPreview = forwardRef<OpeningMethods, Room3DPreviewProps>(
+const Room3DPreviewAmateur = forwardRef<OpeningMethods, Room3DPreviewProps>(
   ({ points, height, openings, onOpeningIndexChange }, ref) => {
 
     // -------------------------
@@ -404,5 +404,5 @@ const Room3DPreview = forwardRef<OpeningMethods, Room3DPreviewProps>(
     return <div ref={mountRef} style={{ width: "100%", height: "100%", minHeight: "200px" }} />;
   }
 );
-Room3DPreview.displayName = "Room3DPreview";
-export default Room3DPreview;
+Room3DPreviewAmateur.displayName = "Room3DPreview";
+export default Room3DPreviewAmateur;

@@ -6,7 +6,7 @@ import { HoveringAnimation } from '@/app/components/animations/animations';
 
 // --- estilos base ---
 const base =
-  'w-auto px-9  inline-flex items-center justify-center select-none ' +
+  'w-auto px-1  inline-flex items-center justify-center select-none ' +
   'font-medium rounded-md transition-colors duration-200 ' +
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ' +
   'disabled:opacity-50 disabled:pointer-events-none ';
@@ -24,9 +24,9 @@ const byVariant: Record<ButtonVariant, string> = {
 };
 
 const bySize: Record<Size, string> = {
-  sm: 'h-9 px-3 gap-2 text-sm',
-  md: 'h-10 px-4 gap-2 text-sm',
-  lg: 'h-12 px-6 gap-3 text-base',
+  sm: 'h-9 px-2 gap-2 text-sm',
+  md: 'h-10 px-3 gap-2 text-sm',
+  lg: 'h-12 px-4 gap-3 text-base',
 };
 
 // --- Spinner ---

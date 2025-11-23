@@ -129,11 +129,10 @@ label {
   content: '⪡';
   position: sticky;
   top: 10%;
-  left: 0;
-  margin-left: -2rem;
+  right: 0;
   font-size: 2rem;
   width: 2rem;
-  transform: translateY(-50%);
+  transform: translateY(-70%);
   color: aqua;
   background: var(--color-primary);
   padding: 10px 0px;
@@ -141,3 +140,12 @@ label {
 }
 
         /* <aside id="wizard-sections" className="w-64 h-full flex flex-col gap-4 bg-red-500 absolute top-0 right-0 py-20 "> */
+
+        input {
+  background-color: #f0f0f0; /* Reemplaza con el color que desees */
+  color: #0d031b;
+}
+
+h1, h2,h3,h4,h5,h6, p{
+  color: black
+}

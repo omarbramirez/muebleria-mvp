@@ -518,3 +518,7 @@ he estado trabajando hoy en 3 nuevas características:
 
 ![alt text](image-46.png)
 
+## 18 NOV
+
+
+BRIEF
