@@ -1,87 +1,94 @@
 "use client";
 
 import React from "react";
-import { usePreferenceWizardStore } from "@/store/preferenceWizardStore"; // Importamos el store aquí para leer valores
+import { usePreferenceWizardStore } from "@/store/preferenceWizardStore"; 
 import { StringSchema } from "yup";
 
 // --- DEFINICIONES DE TIPOS (Domain Models) ---
 
-// 1. Definimos qué valores acepta tu formulario. 
-// Evitamos 'any' para mantener control sobre los datos primitivos.
 export type FormValue = string | number | boolean | string[];
 
-
-// 2. Definimos la firma de la función onChange.
-// Esto estandariza cómo todos los inputs reportan cambios hacia arriba.
 export type FieldChangeHandler = (fieldId: string, value: FormValue) => void;
 
-
-// Definimos la estructura de una Opción (para Radios/Cards)
 export interface WizardOption {
   key: string;
   label: string;
   description?: string;
-  imageUrl?: string | { src: string }; // Soporte para string directo o objeto importado
+  imageUrl?: string | { src: string }; 
 }
 
-// Definimos la estructura de un Electrodoméstico
 export interface WizardAppliance {
   key: string;
   label: string;
-  fields?: string[]; // IDs de campos adicionales si se selecciona
+  fields?: string[]; 
 }
 
 export interface WizardOptionConfig {
   label: string;
-  // Permitimos que el valor sea string o number
   value: string | number; 
-  // Opcional: Si en el futuro necesitas un ID distinto al valor (ej. key interna de BD)
   key?: string; 
   imageUrl?: string | { src: string };
 }
 
-// 3. Modelo de un Campo (Field)
 export interface WizardFieldConfig {
   id: string;
   name?: string;
- type: 'text' | 'number' | 'select' | 'checkbox' | 'textarea' | 'image-select';
+  type: 'text' | 'number' | 'select' | 'checkbox' | 'textarea' | 'image-select';
   label: string;
   placeholder?: string;
   options?: WizardOptionConfig[];
-  validation?: (value: FormValue) => string | null; // Opcional: validación inline
+  validation?: (value: FormValue) => string | null; 
 }
 
-// Modelo de una Sección (Actualizado con lo que usas en JSX)
 export interface WizardSectionConfig {
-  key: string; // Usas .key en el JSX para identificar la sección
+  key: string; 
   title: string;
   description?: string;
   fields?: WizardFieldConfig[];
-  options?: WizardOption[];       // Faltaba en tu definición original
-  appliances?: WizardAppliance[]; // Faltaba en tu definición original
+  options?: WizardOption[];       
+  appliances?: WizardAppliance[]; 
 }
 
 // --- PROPS INTERFACE COMPARTIDA ---
 interface InputHelperProps {
   id: string;
   field: WizardFieldConfig;
-  value: FormValue | undefined; // Puede ser undefined antes de que el usuario interactúe
+  value: FormValue | undefined; 
   onChange: FieldChangeHandler;
 }
 
-
-// --- PROPS INTERFACE ---
 interface PreferenceWizardSectionProps {
   section: WizardSectionConfig;
-  // Si este componente solo renderiza, quizás reciba los valores desde el padre,
-  // o quizás se conecta al store. Asumiremos que es "Controlado" desde el padre para este ejemplo.
   currentValues: Record<string, FormValue | undefined>;
-  onChange: FieldChangeHandler; // <--- AQUÍ SOLUCIONAMOS EL ERROR
+  onChange: FieldChangeHandler; 
 }
+
+
+// Agrega esta función auxiliar fuera o dentro del componente
+// Esta función actúa como un "Filtro de Seguridad"
+const getSafeValue = (val: unknown): FormValue => {
+  // 1. Si es undefined o null, devolvemos cadena vacía (para inputs controlados)
+  if (val === undefined || val === null) return '';
+
+  // 2. Si es un tipo primitivo válido, lo dejamos pasar
+  if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
+    return val;
+  }
+
+  // 3. Si es un array de strings (ej. multiselect), lo dejamos pasar
+  if (Array.isArray(val) && val.every(item => typeof item === 'string')) {
+    return val as string[];
+  }
+
+  // 4. Si es cualquier otra cosa (File, Objeto complejo), devolvemos cadena vacía
+  // para evitar que el renderizado se rompa.
+  return '';
+};
+
 const PreferenceWizardSection = ({ section, currentValues, onChange }: PreferenceWizardSectionProps) => {
   const { values } = usePreferenceWizardStore();
 
-  // Fusión de estrategia: Usamos values del store si existen, o props
+  // Fusión de estrategia
   const effectiveValues = { ...values, ...currentValues };
 
   return (
@@ -91,11 +98,10 @@ const PreferenceWizardSection = ({ section, currentValues, onChange }: Preferenc
 
       <div className="flex flex-col gap-6">
 
-        {/* 1. RENDERIZADO DE OPCIONES (Radios/Checkboxes tipo Card) */}
+        {/* 1. RENDERIZADO DE OPCIONES */}
         {section.options && (
           <div className="grid grid-cols-1 gap-3">
             {section.options.map((opt) => {
-              // Inferencia de tipo para las secciones de selección única
               const isSingleSelect = ['project_type', 'budget', 'usage_profile', 'style', 'color_palette'].includes(section.key);
               const isSelected = Boolean(effectiveValues[opt.key]);
 
@@ -106,13 +112,11 @@ const PreferenceWizardSection = ({ section, currentValues, onChange }: Preferenc
                     }`}
                   onClick={() => {
                     if (isSingleSelect && section.options) {
-                      // Lógica de Radio: Desmarcar otros
                       section.options.forEach(o => {
                         if (o.key !== opt.key) onChange(o.key, false);
                       });
                       onChange(opt.key, true);
                     } else {
-                      // Lógica de Checkbox
                       onChange(opt.key, !isSelected);
                     }
                   }}
@@ -130,7 +134,7 @@ const PreferenceWizardSection = ({ section, currentValues, onChange }: Preferenc
           </div>
         )}
 
-        {/* 2. RENDERIZADO DE ELECTRODOMÉSTICOS */}
+        {/* 2. RENDERIZADO DE ELECTRODOMÉSTICOS (CORRECCIÓN APLICADA AQUÍ) */}
         {section.appliances && (
           <div className="grid grid-cols-1 gap-4">
             {section.appliances.map(app => (
@@ -148,38 +152,55 @@ const PreferenceWizardSection = ({ section, currentValues, onChange }: Preferenc
                   </label>
 
                   {/* Sub-campos dinámicos */}
-                  {effectiveValues[app.key] && app.fields?.map(fieldKey => (
-                    <div key={fieldKey}>
-                      <label className="text-xs text-gray-500 capitalize">{fieldKey.replace('_', ' ')}</label>
-                      <input
-                        type="number"
-                        className="w-full border rounded p-1 text-sm"
-                        value={effectiveValues[`${app.key}_${fieldKey}`] || ''}
-                        onChange={(e) => onChange(`${app.key}_${fieldKey}`, Number(e.target.value))}
-                      />
-                    </div>
-                  ))}
+                  {effectiveValues[app.key] && app.fields?.map(fieldKey => {
+                    
+                    // --- CORRECCIÓN DE TIPO ---
+                    // Extraemos el valor crudo
+                    const rawValue = effectiveValues[`${app.key}_${fieldKey}`];
+                    
+                    // Sanitizamos: Solo permitimos string o number. Si es otra cosa, usamos ''
+                    const safeInputValue = (typeof rawValue === 'string' || typeof rawValue === 'number') 
+                        ? rawValue 
+                        : '';
+
+                    return (
+                        <div key={fieldKey}>
+                        <label className="text-xs text-gray-500 capitalize">{fieldKey.replace('_', ' ')}</label>
+                        <input
+                            type="number"
+                            className="w-full border rounded p-1 text-sm"
+                            // Usamos el valor sanitizado
+                            value={safeInputValue}
+                            onChange={(e) => onChange(`${app.key}_${fieldKey}`, Number(e.target.value))}
+                        />
+                        </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* 3. RENDERIZADO DE CAMPOS MANUALES */}
-        {section.fields?.map((field, index) => (
-          <FieldRenderer
-            // SOLUCIÓN: Usamos String() para asegurar un primitivo.
-            // Añadimos 'index' como fallback de último recurso para garantizar unicidad absoluta.
-            key={String(field.id || field.name || index)}
-
-            field={field}
-            sectionId={section.key}
-            onChange={onChange}
-
-            // Para el value también es buena práctica asegurar el índice
-            value={effectiveValues[field.name || field.id]}
-          />
-        ))}
+{/* 3. RENDERIZADO DE CAMPOS MANUALES (CORREGIDO) */}
+        {section.fields?.map((field, index) => {
+           // Extraemos el valor crudo
+           const rawValue = effectiveValues[field.name || field.id];
+           
+           return (
+            <FieldRenderer
+                // Usamos String() para la key para asegurar unicidad
+                key={String(field.id || field.name || index)}
+                field={field}
+                sectionId={section.key}
+                onChange={onChange}
+                
+                // CORRECCIÓN AQUÍ: Usamos el sanitizador
+                // Esto garantiza que FieldRenderer SIEMPRE reciba un FormValue válido
+                value={getSafeValue(rawValue)}
+            />
+           );
+        })}
 
       </div>
     </div>
@@ -190,7 +211,6 @@ const PreferenceWizardSection = ({ section, currentValues, onChange }: Preferenc
 // RENDERIZADOR PRINCIPAL DE CAMPOS
 // -----------------------------------------------------------------------------
 
-// Reutilizamos la interfaz definida anteriormente
 interface FieldRendererProps {
   field: WizardFieldConfig;
   sectionId: string;
@@ -199,11 +219,8 @@ interface FieldRendererProps {
 }
 
 const FieldRenderer = ({ field, sectionId, onChange, value }: FieldRendererProps) => {
-  // Identificador único compuesto si es necesario, o usar field.id directo
   const fieldId = field.name || field.id;
 
-  // Delegación a componentes especializados
-  // Esto mantiene el código limpio y modular
   if (field.type === 'image-select') {
     return <ImageSelectField id={fieldId} field={field} value={value} onChange={onChange} />;
   }
@@ -216,7 +233,6 @@ const FieldRenderer = ({ field, sectionId, onChange, value }: FieldRendererProps
     return <InputNumber id={fieldId} field={field} value={value} onChange={onChange} />;
   }
 
-  // Fallback para texto y checkboxes simples
   const handleNativeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = field.type === 'checkbox' ? e.target.checked : e.target.value;
     onChange(fieldId, newValue);
@@ -254,16 +270,12 @@ const FieldRenderer = ({ field, sectionId, onChange, value }: FieldRendererProps
 export default PreferenceWizardSection;
 
 // -----------------------------------------------------------------------------
-// INPUTS CORREGIDOS (Tipado Estricto)
+// INPUTS HELPER COMPONENTS
 // -----------------------------------------------------------------------------
-
-// Aplicamos la interfaz InputHelperProps para resolver los 'implicit any'
 
 function InputNumber({ id, field, value, onChange }: InputHelperProps) {
   
-  // LÓGICA DE SANITIZACIÓN (Type Narrowing):
-  // Si el valor llega como boolean (false/true) o array (por error de estado),
-  // lo convertimos a cadena vacía para no romper el input numérico.
+  // Lógica de Sanitización también aquí para reutilización
   const safeValue = (typeof value === 'number' || typeof value === 'string') 
     ? value 
     : '';
@@ -274,14 +286,9 @@ function InputNumber({ id, field, value, onChange }: InputHelperProps) {
       <input
         type="number"
         className="border px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-500 outline-none"
-        
-        // SOLUCIÓN: Usamos el valor sanitizado
         value={safeValue} 
-        
-        // Opcional: Manejo robusto de NaN en el cambio
         onChange={(e) => {
             const val = e.target.value;
-            // Si está vacío, podríamos querer enviar '' o undefined, no 0
             onChange(id, val === '' ? '' : Number(val));
         }}
       />
@@ -295,7 +302,7 @@ function SelectField({ id, field, value, onChange }: InputHelperProps) {
       <label className="block text-sm mb-1 font-medium">{field.label}</label>
       <select
         className="border px-3 py-2 rounded w-full"
-        value={String(value ?? '')} // Forzamos string para el value del select
+        value={String(value ?? '')} 
         onChange={(e) => onChange(id, e.target.value)}
       >
         <option value="">Seleccionar...</option>
@@ -317,14 +324,12 @@ function ImageSelectField({ id, field, onChange, value }: InputHelperProps) {
         {field.options?.map((opt) => (
           <div
             key={opt.key}
-            // Aseguramos que onChange reciba el tipo correcto (string o number según tu modelo)
             onClick={() => onChange(id, opt.key as string)}
             className={`border rounded-lg overflow-hidden cursor-pointer transition-all ${value === opt.key ? 'ring-2 ring-blue-500 border-transparent' : 'hover:border-gray-400'
               }`}
           >
             {opt.imageUrl && (
               <img
-                // Validación segura del tipo de imagen
                 src={typeof opt.imageUrl === 'string' ? opt.imageUrl : opt.imageUrl.src}
                 alt={opt.label}
                 className="h-32 w-full object-cover"
