@@ -27,6 +27,13 @@ interface ApplianceConfig {
   height: number;
   depth: number;
 }
+interface AppliancePreset {
+  id: string;
+  label: string;
+  w: number;
+  h: number;
+  d: number;
+}
 
 // Datos base para presets de "Comprar Nuevo" (Estándares de mercado)
 const PRESETS = {
@@ -58,7 +65,7 @@ const Move3DIcon = ({ className }: { className?: string }) => (
 
 const Appliances = () => {
 // Simulacro de Store Context para hacer el código autocontenido
-  const [storeValues, setStoreValues] = useState<any>({});
+  const [storeValues, setStoreValues] = useState<string, unknown>({});
   const values = storeValues;
   const setValue = (key: string, value: any) => {
     setStoreValues(prev => ({ ...prev, [key]: value }));
@@ -111,7 +118,7 @@ const Appliances = () => {
     }));
   };
 
-  const selectPreset = (key: string, preset: any) => {
+  const selectPreset = (key: string, preset: AppliancePreset) => {
     setAppliances(prev => ({
       ...prev,
       [key]: { 

@@ -10,6 +10,7 @@ import { StringSchema } from "yup";
 // Evitamos 'any' para mantener control sobre los datos primitivos.
 export type FormValue = string | number | boolean | string[];
 
+
 // 2. Definimos la firma de la función onChange.
 // Esto estandariza cómo todos los inputs reportan cambios hacia arriba.
 export type FieldChangeHandler = (fieldId: string, value: FormValue) => void;
@@ -74,7 +75,7 @@ interface PreferenceWizardSectionProps {
   section: WizardSectionConfig;
   // Si este componente solo renderiza, quizás reciba los valores desde el padre,
   // o quizás se conecta al store. Asumiremos que es "Controlado" desde el padre para este ejemplo.
-  currentValues: Record<string, any>;
+  currentValues: Record<string, FormValue | undefined>;
   onChange: FieldChangeHandler; // <--- AQUÍ SOLUCIONAMOS EL ERROR
 }
 const PreferenceWizardSection = ({ section, currentValues, onChange }: PreferenceWizardSectionProps) => {

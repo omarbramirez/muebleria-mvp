@@ -142,23 +142,17 @@ const Preferences = () => {
   };
 
   /** Manejo de archivos */
-  const handleFileChange = (sectionKey: string, file: File | null) => {
-    // Necesitamos envolver el File en un array si tu store espera File[] 
-    // O si espera File | null, pasarlo directo. 
-    // Asumiendo que WizardStoreValue acepta File[] o null, pero tu lógica de validateFileUpload usa File simple.
-    // Ajustaremos para pasar el File directo si tu store lo permite, o array si no.
-    // Basado en tu store anterior, 'files' era File[].
-    // Si guardas en 'values' (record dinámico), puedes guardar el File solo si agregaste File a WizardStoreValue.
-    
-    // Asumiremos que WizardStoreValue tiene 'File[]' y guardamos un array para ser consistentes, 
-    // O modificas WizardStoreValue para aceptar 'File'.
-    // Para este ejemplo, lo pasamos directo asumiendo que agregaste 'File' o usas 'any' temporalmente en la definición del tipo recursivo si no lo hiciste.
-    // RECOMENDACIÓN: Asegúrate que WizardStoreValue incluya 'File'.
-    setValue(sectionKey, file as any); // Cast temporal si tu store solo acepta File[]
-    
-    const fileError = validateFileUpload(file);
-    setErrors(prev => ({ ...prev, file: fileError || '' }));
-  };
+/** Manejo de archivos */
+  const handleFileChange = (sectionKey: string, file: File | null) => {
+    // Necesitamos envolver el File en un array si tu store espera File[] 
+    // O si espera File | null, pasarlo directo. 
+    // Asumiendo que WizardStoreValue acepta File | null.
+    // RECOMENDACIÓN: Asegúrate que WizardStoreValue incluya 'File' en su definición.
+    setValue(sectionKey, file); // CORRECCIÓN: Eliminado el 'as any'
+
+    const fileError = validateFileUpload(file);
+    setErrors(prev => ({ ...prev, file: fileError || '' }));
+  };
 
   return (
     <PageLayout>
