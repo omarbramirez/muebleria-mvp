@@ -9,8 +9,20 @@ import {
   DollarSign
 } from "lucide-react";
 
-// ... imports ...
 import { usePreferenceWizardStore } from "@/store/preferenceWizardStore";
+
+// --- 1. DEFINICIÓN DE TIPOS LOCALES ---
+interface BudgetAllocation {
+  furniture: number;
+  appliances: number;
+  services: number;
+}
+
+interface BudgetConfig {
+  total: number;
+  allocation: BudgetAllocation;
+  tier?: string;
+}
 
 // Helper para formatear moneda (MXN/USD)
 const formatCurrency = (value: number) => {
@@ -21,27 +33,26 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
-
 const Budget = () => {
 
   // "State Object" universal en Zustand
-  // Estrategia de Integración (El Patrón "Sync")
   const { values, setValue } = usePreferenceWizardStore();
 
-  // 1. HYDRATION: Si ya existe 'budget_config', lo usamos. Si no, default.
-  const savedConfig = values.budget_config || {};
+  // --- 2. HYDRATION CORREGIDA (Type Assertion) ---
+  // Le decimos a TS: "Trata esto como unknown y luego como mi interfaz BudgetConfig"
+  // Si es undefined, usamos un objeto vacío para que la lectura de propiedades abajo no falle antes del ||
+  const savedConfig = (values.budget_config as unknown as BudgetConfig) || {};
 
   // Estado Global del Presupuesto
+  // Ahora TypeScript sabe que savedConfig puede tener .total y .allocation
   const [totalBudget, setTotalBudget] = useState(savedConfig.total || 85000);
-  const [allocation, setAllocation] = useState(savedConfig.allocation || {
+  const [allocation, setAllocation] = useState<BudgetAllocation>(savedConfig.allocation || {
     furniture: 50000,
     appliances: 25000,
     services: 10000
   });
 
-  // Recalcular total cuando cambian los parciales (o viceversa, dependiendo de la UX deseada)
-  // Aquí usamos un enfoque simple: El slider principal escala todo, los inputs ajustan fino.
-
+  // Recalcular total cuando cambian los parciales
   const handleTotalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTotal = parseInt(e.target.value);
     setTotalBudget(newTotal);
@@ -64,11 +75,15 @@ const Budget = () => {
 
   // 2. SYNC: Cada vez que cambie el presupuesto, actualizamos el Store Global
   useEffect(() => {
-    setValue('budget_config', {
+    // Construimos el objeto completo para guardar
+    const newConfig: BudgetConfig = {
       total: totalBudget,
       allocation: allocation,
-      tier: totalBudget < 40000 ? 'economy' : totalBudget < 120000 ? 'standard' : 'premium' // Guardamos el Tier también para la IA
-    });
+      tier: totalBudget < 40000 ? 'economy' : totalBudget < 120000 ? 'standard' : 'premium'
+    };
+    setValue('budget_config', newConfig as unknown as Record<string, unknown>); 
+    // Nota: El cast final en setValue depende de tu definición en el Store, 
+    // pero si tu store acepta objetos genéricos, funcionará.
   }, [totalBudget, allocation, setValue]);
 
   return (
@@ -186,4 +201,4 @@ const Budget = () => {
   )
 }
 
-export default Budget
+export default Budget;
