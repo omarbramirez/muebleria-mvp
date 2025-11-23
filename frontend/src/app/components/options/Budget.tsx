@@ -9,7 +9,8 @@ import {
   DollarSign
 } from "lucide-react";
 
-import { usePreferenceWizardStore } from "@/store/preferenceWizardStore";
+// Importamos el hook Y TAMBIÉN EL TIPO (asegúrate de que esté exportado en el store)
+import { usePreferenceWizardStore, WizardStoreValue } from "@/store/preferenceWizardStore";
 
 // --- 1. DEFINICIÓN DE TIPOS LOCALES ---
 interface BudgetAllocation {
@@ -18,6 +19,7 @@ interface BudgetAllocation {
   services: number;
 }
 
+// Esta interfaz define la estructura local de tus datos
 interface BudgetConfig {
   total: number;
   allocation: BudgetAllocation;
@@ -38,13 +40,12 @@ const Budget = () => {
   // "State Object" universal en Zustand
   const { values, setValue } = usePreferenceWizardStore();
 
-  // --- 2. HYDRATION CORREGIDA (Type Assertion) ---
-  // Le decimos a TS: "Trata esto como unknown y luego como mi interfaz BudgetConfig"
-  // Si es undefined, usamos un objeto vacío para que la lectura de propiedades abajo no falle antes del ||
+  // --- 2. HYDRATION STRICT MODE ---
+  // Leemos del store. Convertimos primero a 'unknown' y luego a nuestra interfaz local 'BudgetConfig'.
+  // Esto es seguro y permitido en Vercel.
   const savedConfig = (values.budget_config as unknown as BudgetConfig) || {};
 
   // Estado Global del Presupuesto
-  // Ahora TypeScript sabe que savedConfig puede tener .total y .allocation
   const [totalBudget, setTotalBudget] = useState(savedConfig.total || 85000);
   const [allocation, setAllocation] = useState<BudgetAllocation>(savedConfig.allocation || {
     furniture: 50000,
@@ -56,7 +57,7 @@ const Budget = () => {
   const handleTotalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTotal = parseInt(e.target.value);
     setTotalBudget(newTotal);
-    // Redistribución proporcional simple (60% / 30% / 10%)
+    
     setAllocation({
       furniture: Math.round(newTotal * 0.6),
       appliances: Math.round(newTotal * 0.3),
@@ -73,17 +74,19 @@ const Budget = () => {
 
   const tier = getBudgetTier(totalBudget);
 
-  // 2. SYNC: Cada vez que cambie el presupuesto, actualizamos el Store Global
+  // 2. SYNC: ESTRICTO
   useEffect(() => {
-    // Construimos el objeto completo para guardar
     const newConfig: BudgetConfig = {
       total: totalBudget,
       allocation: allocation,
       tier: totalBudget < 40000 ? 'economy' : totalBudget < 120000 ? 'standard' : 'premium'
     };
-    setValue('budget_config', newConfig as unknown as Record<string, unknown>); 
-    // Nota: El cast final en setValue depende de tu definición en el Store, 
-    // pero si tu store acepta objetos genéricos, funcionará.
+    
+    // --- CORRECCIÓN FINAL (SIN ANY) ---
+    // Usamos 'as unknown' para borrar el tipo interfaz, y luego 'as WizardStoreValue'
+    // para cumplir con el contrato exacto del store.
+    setValue('budget_config', newConfig as unknown as WizardStoreValue);
+    
   }, [totalBudget, allocation, setValue]);
 
   return (
