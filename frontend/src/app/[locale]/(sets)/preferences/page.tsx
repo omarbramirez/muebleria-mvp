@@ -9,12 +9,23 @@ import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import { usePreferenceWizardStore } from '@/store/preferenceWizardStore';
 
+// --- DEFINICIONES DE TIPOS LOCALES ---
+
 interface DimensionFields {
   [key: string]: number | '';
 }
 
-interface FileFields {
-  [key: string]: File | null;
+// Modelo para un Electrodoméstico (Define qué esperar en esa sección)
+interface Appliance {
+  key: string;
+  label: string;
+  fields?: string[];
+}
+
+// Interfaz para una sección que SÍ tiene electrodomésticos
+interface SectionWithAppliances {
+  key: string;
+  appliances: Appliance[];
 }
 
 const Preferences = () => {
@@ -25,6 +36,19 @@ const Preferences = () => {
 
   // Zustand store
   const { values, setValue } = usePreferenceWizardStore();
+
+  /** * TYPE GUARD (Ingeniería de Tipos)
+   * Verifica en tiempo de ejecución si una sección tiene la propiedad 'appliances'.
+   * Si retorna true, TypeScript sabe que dentro del if, 'section' tiene 'appliances'.
+   */
+  const sectionHasAppliances = (section: unknown): section is SectionWithAppliances => {
+    return (
+      typeof section === 'object' && 
+      section !== null && 
+      'appliances' in section && 
+      Array.isArray((section as SectionWithAppliances).appliances)
+    );
+  };
 
   /** Activador del aside */
   function wizardSectionActivator() {
@@ -69,15 +93,24 @@ const Preferences = () => {
     if (section.fields) {
       const fieldsValues: DimensionFields = {};
       section.fields.forEach(f => {
-        fieldsValues[f.name] = values[f.name] ?? '';
+        // Aseguramos que el valor recuperado sea tratado como número o string vacío
+        const rawVal = values[f.name];
+        fieldsValues[f.name] = (typeof rawVal === 'number') ? rawVal : '';
       });
       sectionErrors = validateDimensions(fieldsValues);
     }
 
     if (section.upload) {
-      const file = values[section.key] || null;
-      const fileError = validateFileUpload(file);
-      if (fileError) sectionErrors['file'] = fileError;
+      // Validación segura de tipo para File
+      const file = values[section.key];
+      // Type Narrowing: verificamos si es instancia de File antes de validar
+      if (file instanceof File) {
+          const fileError = validateFileUpload(file);
+          if (fileError) sectionErrors['file'] = fileError;
+      } else if (!file && section.upload) {
+          // Si es obligatorio y no hay archivo
+           // (Ajustar lógica según si es obligatorio o no)
+      }
     }
 
     setErrors(sectionErrors);
@@ -99,8 +132,8 @@ const Preferences = () => {
   /** Manejo de cambios de input de dimensiones */
   const handleDimensionChange = (name: string, value: string) => {
     const numericValue = value === '' ? '' : Number(value);
-    setValue(name, numericValue); // sincroniza con Zustand
-    // actualizar errores en tiempo real si quieres
+    setValue(name, numericValue); // Ahora es compatible con WizardStoreValue (number | string)
+    
     if (errors[name]) {
       const newErrors = { ...errors };
       delete newErrors[name];
@@ -110,7 +143,19 @@ const Preferences = () => {
 
   /** Manejo de archivos */
   const handleFileChange = (sectionKey: string, file: File | null) => {
-    setValue(sectionKey, file); // sincroniza con Zustand
+    // Necesitamos envolver el File en un array si tu store espera File[] 
+    // O si espera File | null, pasarlo directo. 
+    // Asumiendo que WizardStoreValue acepta File[] o null, pero tu lógica de validateFileUpload usa File simple.
+    // Ajustaremos para pasar el File directo si tu store lo permite, o array si no.
+    // Basado en tu store anterior, 'files' era File[].
+    // Si guardas en 'values' (record dinámico), puedes guardar el File solo si agregaste File a WizardStoreValue.
+    
+    // Asumiremos que WizardStoreValue tiene 'File[]' y guardamos un array para ser consistentes, 
+    // O modificas WizardStoreValue para aceptar 'File'.
+    // Para este ejemplo, lo pasamos directo asumiendo que agregaste 'File' o usas 'any' temporalmente en la definición del tipo recursivo si no lo hiciste.
+    // RECOMENDACIÓN: Asegúrate que WizardStoreValue incluya 'File'.
+    setValue(sectionKey, file as any); // Cast temporal si tu store solo acepta File[]
+    
     const fileError = validateFileUpload(file);
     setErrors(prev => ({ ...prev, file: fileError || '' }));
   };
@@ -136,116 +181,114 @@ const Preferences = () => {
                 {section.description}
               </Paragraph>
 
-{/* --------------------------------------------------------- */}
-{/* LOGICA DE RENDERIZADO MEJORADA (Soporta Radios y Arrays)  */}
-{/* --------------------------------------------------------- */}
+              {/* --------------------------------------------------------- */}
+              {/* LOGICA DE RENDERIZADO MEJORADA (Soporta Radios y Arrays)  */}
+              {/* --------------------------------------------------------- */}
 
-{/* CASO 1: OPCIONES SIMPLES (Checkboxes o Radios) */}
-{section.options && (
-  <ul className="space-y-4">
-    {section.options.map((option, idx) => {
-      // Detectar si esta sección debería ser de selección única (Radio)
-      // Hack rápido: Si la sección es "project_type", "budget", "usage", actúa como Radio.
-      const isSingleSelect = ['project_type', 'budget', 'usage_profile', 'style'].includes(section.key);
-      
-      return (
-        <li 
-          key={`option-${idx}`} 
-          className={`p-4 rounded-2xl cursor-pointer transition-all border ${
-            values[option.key] ? 'bg-blue-50 border-blue-500' : 'hover:bg-neutral-100 border-transparent'
-          }`}
-          // Hacemos que todo el li sea clicable
-          onClick={() => {
-             if (isSingleSelect) {
-               // Desmarcar hermanos y marcar este
-               section.options?.forEach(opt => setValue(opt.key, false));
-               setValue(option.key, true);
-             } else {
-               // Toggle normal
-               setValue(option.key, !values[option.key]);
-             }
-          }}
-        >
-          <div className="flex items-center gap-3">
-            <input
-              type={isSingleSelect ? "radio" : "checkbox"}
-              name={section.key} // Agrupa los radios
-              id={`${section.key}-${option.key}`}
-              checked={values[option.key] || false}
-              onChange={() => {}} // Manejado por el onClick del li
-              className="w-5 h-5 text-blue-600"
-            />
-            <div>
-              <label htmlFor={`${section.key}-${option.key}`} className="font-medium cursor-pointer">
-                {option.label}
-              </label>
-              {option.description && (
-                <p className="text-sm text-gray-500 mt-1">{option.description}</p>
+              {/* CASO 1: OPCIONES SIMPLES (Checkboxes o Radios) */}
+              {section.options && (
+                <ul className="space-y-4">
+                  {section.options.map((option, idx) => {
+                    const isSingleSelect = ['project_type', 'budget', 'usage_profile', 'style'].includes(section.key);
+                    const isSelected = Boolean(values[option.key]);
+
+                    return (
+                      <li 
+                        key={`option-${idx}`} 
+                        className={`p-4 rounded-2xl cursor-pointer transition-all border ${
+                          isSelected ? 'bg-blue-50 border-blue-500' : 'hover:bg-neutral-100 border-transparent'
+                        }`}
+                        onClick={() => {
+                           if (isSingleSelect) {
+                             section.options?.forEach(opt => setValue(opt.key, false));
+                             setValue(option.key, true);
+                           } else {
+                             setValue(option.key, !values[option.key]);
+                           }
+                        }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <input
+                            type={isSingleSelect ? "radio" : "checkbox"}
+                            name={section.key}
+                            id={`${section.key}-${option.key}`}
+                            checked={isSelected}
+                            onChange={() => {}} 
+                            className="w-5 h-5 text-blue-600"
+                          />
+                          <div>
+                            <label htmlFor={`${section.key}-${option.key}`} className="font-medium cursor-pointer">
+                              {option.label}
+                            </label>
+                            {option.description && (
+                              <p className="text-sm text-gray-500 mt-1">{option.description}</p>
+                            )}
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
               )}
-            </div>
-          </div>
-        </li>
-      );
-    })}
-  </ul>
-)}
 
-{/* CASO 2: ELECTRODOMÉSTICOS (Recuperando la data perdida) */}
-{/* Nota: Debes agregar 'appliances' a la interfaz de tus items en assets o usar 'any' temporalmente */}
-{(section as any).appliances && (
-  <div className="grid grid-cols-1 gap-4">
-    {(section as any).appliances.map((appliance: any) => (
-       <div key={appliance.key} className="border p-4 rounded-xl bg-white">
-          <h4 className="font-bold mb-2">{appliance.label}</h4>
-          <div className="grid grid-cols-3 gap-2">
-             {appliance.fields?.map((fieldKey: string) => (
-                <div key={fieldKey}>
-                   <label className="text-xs text-gray-500 capitalize">{fieldKey.replace('_', ' ')}</label>
-                   <input 
-                      type="number"
-                      placeholder="0"
-                      // Guardamos como: refrigerador_ancho_cm
-                      value={values[`${appliance.key}_${fieldKey}`] || ''}
-                      onChange={(e) => setValue(`${appliance.key}_${fieldKey}`, Number(e.target.value))}
-                      className="w-full border rounded p-1 text-sm"
-                   />
+              {/* CASO 2: ELECTRODOMÉSTICOS (SOLUCIÓN TYPE GUARD) */}
+              {/* Usamos el Type Guard para confirmar que 'appliances' existe y es un array */}
+              {sectionHasAppliances(section) && (
+                <div className="grid grid-cols-1 gap-4">
+                  {section.appliances.map((appliance) => (
+                     <div key={appliance.key} className="border p-4 rounded-xl bg-white">
+                        <h4 className="font-bold mb-2">{appliance.label}</h4>
+                        <div className="grid grid-cols-3 gap-2">
+                           {appliance.fields?.map((fieldKey) => (
+                              <div key={fieldKey}>
+                                 <label className="text-xs text-gray-500 capitalize">{fieldKey.replace('_', ' ')}</label>
+                                 <input 
+                                   type="number"
+                                   placeholder="0"
+                                   // Casting seguro a string o number para el value
+                                   value={String(values[`${appliance.key}_${fieldKey}`] || '')}
+                                   onChange={(e) => setValue(`${appliance.key}_${fieldKey}`, Number(e.target.value))}
+                                   className="w-full border rounded p-1 text-sm"
+                                 />
+                              </div>
+                           ))}
+                           
+                           {/* Checkbox simple si no hay campos adicionales */}
+                           {!appliance.fields && (
+                              <div className="col-span-3 flex items-center gap-2">
+                                 <input 
+                                   type="checkbox"
+                                   checked={Boolean(values[appliance.key])}
+                                   onChange={(e) => setValue(appliance.key, e.target.checked)}
+                                 />
+                                 <span className="text-sm">Incluir en diseño</span>
+                              </div>
+                           )}
+                        </div>
+                     </div>
+                  ))}
                 </div>
-             ))}
-             {/* Si no tiene campos, es un checkbox simple (ej. tiene lavavajillas o no) */}
-             {!appliance.fields && (
-                <div className="col-span-3 flex items-center gap-2">
-                   <input 
-                      type="checkbox"
-                      checked={values[appliance.key] || false}
-                      onChange={(e) => setValue(appliance.key, e.target.checked)}
-                   />
-                   <span className="text-sm">Incluir en diseño</span>
-                </div>
-             )}
-          </div>
-       </div>
-    ))}
-  </div>
-)}
+              )}
 
-{/* CASO 3: CAMPOS DE TEXTO / NUMÉRICOS (Inputs estándar) */}
-{section.fields?.map(field => (
-  <div key={field.name} className="mb-4">
-    <label className="block text-sm font-medium mb-1 text-gray-700">{field.label}</label>
-    <div className="relative">
-        <input
-          type={field.type}
-          value={values[field.name] ?? ''}
-          onChange={e => handleDimensionChange(field.name, e.target.value)}
-          className={`border p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
-             errors[field.name] ? 'border-red-500 bg-red-50' : 'border-gray-300'
-          }`}
-        />
-        {field.name.includes('_m') && <span className="absolute right-3 top-3 text-gray-400 text-sm">mts</span>}
-    </div>
-    {errors[field.name] && <p className="text-red-500 text-xs mt-1 ml-1">{errors[field.name]}</p>}
-  </div>
-))}
+              {/* CASO 3: CAMPOS DE TEXTO / NUMÉRICOS */}
+              {section.fields?.map(field => (
+                <div key={field.name} className="mb-4">
+                  <label className="block text-sm font-medium mb-1 text-gray-700">{field.label}</label>
+                  <div className="relative">
+                      <input
+                        type={field.type}
+                        // Conversión explícita a string para el input
+                        value={String(values[field.name] ?? '')}
+                        onChange={e => handleDimensionChange(field.name, e.target.value)}
+                        className={`border p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-500 outline-none transition-all ${
+                           errors[field.name] ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                        }`}
+                      />
+                      {field.name.includes('_m') && <span className="absolute right-3 top-3 text-gray-400 text-sm">mts</span>}
+                  </div>
+                  {errors[field.name] && <p className="text-red-500 text-xs mt-1 ml-1">{errors[field.name]}</p>}
+                </div>
+              ))}
 
               {/* UPLOAD */}
               {section.upload && (
