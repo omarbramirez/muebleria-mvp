@@ -9,7 +9,9 @@ export type WizardStoreValue =
   | boolean 
   | null 
   | undefined 
-  | File[] 
+  | File[]
+  | File          // <--- IMPORTANTE: Permitir archivos
+  | null
   | WizardStoreValue[] 
   | { [key: string]: WizardStoreValue };
 
