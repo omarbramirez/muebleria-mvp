@@ -1,18 +1,18 @@
 'use client';
 import React, { useState, useRef, useEffect } from "react";
-import { Button } from '@/app/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 // ... imports de iconos y otros componentes ...
-import Room3DPreviewAmateur from '@/app/components/Room3DPreviewAmateur';
-import Room3DPreviewProfessional from '@/app/components/Room3DPreviewProfessional';
-import Room3DPreviewExpert from '@/app/components/Room3DPreviewExpert';
+import Room3DPreviewAmateur from '@/components/features/planner/Room3DPreviewAmateur';
+import Room3DPreviewProfessional from '@/components/features/planner/Room3DPreviewProfessional';
+import Room3DPreviewExpert from '@/components/features/planner/Room3DPreviewExpert';
 
 // Imports de Módulos
-import Materials from '@/app/components/options/Materials';
-import Budget from '@/app/components/options/Budget';
-import Appliances from '@/app/components/options/Appliances';
-import Compatibility from '@/app/components/options/Compatibility';
-import Position from '@/app/components/options/Position';
-import RoomGeometryPlanner from '@/app/components/options/RoomGeometryPlanner/RoomGeometryPlanner'; // NUEVO
+import Materials from '@/components/features/planner/options/Materials';
+import Budget from '@/components/features/planner/options/Budget';
+import Appliances from '@/components/features/planner/options/Appliances';
+import Compatibility from '@/components/features/planner/options/Compatibility';
+import Position from '@/components/features/planner/options/Position';
+import RoomGeometryPlanner from '@/components/features/planner/options/RoomGeometryPlanner/RoomGeometryPlanner'; // NUEVO
 
 // STORE IMPORT
 import { usePreferenceWizardStore } from "@/store/preferenceWizardStore";

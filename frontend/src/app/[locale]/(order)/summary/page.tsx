@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import Image from "next/image";
 import { orderItems as initialItems } from "@/app/assets/assets";
-import PageLayout from "@/app/components/ui/PageLayout";
+import PageLayout from "@/components/layout/PageLayout";
 import { useRouter } from 'next/navigation';
 
 export default function OrderSummary() {

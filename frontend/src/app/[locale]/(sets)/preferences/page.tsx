@@ -1,11 +1,11 @@
 'use client'
 import React, { useState } from 'react'
-import PageLayout from "@/app/components/ui/PageLayout";
+import PageLayout from "@/components/layout/PageLayout";
 import { PREFERENCE_WIZARD_ITEMS } from "@/app/assets/assets";
-import { Heading } from '@/app/components/ui/Heading';
-import { Paragraph } from '@/app/components/ui/Paragraph';
-import { LinkItem } from "@/app/components/ui/LinkItem";
-import { Button } from '@/app/components/ui/Button';
+import { Heading } from '@/components/ui/Heading';
+import { Paragraph } from '@/components/ui/Paragraph';
+import { LinkItem } from "@/components/ui/LinkItem";
+import { Button } from '@/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import { usePreferenceWizardStore } from '@/store/preferenceWizardStore';
 
@@ -302,7 +302,7 @@ const Preferences = () => {
                 size="sm"
                 onClick={() => handleNext(index)}
               >
-                {section.key === 'materials' ? 'Finalizar' : 'Siguiente'}
+                {section.key === 'constraints' ? 'Finalizar' : 'Siguiente'}
               </Button>
 
             </section>

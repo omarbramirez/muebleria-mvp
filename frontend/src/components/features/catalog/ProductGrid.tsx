@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslations } from "next-intl";
-import { Heading } from '@/app/components/ui/Heading';
-import { Paragraph } from '@/app/components/ui/Paragraph';
+import { Heading } from '@/components/ui/Heading';
+import { Paragraph } from '@/components/ui/Paragraph';
 import { categories } from '@/app/assets/assets';
-import { SlidingUpAnimation, RevealingAnimation, ScalingFadeInAnimation } from '@/app/components/animations/animations'
+import { SlidingUpAnimation, RevealingAnimation, ScalingFadeInAnimation } from '@/components/ui/animations/animations'
 
 const ProductGrid: React.FC = () => {
   const t = useTranslations('product_grid');

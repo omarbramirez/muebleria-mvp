@@ -4,9 +4,9 @@ import React, { useState, useMemo } from "react";
 import Image from "next/image";
 import { categories } from "@/app/assets/assets";
 import { Search, SlidersHorizontal } from 'lucide-react';
-import Filters from '@/app/components/Filters'
-import { Heading } from '@/app/components/ui/Heading';
-import { LinkItem } from "@/app/components/ui/LinkItem";
+import Filters from '@/components/features/catalog/Filters'
+import { Heading } from '@/components/ui/Heading';
+import { LinkItem } from "@/components/ui/LinkItem";
 import { X } from 'lucide-react';
 const ProductCatalog: React.FC = () => {
   const [search, setSearch] = useState("");

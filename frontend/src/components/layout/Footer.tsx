@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl"; // si usas next-intl
 import { sitemap } from "@/config/sitemap.config";
-import { Heading } from "@/app/components/ui/Heading";
-import { Paragraph } from "@/app/components/ui/Paragraph";
-import { LinkItem } from "@/app/components/ui/LinkItem";
+import { Heading } from "@/components/ui/Heading";
+import { Paragraph } from "@/components/ui/Paragraph";
+import { LinkItem } from "@/components/ui/LinkItem";
 export default function Footer() {
   const t = useTranslations();
 

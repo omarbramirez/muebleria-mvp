@@ -1,5 +1,5 @@
 import React from 'react'
-import RoomPlanner from '@/app/components/RoomPlanner'
+import RoomPlanner from '@/components/features/planner/RoomPlanner'
 const page = () => {
   return (
 <RoomPlanner link='/generation'/>

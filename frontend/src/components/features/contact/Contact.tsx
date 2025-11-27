@@ -1,13 +1,13 @@
 "use client"
 import React from 'react'
 import { useTranslations } from "next-intl";
-import { useContactForm } from "@/app/hooks/useContactForm";
+import { useContactForm } from "@/hooks/useContactForm";
 import { ContactForm } from "./ContactForm";
 import { useState } from 'react';
-import { Heading } from '@/app/components/ui/Heading';
-import { Paragraph } from '@/app/components/ui/Paragraph';
-import { Button } from '@/app/components/ui/Button';
-import { SlidingUpAnimation, RevealingAnimation, ScalingFadeInAnimation } from '@/app/components/animations/animations'
+import { Heading } from '@/components/ui/Heading';
+import { Paragraph } from '@/components/ui/Paragraph';
+import { Button } from '@/components/ui/Button';
+import { SlidingUpAnimation, RevealingAnimation, ScalingFadeInAnimation } from '@/components/ui/animations/animations'
 
 const Contact = () => {
   const t = useTranslations("contact");

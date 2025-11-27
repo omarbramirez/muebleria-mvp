@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import { Button } from "@/app/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 
 const MODULES: Record<string, React.ReactNode> = {
   Presupuesto: (

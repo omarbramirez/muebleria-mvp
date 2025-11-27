@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { materials,defaultProducts,configuradores } from "@/app/assets/assets";
-import PageLayout from "@/app/components/ui/PageLayout";
-import { Button } from '@/app/components/ui/Button';
+import PageLayout from "@/components/layout/PageLayout";
+import { Button } from '@/components/ui/Button';
 import { useRouter } from 'next/navigation';
 
 

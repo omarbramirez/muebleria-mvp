@@ -1,8 +1,8 @@
 import React from 'react'
-import { Heading } from '@/app/components/ui/Heading';
-import { Paragraph } from '@/app/components/ui/Paragraph';
-import { LinkItem } from "@/app/components/ui/LinkItem";
-import Header from '@/app/components/Header';
+import { Heading } from '@/components/ui/Heading';
+import { Paragraph } from '@/components/ui/Paragraph';
+import { LinkItem } from "@/components/ui/LinkItem";
+import Header from '@/components/layout/Header';
 import { X } from 'lucide-react';
 import {filters} from '@/app/assets/assets'
 

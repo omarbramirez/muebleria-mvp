@@ -2,7 +2,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 
-const KitchenScene = dynamic(() => import("@/app/components/scenes/scene"), {
+const KitchenScene = dynamic(() => import("@/components/features/planner/scenes/scene"), {
   ssr: false,
 });
 

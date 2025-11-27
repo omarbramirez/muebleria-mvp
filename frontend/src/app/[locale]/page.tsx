@@ -1,8 +1,8 @@
 
-import Navbar from "@/app/components/Navbar";
-import Header from "@/app/components/Header";
-import ServiceProcess from "@/app/components/ServiceProcess";
-import Footer from "@/app/components/Footer";
+import Navbar from "@/components/layout/Navbar";
+import Header from "@/components/layout/Header";
+import ServiceProcess from "@/components/features/home/ServiceProcess";
+import Footer from "@/components/layout/Footer";
 
 
 export default function Home() {

@@ -1,5 +1,5 @@
 import React from 'react'
-import PageLayout from "@/app/components/ui/PageLayout";
+import PageLayout from "@/components/layout/PageLayout";
 const Order = () => {
   return (
     <PageLayout>

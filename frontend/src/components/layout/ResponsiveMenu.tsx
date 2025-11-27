@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from "react";
 import { NAVBAR_ITEMS } from "@/app/assets/assets";
 import { useTranslations } from "next-intl";
-import { LinkItem } from "@/app/components/ui/LinkItem";
+import { LinkItem } from "@/components/ui/LinkItem";
 import {ResponsiveMenuProps } from '@/types/index';
 import { LinkVariant } from "@/types/index";
 

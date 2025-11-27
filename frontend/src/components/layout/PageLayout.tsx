@@ -1,7 +1,7 @@
 // components/LegalLayout.tsx
 import { ReactNode } from "react";
-import Footer from "@/app/components/Footer";
-import Navbar from "@/app/components/Navbar";
+import Footer from "@/components/layout/Footer";
+import Navbar from "@/components/layout/Navbar";
 interface PageLayoutProps {
   children: ReactNode;
 }

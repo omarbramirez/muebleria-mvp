@@ -1,6 +1,6 @@
 import React from 'react'
-import RoomPlanner from '@/app/components/RoomPlanner'
-import RoomPlannerHeight from '@/app/components/RoomPlannerHeight'
+import RoomPlanner from '@/components/features/planner/RoomPlanner'
+import RoomPlannerHeight from '@/components/features/planner/RoomPlannerHeight'
 const page = () => {
   return (
 

@@ -1,7 +1,7 @@
 
 import React from 'react'
-import { Button } from '@/app/components/ui/Button';
-import PageLayout from "@/app/components/ui/PageLayout";
+import { Button } from '@/components/ui/Button';
+import PageLayout from "@/components/layout/PageLayout";
 
 const Creation = () => {
   return (

@@ -1,10 +1,10 @@
 "use client"
 import { serviceProcess } from '@/app/assets/assets';
 import { useTranslations } from 'next-intl';
-import { Heading } from '@/app/components/ui/Heading';
+import { Heading } from '@/components/ui/Heading';
 import Image from 'next/image'
-import { Paragraph } from '@/app/components/ui/Paragraph';
-import { Button } from '@/app/components/ui/Button';
+import { Paragraph } from '@/components/ui/Paragraph';
+import { Button } from '@/components/ui/Button';
 
 const ServiceProcess: React.FC = () => {
   const t = useTranslations('service_process');

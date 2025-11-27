@@ -1,10 +1,10 @@
 'use client'
 import React, { useState } from 'react'
-import { Button } from '@/app/components/ui/Button';
-import PageLayout from "@/app/components/ui/PageLayout";
-import { Paragraph } from '@/app/components/ui/Paragraph';
+import { Button } from '@/components/ui/Button';
+import PageLayout from "@/components/layout/PageLayout";
+import { Paragraph } from '@/components/ui/Paragraph';
 import { useRouter } from 'next/navigation';
-import SetPlanner from '@/app/components/SetPlanner';
+import SetPlanner from '@/components/features/planner/SetPlanner';
 const Generation = () => {
   const [budget, setBudget] = useState(55000);
   const [details, setDetails] = useState(25000);

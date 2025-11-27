@@ -2,7 +2,7 @@
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/app/lib/cn';
 import { ButtonProps, ButtonVariant, Size } from '@/types/index';
-import { HoveringAnimation } from '@/app/components/animations/animations';
+import { HoveringAnimation } from '@/components/ui/animations/animations';
 
 // --- estilos base ---
 const base =

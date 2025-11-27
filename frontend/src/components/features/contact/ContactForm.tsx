@@ -2,8 +2,8 @@
 import { useTranslations } from "next-intl";
 import { motion } from 'motion/react';
 import { ContactFormProps } from '@/types/index';
-import { Button } from '@/app/components/ui/Button';
-import { Paragraph } from '@/app/components/ui/Paragraph';
+import { Button } from '@/components/ui/Button';
+import { Paragraph } from '@/components/ui/Paragraph';
 import { useEffect } from "react";
 
 export const ContactForm: React.FC<ContactFormProps> = ({

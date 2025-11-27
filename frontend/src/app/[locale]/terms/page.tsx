@@ -1,7 +1,7 @@
 // app/[locale]/terms/page.tsx
-import LegalLayout from "@/app/components/ui/LegalLayout";
+import LegalLayout from "@/components/layout/LegalLayout";
 import { useTranslations } from "next-intl";
-import { Paragraph } from "@/app/components/ui/Paragraph";
+import { Paragraph } from "@/components/ui/Paragraph";
 
 const TermsPage = () => {
   const t = useTranslations("terms");

@@ -1,11 +1,11 @@
 
 import React, {FC} from 'react';
 import { useTranslations } from 'next-intl';
-import Chair from './Chair';
-import { Button } from '@/app/components/ui/Button';
-import { Heading } from '@/app/components/ui/Heading';
-import { Paragraph } from '@/app/components/ui/Paragraph';
-import { SlidingUpAnimation, RevealingAnimation } from '@/app/components/animations/animations'
+import Chair from '@/components/features/planner/Chair';
+import { Button } from '@/components/ui/Button';
+import { Heading } from '@/components/ui/Heading';
+import { Paragraph } from '@/components/ui/Paragraph';
+import { SlidingUpAnimation, RevealingAnimation } from '@/components/ui/animations/animations'
 
 
 interface IntroductionProps {

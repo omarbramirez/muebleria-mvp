@@ -3,10 +3,10 @@
 import React from "react";
 import * as Yup from "yup";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { useNewsletter } from "@/app/hooks/useNewsletter";
-import { Heading } from "@/app/components/ui/Heading";
-import { Paragraph } from "@/app/components/ui/Paragraph";
-import { Button } from "@/app/components/ui/Button";
+import { useNewsletter } from "@/hooks/useNewsletter";
+import { Heading } from "@/components/ui/Heading";
+import { Paragraph } from "@/components/ui/Paragraph";
+import { Button } from "@/components/ui/Button";
 import { useTranslations } from "next-intl";
 type Props = Record<string, never>;
 

@@ -3,7 +3,7 @@ import React, { Suspense, memo, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Environment } from "@react-three/drei";
 import * as THREE from "three";
-import {KitchenModel} from '@/app/hooks/useGLTF'
+import {KitchenModel} from '@/hooks/useGLTF'
 
 interface KitchenModelProps {
   selectedTexture?: "cardboard" | "wood";

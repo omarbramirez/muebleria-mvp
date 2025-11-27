@@ -1,9 +1,9 @@
 // components/LegalLayout.tsx
 import { ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
-import { Heading } from "@/app/components/ui/Heading";
-import Footer from "@/app/components/Footer";
-import Navbar from "@/app/components/Navbar";
+import { Heading } from "@/components/ui/Heading";
+import Footer from "@/components/layout/Footer";
+import Navbar from "@/components/layout/Navbar";
 interface LegalLayoutProps {
   title: string;
   children: ReactNode;
