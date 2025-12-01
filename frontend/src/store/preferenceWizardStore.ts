@@ -172,7 +172,7 @@ export const usePreferenceWizardStore = create<WizardState>((set, get) => ({
 
     // 1. Costo Base (Muros y Obra civil aproximada)
     // Supongamos $5,000 MXN por metro lineal de muro (solo ejemplo)
-    const wallCost = (state.values.room_points as any[] || []).length * 5000;
+    const wallCost = (state.values.room_points as unknown[] || []).length * 5000;
 
     // 2. Costo Electrodomésticos
     const appCost = state.appliances.reduce((acc, app) => {

@@ -74,15 +74,16 @@ const Compatibility = () => {
     setPoints([...points, newPoint]);
   };
 
-  const updatePoint = (id: string, field: keyof InstallationPoint, value: any) => {
+  const updatePoint = <K extends keyof InstallationPoint>(id: string, field: K, value: InstallationPoint[K]) => {
     setPoints(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
   };
+
 
   const removePoint = (id: string) => {
     setPoints(prev => prev.filter(p => p.id !== id));
   };
 
-  const handleGasConfigChange = (field: keyof GasConfig, value: any) => {
+  const handleGasConfigChange = <K extends keyof GasConfig>(field: K, value: GasConfig[K]) => {
     setGasConfig(prev => ({ ...prev, [field]: value }));
   };
 
@@ -244,7 +245,7 @@ const Compatibility = () => {
                   <label className="text-[10px] font-bold text-gray-400 block mb-1">TIPO</label>
                   <select
                     value={gasConfig.type}
-                    onChange={(e) => handleGasConfigChange('type', e.target.value)}
+                    onChange={(e) => handleGasConfigChange('type', e.target.value as unknown as GasConfig['type'])}
                     className="w-full text-xs border-gray-200 rounded"
                   >
                     <option value="natural">Gas Natural</option>

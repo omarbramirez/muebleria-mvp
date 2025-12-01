@@ -11,7 +11,7 @@ import {
   Info
 } from "lucide-react";
 
-import { usePreferenceWizardStore, ApplianceModel } from "@/store/preferenceWizardStore";
+import { usePreferenceWizardStore, ApplianceModel, WizardStoreValue } from "@/store/preferenceWizardStore";
 
 // --- Tipos de Datos y Catálogos Estáticos ---
 
@@ -84,7 +84,7 @@ const Appliances = () => {
   const [localConfig, setLocalConfig] = useState<Record<string, ApplianceConfig>>(() => {
     // Si hay configuración en el store, la usamos. 
     // Luego, la fusionamos con los defaults para asegurar que todas las claves existan.
-    return { ...defaultAppliances, ...(values.appliances_config as Record<string, ApplianceConfig> || {}) };
+    return { ...defaultAppliances, ...(values.appliances_config as unknown as Record<string, ApplianceConfig> || {}) };
   });
 
   // Helper para actualizar Store Global (3D) y Estado Local (UI)
@@ -123,7 +123,7 @@ const Appliances = () => {
         // CREAR: Si no existe y está activo, lo agregamos
         const newApp: ApplianceModel = {
           id: targetId,
-          type: key as any, // 'fridge', 'stove', etc.
+          type: key as ApplianceModel['type'], // 'fridge', 'stove', etc.
           width: updatedConfig.width,
           height: updatedConfig.height,
           depth: updatedConfig.depth,
@@ -174,7 +174,7 @@ const Appliances = () => {
         if (config.active) {
           initialApps.push({
             id: `${key}_${config.type}`,
-            type: key as any,
+            type: key as ApplianceModel['type'],
             width: config.width,
             height: config.height,
             depth: config.depth,
@@ -192,7 +192,7 @@ const Appliances = () => {
 
   // 3. SYNC VALUES
   useEffect(() => {
-    setValue('appliances_config', localConfig);
+    setValue('appliances_config', localConfig as unknown as WizardStoreValue);
   }, [localConfig, setValue]);
 
   // Sub-componente de Tarjeta
