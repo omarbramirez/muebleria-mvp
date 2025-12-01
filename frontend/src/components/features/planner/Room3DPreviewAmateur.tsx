@@ -406,7 +406,7 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
           if (pointLocal.z < 0) baseAngle += Math.PI;
           mesh.rotation.y = baseAngle + manualRotationRef.current;
           // Clamping appliance
-          const wallLen = wall.geometry.parameters.width;
+          const wallLen = (wall.geometry as THREE.BoxGeometry).parameters.width;
           const objWidth = (mesh.geometry as THREE.BoxGeometry).parameters.width;
           const minX = -wallLen / 2 + objWidth / 2;
           const maxX = wallLen / 2 - objWidth / 2;
