@@ -8,8 +8,8 @@ import {
   DoorOpen,
   AppWindow,
   Trash2,
-  Hammer, 
-  MousePointer2 
+  Hammer,
+  MousePointer2
 } from "lucide-react";
 
 // Importamos el hook Y EL TIPO para el casting estricto
@@ -42,12 +42,12 @@ const DEFAULT_POINTS: Point[] = [
 ];
 
 const RoomGeometryPlanner = () => {
-  
-      // "State Object" universal en Zustand
-      const { values, setValue } = usePreferenceWizardStore();
+
+  // 1. USAR ESTADO GLOBAL EN LUGAR DE LOCAL
+  const { values, setValue, activeWallIndex, setActiveWall } = usePreferenceWizardStore();
 
   // --- ESTADO (CORRECCIÓN DE TIPADO ESTRICTO) ---
-  
+
   // 1. Puntos: Casting doble para asegurar que es Point[]
   const [points, setPoints] = useState<Point[]>(
     (values.room_points as unknown as Point[]) || DEFAULT_POINTS
@@ -66,22 +66,43 @@ const RoomGeometryPlanner = () => {
   // Estado de Interacción
   const [dragging, setDragging] = useState<number | null>(null);
   const [lastTap, setLastTap] = useState(0);
-  const [selectedWallIndex, setSelectedWallIndex] = useState<number | null>(null);
 
   // MODO DE EDICIÓN
   const [editMode, setEditMode] = useState<'geometry' | 'openings'>('geometry');
 
+  // ==============================================================================
+  // 🟢 SOLUCIÓN DE SINCRONIZACIÓN (NUEVO CÓDIGO)
+  // ==============================================================================
+
+  // 1. Escuchar cambios EXTERNOS del Store (ej. vienen del 3D) y actualizar localmente
+  useEffect(() => {
+    const storeOpenings = values.room_openings as unknown as WallOpening[];
+    // IMPORTANTE: Comparamos JSON para evitar bucles infinitos (Store -> Local -> Store...)
+    // Solo actualizamos si los datos son realmente diferentes.
+    if (storeOpenings && JSON.stringify(storeOpenings) !== JSON.stringify(openings)) {
+      setOpenings(storeOpenings);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values.room_openings]); // Solo dependemos del valor del store
+
+  // (Opcional) Hacemos lo mismo para puntos y altura por si en el futuro el 3D los edita
+  useEffect(() => {
+    const storeHeight = values.room_height as unknown as number;
+    if (storeHeight && storeHeight !== roomHeight) setRoomHeight(storeHeight);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values.room_height]);
+
   // --- SINCRONIZACIÓN (ESCRITURA SEGURA) ---
-  useEffect(() => { 
-      setValue("room_points", points as unknown as WizardStoreValue); 
+  useEffect(() => {
+    setValue("room_points", points as unknown as WizardStoreValue);
   }, [points, setValue]);
 
-  useEffect(() => { 
-      setValue("room_height", roomHeight as unknown as WizardStoreValue); 
+  useEffect(() => {
+    setValue("room_height", roomHeight as unknown as WizardStoreValue);
   }, [roomHeight, setValue]);
 
-  useEffect(() => { 
-      setValue("room_openings", openings as unknown as WizardStoreValue); 
+  useEffect(() => {
+    setValue("room_openings", openings as unknown as WizardStoreValue);
   }, [openings, setValue]);
 
   // --- CÁLCULOS AVANZADOS ---
@@ -135,7 +156,7 @@ const RoomGeometryPlanner = () => {
 
   const handleAddVertex = (index: number, e: React.PointerEvent<SVGLineElement>) => {
     e.stopPropagation();
-    e.preventDefault(); 
+    e.preventDefault();
 
     const svg = e.currentTarget.closest("svg") as SVGSVGElement;
     if (!svg) return;
@@ -178,12 +199,12 @@ const RoomGeometryPlanner = () => {
 
   // --- LÓGICA DE VANOS ---
   const addOpening = (type: OpeningType) => {
-    if (selectedWallIndex === null) return;
-    const wall = wallMetrics[selectedWallIndex];
+    if (activeWallIndex === null) return;
+    const wall = wallMetrics[activeWallIndex];
     const newOpening: WallOpening = {
       id: Math.random().toString(36).substr(2, 9),
       type,
-      wallIndex: selectedWallIndex,
+      wallIndex: activeWallIndex,
       distFromStart: wall.lengthMm / 2 - 450,
       width: 900,
       height: type === 'door' ? 2100 : 1200,
@@ -192,8 +213,53 @@ const RoomGeometryPlanner = () => {
     setOpenings([...openings, newOpening]);
   };
 
+
+  // --- LÓGICA DE ACTUALIZACIÓN CON VALIDACIÓN (CLAMPING) ---
   const updateOpening = (id: string, field: keyof WallOpening, value: number) => {
-    setOpenings(prev => prev.map(op => op.id === id ? { ...op, [field]: value } : op));
+    setOpenings(prev => prev.map(op => {
+      if (op.id !== id) return op;
+
+      const wall = wallMetrics[op.wallIndex];
+      const maxWallLength = wall?.lengthMm || 0;
+      const maxWallHeight = Number(roomHeight);
+
+      const currentSill = Number(op.sillHeight) || 0;
+      const currentHeight = Number(op.height) || 0;
+      const currentDist = Number(op.distFromStart) || 0;
+      const currentWidth = Number(op.width) || 0;
+
+      let newValue = Number(value);
+
+      if (field === 'height') {
+        newValue = Math.max(10, newValue);
+        if (newValue + currentSill > maxWallHeight) {
+          newValue = Math.max(10, maxWallHeight - currentSill);
+        }
+      }
+
+      if (field === 'sillHeight') {
+        newValue = Math.max(0, newValue);
+        if (newValue + currentHeight > maxWallHeight) {
+          newValue = Math.max(0, maxWallHeight - currentHeight);
+        }
+      }
+
+      if (field === 'width') {
+        newValue = Math.max(10, newValue);
+        if (newValue + currentDist > maxWallLength) {
+          newValue = Math.max(10, maxWallLength - currentDist);
+        }
+      }
+
+      if (field === 'distFromStart') {
+        newValue = Math.max(0, newValue);
+        if (newValue + currentWidth > maxWallLength) {
+          newValue = Math.max(0, maxWallLength - currentWidth);
+        }
+      }
+
+      return { ...op, [field]: newValue };
+    }));
   };
 
   const removeOpening = (id: string) => {
@@ -240,11 +306,11 @@ const RoomGeometryPlanner = () => {
         <g key={op.id} onClick={(e) => {
           if (editMode === 'openings') {
             e.stopPropagation();
-            setSelectedWallIndex(op.wallIndex);
+            setActiveWall(op.wallIndex);
           }
         }}>
           <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={op.type === 'door' ? '#F87171' : '#60A5FA'} strokeWidth={8} />
-          {editMode === 'openings' && selectedWallIndex === op.wallIndex && (
+          {editMode === 'openings' && activeWallIndex === op.wallIndex && (
             <circle cx={(x1 + x2) / 2} cy={(y1 + y2) / 2} r={4} fill="white" stroke="black" />
           )}
         </g>
@@ -271,7 +337,7 @@ const RoomGeometryPlanner = () => {
         {/* SWITCHER DE MODO */}
         <div className="bg-gray-100 p-1 rounded-lg flex gap-1">
           <button
-            onClick={() => { setEditMode('geometry'); setSelectedWallIndex(null); }}
+            onClick={() => { setEditMode('geometry'); setActiveWall(null); }}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${editMode === 'geometry' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
           >
             <Hammer className="w-3 h-3" /> Estructura
@@ -285,7 +351,7 @@ const RoomGeometryPlanner = () => {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row flex-1 overflow-hidden p-6 pt-3 gap-6">
+      <div className="flex flex-col flex-1 overflow-hidden p-6 sm:px-30  pt-3 gap-6">
 
         {/* COLUMNA 1: PLANO 2D */}
         <div className="flex-1 min-h-[300px] sm:min-h-full flex flex-col relative">
@@ -301,7 +367,7 @@ const RoomGeometryPlanner = () => {
                     `}
             onPointerMove={handlePointerMove}
             onPointerUp={() => setDragging(null)}
-            onClick={() => setSelectedWallIndex(null)}
+            onClick={() => setActiveWall(null)}
           >
             {/* ... Defs (Patrón) ... */}
             <defs>
@@ -316,7 +382,7 @@ const RoomGeometryPlanner = () => {
             {/* Muros (Líneas) */}
             {points.map((p, i) => {
               const next = points[(i + 1) % points.length];
-              const isSelected = selectedWallIndex === i;
+              const isSelected = activeWallIndex === i;
 
               return (
                 <g key={`wall-${i}`}>
@@ -328,7 +394,7 @@ const RoomGeometryPlanner = () => {
                     onClick={(e) => {
                       if (editMode === 'openings') {
                         e.stopPropagation();
-                        setSelectedWallIndex(prev => prev === i ? null : i);
+                        setActiveWall(i);
                       }
                     }}
                     className={editMode === 'geometry' ? 'cursor-copy' : 'cursor-pointer'}
@@ -406,7 +472,7 @@ const RoomGeometryPlanner = () => {
           )}
 
           {/* MODO ABERTURAS (Selección de Muros) */}
-          {editMode === 'openings' && selectedWallIndex === null && (
+          {editMode === 'openings' && activeWallIndex === null && (
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center space-y-4 animate-in fade-in">
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto text-blue-600">
                 <MousePointer2 className="w-6 h-6" />
@@ -424,13 +490,13 @@ const RoomGeometryPlanner = () => {
           )}
 
           {/* EDITOR DE MURO */}
-          {editMode === 'openings' && selectedWallIndex !== null && (
+          {editMode === 'openings' && activeWallIndex !== null && (
             <div className="flex flex-col h-full animate-in slide-in-from-right-4 fade-in duration-200">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-sm font-bold text-blue-800 flex items-center gap-2">
-                  <Ruler className="w-4 h-4" /> Muro #{selectedWallIndex + 1}
+                  <Ruler className="w-4 h-4" /> Muro #{activeWallIndex + 1}
                 </h3>
-                <button onClick={() => setSelectedWallIndex(null)} className="text-xs text-gray-400 hover:text-gray-600 underline">Cerrar</button>
+                <button onClick={() => setActiveWall(null)} className="text-xs text-gray-400 hover:text-gray-600 underline">Cerrar</button>
               </div>
               <div className="grid grid-cols-2 gap-2 mb-4">
                 <button onClick={() => addOpening('door')} className="flex flex-col items-center justify-center p-3 bg-white border hover:border-red-400 hover:bg-red-50 rounded-lg transition-all gap-1 group">
@@ -441,65 +507,125 @@ const RoomGeometryPlanner = () => {
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto space-y-3">
-                {openings.filter(op => op.wallIndex === selectedWallIndex).map(op => (
-                  <div key={op.id} className="bg-white p-3 rounded-lg border shadow-sm relative">
-                    <div className="flex items-center gap-2 mb-2">
+                {openings.filter(op => op.wallIndex === activeWallIndex).map(op => (
+
+                  <div key={op.id} className="bg-white p-3 rounded-lg border shadow-sm relative space-y-3">
+
+                    {/* Encabezado del Card */}
+                    <div className="flex items-center gap-2">
                       {op.type === 'door' ? <DoorOpen className="w-4 h-4 text-red-400" /> : <AppWindow className="w-4 h-4 text-blue-400" />}
                       <span className="text-xs font-bold text-gray-700">{op.type === 'door' ? 'Puerta' : 'Ventana'}</span>
-                      <button onClick={() => removeOpening(op.id)} className="ml-auto text-gray-300 hover:text-red-500"><Trash2 className="w-3 h-3" /></button>
+                      <button onClick={() => removeOpening(op.id)} className="ml-auto text-gray-300 hover:text-red-500">
+                        <Trash2 className="w-3 h-3" />
+                      </button>
                     </div>
+
+                    {/* FILA 1: HORIZONTAL (Ubicación X y Ancho) */}
                     <div className="grid grid-cols-2 gap-2">
-                      <div><label className="text-[9px] text-gray-400 block">DISTANCIA</label><input type="number" value={Math.round(op.distFromStart)} onChange={(e) => updateOpening(op.id, 'distFromStart', Number(e.target.value))} className="w-full border rounded px-1 text-xs" /></div>
-                      <div><label className="text-[9px] text-gray-400 block">ANCHO</label><input type="number" value={op.width} onChange={(e) => updateOpening(op.id, 'width', Number(e.target.value))} className="w-full border rounded px-1 text-xs" /></div>
+                      <div>
+                        <label className="text-[9px] font-bold text-gray-400 block mb-1">DISTANCIA (X)</label>
+                        <div className="flex items-center border rounded bg-gray-50">
+                          <input
+                            type="number"
+                            value={Math.round(op.distFromStart)}
+                            onChange={(e) => updateOpening(op.id, 'distFromStart', Number(e.target.value))}
+                            className="w-full bg-transparent px-2 py-1 text-xs outline-none"
+                          />
+                          <span className="text-[9px] text-gray-400 pr-1">mm</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[9px] font-bold text-gray-400 block mb-1">ANCHO</label>
+                        <div className="flex items-center border rounded bg-gray-50">
+                          <input
+                            type="number"
+                            value={Math.round(op.width)}
+                            onChange={(e) => updateOpening(op.id, 'width', Number(e.target.value))}
+                            className="w-full bg-transparent px-2 py-1 text-xs outline-none"
+                          />
+                          <span className="text-[9px] text-gray-400 pr-1">mm</span>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* FILA 2: VERTICAL (Altura y Elevación) - NUEVO */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[9px] font-bold text-gray-400 block mb-1">ALTURA (Y)</label>
+                        <div className="flex items-center border rounded bg-gray-50">
+                          <input
+                            type="number"
+                            value={Math.round(op.height)}
+                            onChange={(e) => updateOpening(op.id, 'height', Number(e.target.value))}
+                            className="w-full bg-transparent px-2 py-1 text-xs outline-none"
+                          />
+                          <span className="text-[9px] text-gray-400 pr-1">mm</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[9px] font-bold text-gray-400 block mb-1">ELEVACIÓN</label>
+                        <div className="flex items-center border rounded bg-gray-50">
+                          <input
+                            type="number"
+                            value={Math.round(op.sillHeight)}
+                            onChange={(e) => updateOpening(op.id, 'sillHeight', Number(e.target.value))}
+                            className="w-full bg-transparent px-2 py-1 text-xs outline-none"
+                          // Opcional: Deshabilitar antepecho si es puerta, aunque a veces hay escalones
+                          // disabled={op.type === 'door'} 
+                          />
+                          <span className="text-[9px] text-gray-400 pr-1">mm</span>
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
                 ))}
               </div>
             </div>
           )}
         </div>
-        
+
         {/* Resumen de Métricas Avanzado */}
         <div className="space-y-3 p-4 border rounded-lg bg-blue-50 mt-auto">
-            <h3 className="text-sm font-bold text-blue-800 flex items-center gap-2 border-b border-blue-200 pb-2">
-                <Move3D className="w-4 h-4"/>
-                Cómputo Métrico
-            </h3>
-            <div className="text-xs space-y-2">
-                {/* Grupo: Superficies Horizontales */}
-                <div className="flex justify-between font-medium text-gray-600">
-                    <span>Área Piso (Planta):</span>
-                    <span className="font-bold text-gray-900">{floorAreaM2} m²</span>
-                </div>
-                
-                {/* Grupo: Volumen */}
-                <div className="flex justify-between font-medium text-gray-600">
-                    <span>Volumen Aire:</span>
-                    <span className="font-bold text-gray-900">{(parseFloat(floorAreaM2) * (roomHeight / 1000)).toFixed(2)} m³</span>
-                </div>
-
-                <div className="border-t border-blue-200 my-1"></div>
-
-                {/* Grupo: Superficies Verticales (Muros) */}
-                <div className="flex justify-between font-medium text-gray-600">
-                    <span>Muros (Bruto):</span>
-                    <span className="text-gray-500">{wallAreaGrossM2.toFixed(2)} m²</span>
-                </div>
-                
-                {/* Resta de huecos (Feedback Visual) */}
-                {openings.length > 0 && (
-                    <div className="flex justify-between font-medium text-red-400 pl-2 border-l-2 border-red-200">
-                        <span>- {openings.length} Vanos:</span>
-                        <span>-{openingsAreaM2.toFixed(2)} m²</span>
-                    </div>
-                )}
-
-                {/* Resultado Neto */}
-                <div className="flex justify-between font-bold text-blue-900 bg-blue-100/50 p-1 rounded">
-                    <span>Muros (Neto):</span>
-                    <span>{wallAreaNetM2} m²</span>
-                </div>
+          <h3 className="text-sm font-bold text-blue-800 flex items-center gap-2 border-b border-blue-200 pb-2">
+            <Move3D className="w-4 h-4" />
+            Cómputo Métrico
+          </h3>
+          <div className="text-xs space-y-2">
+            {/* Grupo: Superficies Horizontales */}
+            <div className="flex justify-between font-medium text-gray-600">
+              <span>Área Piso (Planta):</span>
+              <span className="font-bold text-gray-900">{floorAreaM2} m²</span>
             </div>
+
+            {/* Grupo: Volumen */}
+            <div className="flex justify-between font-medium text-gray-600">
+              <span>Volumen Aire:</span>
+              <span className="font-bold text-gray-900">{(parseFloat(floorAreaM2) * (roomHeight / 1000)).toFixed(2)} m³</span>
+            </div>
+
+            <div className="border-t border-blue-200 my-1"></div>
+
+            {/* Grupo: Superficies Verticales (Muros) */}
+            <div className="flex justify-between font-medium text-gray-600">
+              <span>Muros (Bruto):</span>
+              <span className="text-gray-500">{wallAreaGrossM2.toFixed(2)} m²</span>
+            </div>
+
+            {/* Resta de huecos (Feedback Visual) */}
+            {openings.length > 0 && (
+              <div className="flex justify-between font-medium text-red-400 pl-2 border-l-2 border-red-200">
+                <span>- {openings.length} Vanos:</span>
+                <span>-{openingsAreaM2.toFixed(2)} m²</span>
+              </div>
+            )}
+
+            {/* Resultado Neto */}
+            <div className="flex justify-between font-bold text-blue-900 bg-blue-100/50 p-1 rounded">
+              <span>Muros (Neto):</span>
+              <span>{wallAreaNetM2} m²</span>
+            </div>
+          </div>
         </div>
 
         {/* Consejos de Usabilidad */}

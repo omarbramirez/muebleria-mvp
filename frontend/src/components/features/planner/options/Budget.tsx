@@ -4,29 +4,15 @@ import {
   Wallet,
   ShoppingBag,
   Truck,
-  AlertCircle,
+  AlertTriangle, // Icono de alerta para el conflicto
   TrendingUp,
-  DollarSign
+  DollarSign,
+  CheckCircle2,
+  XCircle
 } from "lucide-react";
+import { usePreferenceWizardStore } from "@/store/preferenceWizardStore";
 
-// Importamos el hook Y TAMBIÉN EL TIPO (asegúrate de que esté exportado en el store)
-import { usePreferenceWizardStore, WizardStoreValue } from "@/store/preferenceWizardStore";
-
-// --- 1. DEFINICIÓN DE TIPOS LOCALES ---
-interface BudgetAllocation {
-  furniture: number;
-  appliances: number;
-  services: number;
-}
-
-// Esta interfaz define la estructura local de tus datos
-interface BudgetConfig {
-  total: number;
-  allocation: BudgetAllocation;
-  tier?: string;
-}
-
-// Helper para formatear moneda (MXN/USD)
+// Helper moneda
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('es-MX', {
     style: 'currency',
@@ -36,172 +22,200 @@ const formatCurrency = (value: number) => {
 };
 
 const Budget = () => {
+  const {
+    budget,
+    setBudgetLimit,
+    recalculateProjectCost,
+    applyBudgetOptimization
+  } = usePreferenceWizardStore();
 
-  // "State Object" universal en Zustand
-  const { values, setValue } = usePreferenceWizardStore();
+  // Estado local para el slider (para que sea fluido)
+  const [localLimit, setLocalLimit] = useState(budget.limit);
 
-  // --- 2. HYDRATION STRICT MODE ---
-  // Leemos del store. Convertimos primero a 'unknown' y luego a nuestra interfaz local 'BudgetConfig'.
-  // Esto es seguro y permitido en Vercel.
-  const savedConfig = (values.budget_config as unknown as BudgetConfig) || {};
+  // Estado para el Pop-up de Conflicto
+  const [showOptimizationModal, setShowOptimizationModal] = useState(false);
 
-  // Estado Global del Presupuesto
-  const [totalBudget, setTotalBudget] = useState(savedConfig.total || 85000);
-  const [allocation, setAllocation] = useState<BudgetAllocation>(savedConfig.allocation || {
-    furniture: 50000,
-    appliances: 25000,
-    services: 10000
-  });
-
-  // Recalcular total cuando cambian los parciales
-  const handleTotalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTotal = parseInt(e.target.value);
-    setTotalBudget(newTotal);
-    
-    setAllocation({
-      furniture: Math.round(newTotal * 0.6),
-      appliances: Math.round(newTotal * 0.3),
-      services: Math.round(newTotal * 0.1),
-    });
-  };
-
-  // Lógica visual para determinar el "Nivel" del proyecto
-  const getBudgetTier = (amount: number) => {
-    if (amount < 40000) return { label: 'Económico / Essential', color: 'text-green-600', bg: 'bg-green-100' };
-    if (amount < 120000) return { label: 'Estándar / Plus', color: 'text-blue-600', bg: 'bg-blue-100' };
-    return { label: 'Premium / High-End', color: 'text-purple-600', bg: 'bg-purple-100' };
-  };
-
-  const tier = getBudgetTier(totalBudget);
-
-  // 2. SYNC: ESTRICTO
+  // Al montar, recalculamos el costo real del proyecto basado en lo que el usuario ya diseñó
   useEffect(() => {
-    const newConfig: BudgetConfig = {
-      total: totalBudget,
-      allocation: allocation,
-      tier: totalBudget < 40000 ? 'economy' : totalBudget < 120000 ? 'standard' : 'premium'
-    };
-    
-    // --- CORRECCIÓN FINAL (SIN ANY) ---
-    // Usamos 'as unknown' para borrar el tipo interfaz, y luego 'as WizardStoreValue'
-    // para cumplir con el contrato exacto del store.
-    setValue('budget_config', newConfig as unknown as WizardStoreValue);
-    
-  }, [totalBudget, allocation, setValue]);
+    recalculateProjectCost();
+    setLocalLimit(budget.limit);
+  }, [recalculateProjectCost, budget.limit]);
+
+  // Manejador del Slider
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(e.target.value);
+    setLocalLimit(val);
+  };
+
+  // Manejador al SOLTAR el slider (MouseUp) - Aquí ocurre la validación mágica
+  const handleSliderCommit = () => {
+    // 1. Actualizamos el store
+    setBudgetLimit(localLimit);
+
+    // 2. VALIDACIÓN: ¿El nuevo límite es menor al costo real de lo que ya diseñó?
+    if (localLimit < budget.currentCost) {
+      setShowOptimizationModal(true);
+    }
+  };
+
+  // Acción del Pop-up: ACEPTAR AJUSTE
+  const handleOptimize = () => {
+    applyBudgetOptimization(); // Borra cosas del store
+    setShowOptimizationModal(false);
+    recalculateProjectCost(); // Actualiza el precio mostrado
+  };
+
+  // Acción del Pop-up: CANCELAR (Revertir slider)
+  const handleCancel = () => {
+    setLocalLimit(budget.currentCost); // Regresa el slider al mínimo necesario
+    setBudgetLimit(budget.currentCost);
+    setShowOptimizationModal(false);
+  };
+
+  // Cálculos visuales de la barra
+  const percentageUsed = Math.min(100, (budget.currentCost / localLimit) * 100);
+  const isOverBudget = budget.currentCost > localLimit;
 
   return (
-    <div className="p-6 shadow-sm bg-white h-full flex flex-col gap-6">
+    <div className="p-6 shadow-sm bg-white h-full flex flex-col gap-6 relative overflow-hidden">
 
-      {/* Header con Contexto */}
-      <div className="flex items-start gap-3 mb-2">
+      {/* --- MODAL DE OPTIMIZACIÓN (Conflict Resolution) --- */}
+      {showOptimizationModal && (
+        <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+            <AlertTriangle className="w-8 h-8 text-orange-500" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-800 mb-2">Ajuste de Presupuesto Requerido</h3>
+          <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
+            El diseño actual cuesta <strong className="text-gray-900">{formatCurrency(budget.currentCost)}</strong>,
+            pero tu nuevo límite es de <strong className="text-gray-900">{formatCurrency(localLimit)}</strong>.
+          </p>
+
+          <div className="bg-gray-50 p-4 rounded-lg text-left text-xs text-gray-600 w-full mb-6 border border-gray-200">
+            <p className="font-semibold mb-2">Sugerencia de Optimización:</p>
+            <ul className="space-y-1 list-disc pl-4">
+              <li>Reemplazar encimeras de Mármol por Granito.</li>
+              <li>Eliminar lavavajillas (no esencial).</li>
+              <li>Simplificar herrajes de gabinetes.</li>
+            </ul>
+          </div>
+
+          <div className="flex flex-col gap-3 w-full">
+            <button
+              onClick={handleOptimize}
+              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2"
+            >
+              <CheckCircle2 className="w-4 h-4" /> Aplicar Ajustes Automáticos
+            </button>
+            <button
+              onClick={handleCancel}
+              className="w-full py-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-xl font-semibold text-sm transition-all"
+            >
+              Cancelar y Mantener Diseño
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* --- UI PRINCIPAL --- */}
+
+      {/* Header */}
+      <div className="flex items-start gap-3">
         <div className="bg-primary/10 p-2 rounded-lg">
           <Calculator className="w-6 h-6 text-primary" />
         </div>
         <div>
           <h2 className="text-xl font-bold text-gray-800">Define tu Inversión</h2>
           <p className="text-sm text-gray-500">
-            Ajusta los rangos para que te mostremos materiales y equipos que se adapten a tu realidad financiera.
+            El diseño actual cuesta: <span className="font-bold text-blue-600">{formatCurrency(budget.currentCost)}</span>
           </p>
         </div>
       </div>
 
-      {/* SECCIÓN PRINCIPAL: CONTROL MAESTRO */}
-      <section className="bg-slate-50 border border-slate-200 rounded-xl p-5">
+      {/* Control Maestro */}
+      <section className={`border rounded-xl p-5 transition-colors duration-300 ${isOverBudget ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-slate-200'}`}>
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">
             <Wallet className="w-5 h-5 text-slate-600" />
-            <span className="font-semibold text-slate-700">Presupuesto Total Objetivo</span>
+            <span className="font-semibold text-slate-700">Tu Límite Máximo</span>
           </div>
-          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${tier.bg} ${tier.color}`}>
-            {tier.label}
+          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase 
+            ${localLimit < 40000 ? 'bg-green-100 text-green-700' : localLimit < 120000 ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+            {localLimit < 40000 ? 'Económico' : localLimit < 120000 ? 'Estándar' : 'Premium'}
           </span>
         </div>
 
         <div className="flex items-end gap-2 mb-6">
           <DollarSign className="w-8 h-8 text-gray-400 mb-1" />
           <span className="text-4xl font-bold text-gray-900 tracking-tight">
-            {formatCurrency(totalBudget)}
+            {formatCurrency(localLimit)}
           </span>
         </div>
 
-        <input
-          type="range"
-          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-          min="15000"
-          max="300000"
-          step="1000"
-          value={totalBudget}
-          onChange={handleTotalChange}
-        />
-        <div className="flex justify-between text-xs text-gray-400 mt-2 font-medium">
-          <span>$15k (Básico)</span>
-          <span>$300k+ (Lujo)</span>
+        {/* Input Range */}
+        <div className="relative w-full h-6 flex items-center">
+          {/* Track de fondo */}
+          <div className="absolute w-full h-2 bg-gray-200 rounded-lg overflow-hidden">
+            {/* Barra de "Costo Actual" (Visualización de qué tanto del presupuesto se come el diseño) */}
+            <div
+              className={`h-full transition-all duration-500 ${isOverBudget ? 'bg-red-500' : 'bg-green-500'}`}
+              style={{ width: `${percentageUsed}%` }}
+            />
+          </div>
+          <input
+            type="range"
+            className="absolute w-full h-2 bg-transparent appearance-none cursor-pointer z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-blue-600 [&::-webkit-slider-thumb]:shadow-md hover:[&::-webkit-slider-thumb]:scale-110 transition-all"
+            min="15000"
+            max="650000"
+            step="5000"
+            value={localLimit}
+            onChange={handleSliderChange}
+            onMouseUp={handleSliderCommit} // <--- AQUÍ SE DISPARA LA VALIDACIÓN
+            onTouchEnd={handleSliderCommit}
+          />
+        </div>
+
+        <div className="flex justify-between text-xs text-gray-400 mt-3 font-medium">
+          <span>Min: $15k</span>
+          <span className={isOverBudget ? "text-red-500 font-bold" : "text-gray-500"}>
+            Uso: {percentageUsed.toFixed(0)}%
+          </span>
+          <span>Max: $300k</span>
         </div>
       </section>
 
-      {/* SECCIÓN DE DESGLOSE (BUCKETS) */}
-      <section className="space-y-5">
-        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2">
-          <TrendingUp className="w-4 h-4" />
-          Distribución Sugerida
+      {/* Desglose de Gastos (Proyección basada en el límite) */}
+      <section className="space-y-4 opacity-75 hover:opacity-100 transition-opacity">
+        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+          <TrendingUp className="w-3 h-3" />
+          Distribución Proyectada
         </h3>
 
-        {/* Bucket: Mobiliario */}
-        <div className="group relative">
-          <div className="flex justify-between items-center mb-2">
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <ShoppingBag className="w-4 h-4 text-blue-500" />
-              Mobiliario y Acabados
-            </label>
-            <span className="text-sm font-bold text-gray-900">{formatCurrency(allocation.furniture)}</span>
+        {/* Mobiliario */}
+        <div>
+          <div className="flex justify-between text-xs mb-1">
+            <span className="font-semibold text-gray-700">Mobiliario (60%)</span>
+            <span className="font-bold">{formatCurrency(localLimit * 0.6)}</span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-            <div className="bg-blue-500 h-2.5 rounded-full" style={{ width: '60%' }}></div>
+          <div className="w-full bg-gray-100 h-1.5 rounded-full">
+            <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: '60%' }}></div>
           </div>
-          <p className="text-xs text-gray-400 mt-1">Gabinetes, puertas, cubiertas y herrajes.</p>
         </div>
 
-        {/* Bucket: Equipos */}
-        <div className="group relative">
-          <div className="flex justify-between items-center mb-2">
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <Calculator className="w-4 h-4 text-orange-500" />
-              Electrodomésticos
-            </label>
-            <span className="text-sm font-bold text-gray-900">{formatCurrency(allocation.appliances)}</span>
+        {/* Electrodomésticos */}
+        <div>
+          <div className="flex justify-between text-xs mb-1">
+            <span className="font-semibold text-gray-700">Equipos (30%)</span>
+            <span className="font-bold">{formatCurrency(localLimit * 0.3)}</span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-            <div className="bg-orange-500 h-2.5 rounded-full" style={{ width: '30%' }}></div>
+          <div className="w-full bg-gray-100 h-1.5 rounded-full">
+            <div className="bg-orange-500 h-1.5 rounded-full" style={{ width: '30%' }}></div>
           </div>
-          <p className="text-xs text-gray-400 mt-1">Estufa, campana, refrigerador, tarja.</p>
-        </div>
-
-        {/* Bucket: Servicios */}
-        <div className="group relative">
-          <div className="flex justify-between items-center mb-2">
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <Truck className="w-4 h-4 text-green-600" />
-              Logística e Instalación
-            </label>
-            <span className="text-sm font-bold text-gray-900">{formatCurrency(allocation.services)}</span>
-          </div>
-          <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-            <div className="bg-green-600 h-2.5 rounded-full" style={{ width: '10%' }}></div>
-          </div>
-          <p className="text-xs text-gray-400 mt-1">Envío a domicilio y mano de obra técnica.</p>
         </div>
       </section>
 
-      {/* Feedback Proactivo / Insight */}
-      <div className="mt-auto bg-yellow-50 border border-yellow-100 p-4 rounded-lg flex gap-3">
-        <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0" />
-        <p className="text-xs text-yellow-800 leading-relaxed">
-          <span className="font-bold">Tip de experto:</span> Con un presupuesto de {formatCurrency(allocation.furniture)} en mobiliario, te recomendamos optar por acabados en <strong>Melamina Texturizada</strong> en lugar de Madera Sólida para maximizar la durabilidad sin salirte del rango.
-        </p>
-      </div>
-
     </div>
-  )
-}
+  );
+};
 
 export default Budget;
