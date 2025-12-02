@@ -6,25 +6,25 @@ import {
   Plus,
   Trash2,
   AlertCircle,
-  X,
-  MousePointer2
+  X
 } from "lucide-react";
 
 import { usePreferenceWizardStore, WizardStoreValue, InstallationPoint, GasConfig, InstallationType } from "@/store/preferenceWizardStore";
 
-// Valores iniciales seguros
+// Objeto base para inicialización segura
 const INITIAL_GAS_CONFIG: GasConfig = {
   required: false,
   type: 'natural',
-  x: 0,
-  z: 0,
-  wallIndex: 0
+  x: 200,
+  z: 200,
+  wallIndex: 0,
 };
 
 const Compatibility = () => {
-  const { values, setValue, activeWallIndex, setActiveWall } = usePreferenceWizardStore();
+  const { values, setValue, activeWallIndex } = usePreferenceWizardStore();
 
-  // --- HYDRATION ---
+  // 1. ESTADO LOCAL (Buffer de UI)
+  // Inicializamos con lo que haya en el store, o con el default si está vacío.
   const [points, setPoints] = useState<InstallationPoint[]>(
     (values.installation_points as unknown as InstallationPoint[]) || []
   );
@@ -33,29 +33,52 @@ const Compatibility = () => {
     (values.gas_config as unknown as GasConfig) || INITIAL_GAS_CONFIG
   );
 
-  // Sincronización BIDIRECCIONAL (Igual que en Geometría)
-  // Escuchamos cambios del store (por si se mueven en 3D)
+  // ----------------------------------------------------------------------
+  // LOGICA DE SINCRONIZACIÓN (El corazón de la reactividad 2D <-> 3D)
+  // ----------------------------------------------------------------------
+
+  // A. HIDRATACIÓN DE PUNTOS (Store -> Local)
   useEffect(() => {
     const storePoints = values.installation_points as unknown as InstallationPoint[];
+    // Verificamos cambios profundos para evitar re-renders si el objeto es idéntico
     if (storePoints && JSON.stringify(storePoints) !== JSON.stringify(points)) {
       setPoints(storePoints);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values.installation_points]);
 
-  // Escritura al Store
+  // B. PERSISTENCIA DE PUNTOS (Local -> Store)
   useEffect(() => {
     setValue('installation_points', points as unknown as WizardStoreValue);
   }, [points, setValue]);
 
+
+  // C. HIDRATACIÓN DE GAS (Store -> Local) <--- ESTO FALTABA
   useEffect(() => {
+    const storeGas = values.gas_config as unknown as GasConfig;
+
+    // Si el store tiene datos y son diferentes a mi estado local (ej. se movió en 3D)
+    // actualizo mi estado local para que los inputs numéricos cambien.
+    if (storeGas && JSON.stringify(storeGas) !== JSON.stringify(gasConfig)) {
+      setGasConfig(storeGas);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values.gas_config]); // Escuchamos cambios en el store
+
+
+  // D. PERSISTENCIA DE GAS (Local -> Store)
+  useEffect(() => {
+    // Cuando el usuario escribe en los inputs, actualizamos el store
+    // para que el 3D reaccione.
     setValue('gas_config', gasConfig as unknown as WizardStoreValue);
   }, [gasConfig, setValue]);
 
-  // --- HANDLERS ---
+
+  // ----------------------------------------------------------------------
+  // HANDLERS
+  // ----------------------------------------------------------------------
 
   const addPoint = (type: InstallationType) => {
-    // Requerimos que un muro esté seleccionado para saber dónde ponerlo
     if (activeWallIndex === null) {
       alert("Por favor, selecciona un muro en el visor 3D primero.");
       return;
@@ -65,9 +88,9 @@ const Compatibility = () => {
       id: Math.random().toString(36).substr(2, 9),
       type,
       subtype: type === 'electrical' ? '110v' : 'sink',
-      wallIndex: activeWallIndex, // Se agrega al muro activo
-      distFromStart: 500, // 50cm del borde
-      heightFromFloor: type === 'electrical' ? 1100 : 550, // Alturas estándar
+      wallIndex: activeWallIndex,
+      distFromStart: 500,
+      heightFromFloor: type === 'electrical' ? 1100 : 550,
       hasHotWater: type === 'plumbing' ? true : undefined,
       hasColdWater: type === 'plumbing' ? true : undefined,
     };
@@ -78,16 +101,18 @@ const Compatibility = () => {
     setPoints(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
   };
 
-
   const removePoint = (id: string) => {
     setPoints(prev => prev.filter(p => p.id !== id));
   };
 
+  // Handler genérico y tipado para GasConfig
   const handleGasConfigChange = <K extends keyof GasConfig>(field: K, value: GasConfig[K]) => {
     setGasConfig(prev => ({ ...prev, [field]: value }));
   };
 
-  // --- RENDER ---
+  // ----------------------------------------------------------------------
+  // RENDER
+  // ----------------------------------------------------------------------
   return (
     <div className="p-6 bg-white flex flex-col gap-6 pb-24">
 
@@ -246,7 +271,7 @@ const Compatibility = () => {
                   <select
                     value={gasConfig.type}
                     onChange={(e) => handleGasConfigChange('type', e.target.value as unknown as GasConfig['type'])}
-                    className="w-full text-xs border-gray-200 rounded"
+                    className="w-full text-xs border border-gray-300 rounded-lg py-2 px-3 bg-white shadow-sm focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all text-black"
                   >
                     <option value="natural">Gas Natural</option>
                     <option value="lp">Gas LP</option>
@@ -255,18 +280,20 @@ const Compatibility = () => {
                 <div className="w-1/2">
                   <label className="text-[10px] font-bold text-gray-400 block mb-1">MURO ACTIVO</label>
                   <div className="text-xs py-2 px-2 bg-white border rounded text-gray-500">
-                    {activeWallIndex !== null ? `#${activeWallIndex + 1}` : 'Ninguno'}
+                    {/* Visualizamos el muro donde está guardada la config, no necesariamente el activo actualmente */}
+                    {gasConfig.wallIndex !== undefined ? `#${gasConfig.wallIndex + 1}` : 'Ninguno'}
                   </div>
-                  {/* Nota: Podrías agregar botón para "Fijar en Muro Actual" */}
                 </div>
               </div>
               {/* Coordenadas Gas */}
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <input type="number" placeholder="X" value={gasConfig.x} onChange={(e) => handleGasConfigChange('x', Number(e.target.value))} className="w-full text-xs border-gray-200 rounded py-1 text-center" />
+                  <input type="number" placeholder="X" value={Math.round(gasConfig.x)} onChange={(e) => handleGasConfigChange('x', Number(e.target.value))} className="w-full text-xs border-gray-200 rounded py-1 text-center" />
+                  <span className="text-[9px] text-gray-400 block text-center">Distancia X (mm)</span>
                 </div>
                 <div>
-                  <input type="number" placeholder="Y" value={gasConfig.z} onChange={(e) => handleGasConfigChange('z', Number(e.target.value))} className="w-full text-xs border-gray-200 rounded py-1 text-center" />
+                  <input type="number" placeholder="Y" value={Math.round(gasConfig.z)} onChange={(e) => handleGasConfigChange('z', Number(e.target.value))} className="w-full text-xs border-gray-200 rounded py-1 text-center" />
+                  <span className="text-[9px] text-gray-400 block text-center">Altura Y (mm)</span>
                 </div>
               </div>
             </div>

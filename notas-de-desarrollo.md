@@ -444,4 +444,104 @@ export interface WizardFieldConfig {
 }
 ```
 
-Al aplicar String(...) en el key, estás aplicando programación defensiva: proteges el renderizado de React contra inconsistencias menores en los tipos de datos entrantes.
+## 23 NOV
+
+🎓 Masterclass: Domando el Store Genérico en TypeScript Estricto
+1. El Diagnóstico: ¿Por qué falló todo al mismo tiempo?
+El patrón que causó el 90% de tus errores fue el conflicto entre Flexibilidad (Store) vs. Rigidez (Componentes).
+
+Tu Store (values): Es como una caja gigante de mudanza sin etiquetas. Puede contener libros, ropa, jarrones o basura (string | number | File | null | undefined).
+
+Tus Componentes (useState): Son estanterías hechas a medida. Solo aceptan libros (Point[]), o solo aceptan ropa (MaterialSelections).
+
+El Error Recurrente: TypeScript te gritaba: "¡No puedes intentar meter 'toda la caja de mudanza' en la estantería de libros! ¿Y si hay un jarrón dentro?"
+
+2. Las 3 Estrategias de Defensa (Sin usar any)
+Para solucionar esto, aplicamos tres técnicas de Ingeniería de Tipos.
+
+Técnica A: La "Doble Aserción" (Double Assertion)
+Usada en: RoomGeometryPlanner, Position, Compatibility
+
+Cuando tú sabes más que TypeScript (ej. sabes que room_points siempre será un array de puntos), pero TypeScript ve un tipo incompatible, debes usar un intermediario.
+
+El Problema: TS no te deja convertir un WizardStoreValue (unión compleja) directamente a Point[].
+
+El Secreto: unknown. Es el tipo "padre" seguro.
+
+La Fórmula:
+
+TypeScript
+
+// ❌ Error: No hay superposición
+const points = values.room_points as Point[];
+
+// ✅ Correcto: Pasamos por "desconocido" para limpiar el tipo anterior
+const points = (values.room_points as unknown as Point[]);
+Lección: unknown es la forma segura de decirle a TS "Olvida lo que sabes, confía en mi nuevo tipo". A diferencia de any, unknown te obliga a definir el tipo final.
+
+Técnica B: El "Sanitizador de Datos" (Type Guarding)
+Usada en: PreferenceWizardSection
+
+Cuando los datos van a un lugar peligroso (como un <input> HTML que explota si recibe un objeto o null), no basta con el casting; necesitas filtrar el dato en tiempo de ejecución.
+
+El Problema: El input espera string | number. El store podría tener undefined o un File.
+
+La Solución: Crear una función "portero".
+
+TypeScript
+
+const getSafeValue = (val: unknown): string | number => {
+   if (typeof val === 'string' || typeof val === 'number') return val;
+   return ''; // Si es basura, devolvemos cadena vacía segura
+};
+
+// Uso:
+value={getSafeValue(effectiveValues[field.id])}
+Lección: Nunca confíes en los datos crudos del store cuando renderices inputs directos. Sanitiza siempre.
+
+Técnica C: El "Type Predicate" (Guardia de Tipos)
+Usada en: Preferences.tsx (con sectionHasAppliances)
+
+Esta es la forma más elegante. Es una función que retorna un booleano, pero le dice al compilador que el dato cambió de tipo.
+
+La Fórmula:
+
+TypeScript
+
+// Le dice a TS: "Si esto retorna true, 'section' es SectionWithAppliances"
+const hasAppliances = (s: any): s is SectionWithAppliances => {
+   return 'appliances' in s;
+}
+Lección: Úsalo cuando tengas lógica condicional (if) compleja para que TypeScript entienda qué pasa dentro del bloque.
+
+3. Visualización del Flujo
+Aquí es donde vivieron tus errores. Entender este diagrama es entender la arquitectura de tu app.
+
+Store (Fuente): Tipo Ancho (Wide Type).
+
+El Cuello de Botella: Aquí ocurrieron los errores. TS bloquea el paso.
+
+La Solución: Aplicamos "Adaptadores" (Casting/Sanitizers).
+
+Componente (Destino): Tipo Estrecho (Narrow Type).
+
+4. Tu Checklist para el Futuro
+La próxima vez que crees un componente conectado a Zustand en este proyecto, sigue estos 3 pasos para que Vercel no te rechace el build:
+
+Lectura (Hydration):
+
+¿Estoy leyendo un objeto complejo o array? -> Usa (values.key as unknown as MiInterfaz).
+
+¿Estoy leyendo un primitivo para un input? -> Usa getSafeValue(values.key).
+
+Escritura (Sync):
+
+Al hacer setValue, si tu objeto local tiene una interfaz propia, conviértelo al salir: setValue('key', miObjetoLocal as unknown as WizardStoreValue).
+
+Definición:
+
+Nunca uses any. Si te bloqueas, usa unknown y luego haz el casting al tipo que debería ser.
+
+- Agregar altura manual de ventanas y puertas como paramétro en modulo
+
+- En Wizard, agregar imágens de referencia en lugar de texto para configuración de cocina: el U en L, etc

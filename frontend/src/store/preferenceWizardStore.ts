@@ -46,7 +46,8 @@ export interface GasConfig {
   type: 'natural' | 'lp';
   x: number; // Coordenada X global o relativa al muro principal
   z: number; // Altura
-  wallIndex: number; // Muro donde está la válvula
+  wallIndex: number; // Muro donde está la válvul
+
 }
 
 // 1. TIPO RECURSIVO (La solución definitiva a 'any')
@@ -66,6 +67,27 @@ export type WizardStoreValue =
 
 // 2. Claves para anidación
 type NestedCategory = 'space' | 'budget' | 'style';
+
+// NUEVA INTERFAZ: Módulo de Mobiliario (Carpintería)
+export interface CabinetModule {
+  id: string;
+  catalogId: string; // Referencia al SKU o ID del catálogo base
+  type: 'base' | 'wall' | 'tall'; // Base (Bajo), Aéreo (Alto), Torre
+  name: string;
+
+  // Coordenadas Locales (Relativas al Muro)
+  wallIndex: number;      // A qué muro está anclado
+  distFromStart: number;  // X: Distancia en mm desde el inicio del muro
+  elevation: number;      // Y: Altura desde el piso en mm
+
+  // Dimensiones Físicas
+  width: number;
+  height: number;
+  depth: number;
+
+  // Estado
+  rotation: number; // Generalmente 0 si está pegado al muro, pero útil para islas
+}
 
 // 3. Estructura del Store
 interface WizardState {
@@ -92,6 +114,7 @@ interface WizardState {
   values: Record<string, WizardStoreValue>;
   installation_points: InstallationPoint[];
   gas_config: GasConfig;
+  layout_items: CabinetModule[]; // Agrega esto al estado
 
   // --- ACCIONES ---
   setValue: (key: string, value: WizardStoreValue) => void;
@@ -104,6 +127,7 @@ interface WizardState {
   applyBudgetOptimization: () => void; // La función "mágica" que baja costos
   setInstallationPoints: (points: InstallationPoint[]) => void;
   updateInstallationPoint: (id: string, data: Partial<InstallationPoint>) => void;
+  setLayoutItems: (items: CabinetModule[]) => void;
 }
 
 export const usePreferenceWizardStore = create<WizardState>((set, get) => ({
@@ -131,6 +155,7 @@ export const usePreferenceWizardStore = create<WizardState>((set, get) => ({
     z: 0,
     wallIndex: -1
   },
+  layout_items: [],
   // Setter Plano
   setValue: (key, value) => set((state) => ({
     values: { ...state.values, [key]: value }
@@ -214,4 +239,5 @@ export const usePreferenceWizardStore = create<WizardState>((set, get) => ({
       p.id === id ? { ...p, ...data } : p
     )
   })),
+  setLayoutItems: (items) => set(() => ({ layout_items: items }))
 }));
