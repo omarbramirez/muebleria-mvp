@@ -12,7 +12,8 @@ import {
   CabinetModule
 } from "@/store/preferenceWizardStore";
 
-
+// IMPORTACIÓN DE LA FÁBRICA DE GABINETES
+import { createProceduralCabinet } from "@/utils/CabinetFactory";
 
 interface Room3DPreviewProps {
   points: { x: number; y: number }[];
@@ -60,50 +61,46 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const controlsRef = useRef<OrbitControls | null>(null);
 
-  // Cache de objetos para interacción (Raycasting)
+  // Cache de objetos para interacción
   const wallsRef = useRef<THREE.Mesh[]>([]);
   const roomGroupRef = useRef<THREE.Group>(new THREE.Group());
-
-  // Estado de interacción
   const raycaster = useRef(new THREE.Raycaster());
   const mouse = useRef(new THREE.Vector2());
+
+  // Definición de tipos para el Drag & Drop
+  type DraggableItemType = 'installation' | 'appliance' | 'opening' | 'gas' | 'furniture';
+
+  // El ref ahora soporta Object3D genérico (para manejar Grupos de muebles y Meshes simples)
   const dragRef = useRef<{
     id: string;
     wallIndex: number;
-    mesh: THREE.Mesh;
-    type: 'installation' | 'appliance' | 'opening' | 'gas' | 'furniture';
+    mesh: THREE.Object3D;
+    type: DraggableItemType;
   } | null>(null);
 
   const manualRotationRef = useRef<number>(0);
 
-  // 3. OPTIMIZACIÓN: MATERIALES (Flyweight Pattern implícito)
+  // 3. OPTIMIZACIÓN: MATERIALES (Flyweight Pattern)
   const materials = useMemo(() => ({
-    wall: new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.25,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-      roughness: 1,
-      metalness: 0
-    }),
-    wallSelected: new THREE.MeshStandardMaterial({
-      color: 0x00aaff,
-      transparent: true,
-      opacity: 0.75,
-      roughness: 0.8,
-      metalness: 0,
-      side: THREE.DoubleSide
-    }),
+    // Arquitectura Base
+    wall: new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.25, side: THREE.DoubleSide, depthWrite: false, roughness: 1, metalness: 0 }),
+    wallSelected: new THREE.MeshStandardMaterial({ color: 0x00aaff, transparent: true, opacity: 0.75, roughness: 0.8, metalness: 0, side: THREE.DoubleSide }),
     floor: new THREE.MeshStandardMaterial({ color: 0xf3f4f6, roughness: 0.8 }),
     window: new THREE.MeshBasicMaterial({ color: 0x60a5fa, transparent: true, opacity: 0.4, depthWrite: false }),
     door: new THREE.MeshBasicMaterial({ color: 0xf87171, transparent: true, opacity: 0.3, depthWrite: false }),
+
+    // MEP (Instalaciones)
     elec: new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xccaa00, emissiveIntensity: 0.2 }),
     water: new THREE.MeshStandardMaterial({ color: 0x3b82f6 }),
     gas: new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.5, metalness: 0.3 }),
-    furnitureBase: new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 0.5, metalness: 0.1 }),
-    furnitureWall: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5, metalness: 0.1 }),
-    furnitureTall: new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.5, metalness: 0.1 })
+
+    // CABINETRY (Nuevos materiales base para la fábrica procedural)
+    // Estos placeholders se conectarán después al módulo de selección de materiales
+    cabinetCarcass: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 }), // Melamina blanca
+    cabinetDoor: new THREE.MeshStandardMaterial({ color: 0xe5e7eb, roughness: 0.4 }),     // Gris claro mate
+    cabinetKickplate: new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.9 }), // Zoclo oscuro
+    cabinetCountertop: new THREE.MeshStandardMaterial({ color: 0xd1d5db, roughness: 0.2, metalness: 0.1 }), // Imitación piedra
+    cabinetHandle: new THREE.MeshStandardMaterial({ color: 0x111827, metalness: 0.8, roughness: 0.2 }),    // Negro mate
   }), []);
 
   // 4. INICIALIZACIÓN DEL MOTOR GRÁFICO
@@ -111,9 +108,11 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
     if (!mountRef.current) return;
     const { clientWidth: w, clientHeight: h } = mountRef.current;
 
+    // Renderer con sombras suaves
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(w, h);
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     mountRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
@@ -124,17 +123,17 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.enableZoom = true;
-    controls.rotateSpeed = 0.8;
-    controls.zoomSpeed = 1.25;
     controlsRef.current = controls;
 
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
     sceneRef.current.add(hemiLight);
 
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
     dirLight.position.set(500, 1000, 500);
     dirLight.castShadow = true;
+    // Ajustar mapa de sombras para mayor nitidez
+    dirLight.shadow.mapSize.width = 2048;
+    dirLight.shadow.mapSize.height = 2048;
     sceneRef.current.add(dirLight);
 
     const grid = new THREE.GridHelper(2000, 40, 0xdddddd, 0xf0f0f0);
@@ -158,7 +157,7 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
   useEffect(() => {
     const roomGroup = roomGroupRef.current;
 
-    // Limpieza agresiva para evitar fugas de memoria en mallas
+    // Limpieza agresiva
     while (roomGroup.children.length > 0) {
       roomGroup.remove(roomGroup.children[0]);
     }
@@ -166,23 +165,17 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
 
     const heightUnits = height / 10;
 
-    // Centrado automático de la habitación
-    let minX = Infinity, maxX = -Infinity;
-    let minZ = Infinity, maxZ = -Infinity;
-
+    // Centrado automático
+    let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
     if (points.length > 0) {
       points.forEach(p => {
-        if (p.x < minX) minX = p.x;
-        if (p.x > maxX) maxX = p.x;
-        if (p.y < minZ) minZ = p.y;
-        if (p.y > maxZ) maxZ = p.y;
+        if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+        if (p.y < minZ) minZ = p.y; if (p.y > maxZ) maxZ = p.y;
       });
-      const centerX = (minX + maxX) / 2;
-      const centerZ = (minZ + maxZ) / 2;
-      roomGroup.position.set(-centerX, 0, -centerZ);
+      roomGroup.position.set(-(minX + maxX) / 2, 0, -(minZ + maxZ) / 2);
     }
 
-    // A. GENERACIÓN DE MUROS
+    // A. MUROS
     points.forEach((p, i) => {
       const next = points[(i + 1) % points.length];
       const dx = next.x - p.x;
@@ -190,44 +183,29 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
       const len = Math.sqrt(dx * dx + dy * dy);
       const angle = Math.atan2(dy, dx);
 
-      const wallGeo = new THREE.BoxGeometry(len, heightUnits, WALL_THICKNESS);
-      const wall = new THREE.Mesh(wallGeo, materials.wall.clone());
+      const wall = new THREE.Mesh(
+        new THREE.BoxGeometry(len, heightUnits, WALL_THICKNESS),
+        materials.wall.clone()
+      );
 
-      const cx = p.x + dx / 2;
-      const cy = p.y + dy / 2;
-
-      wall.position.set(cx, heightUnits / 2, cy);
-      wall.rotation.y = -angle; // Rotación inversa para alinear con Three.js
-
-      // Metadatos críticos para Raycasting
+      wall.position.set(p.x + dx / 2, heightUnits / 2, p.y + dy / 2);
+      wall.rotation.y = -angle;
       wall.userData = { isDynamic: true, isWall: true, index: i, length: len };
 
       roomGroup.add(wall);
       wallsRef.current.push(wall);
     });
 
-    // B. RENDERIZADO DE VANOS (Puertas/Ventanas)
+    // B. VANOS
     openings.forEach(op => {
       const wall = wallsRef.current[op.wallIndex];
       if (!wall) return;
-
-      const opWidth = op.width / SCALE_FACTOR;
-      const opHeight = op.height / SCALE_FACTOR;
-      const opDist = op.distFromStart / SCALE_FACTOR;
-      const opSill = op.sillHeight / SCALE_FACTOR;
-
       const mesh = new THREE.Mesh(
-        new THREE.BoxGeometry(opWidth, opHeight, OPENING_DEPTH),
+        new THREE.BoxGeometry(op.width / SCALE_FACTOR, op.height / SCALE_FACTOR, OPENING_DEPTH),
         op.type === 'window' ? materials.window : materials.door
       );
-
-      const wallTotalHeight = height / 10;
-      const wallLen = wall.userData.length;
-
-      // Coordenadas locales relativas al centro del muro
-      const localX = -wallLen / 2 + opDist + opWidth / 2;
-      const localY = (-wallTotalHeight / 2) + opSill + (opHeight / 2);
-
+      const localX = -wall.userData.length / 2 + (op.distFromStart / SCALE_FACTOR) + (op.width / SCALE_FACTOR / 2);
+      const localY = (-heightUnits / 2) + (op.sillHeight / SCALE_FACTOR) + (op.height / SCALE_FACTOR / 2);
       mesh.position.set(localX, localY, 0);
       mesh.userData = { isDynamic: true, isOpening: true, id: op.id, wallIndex: op.wallIndex };
       wall.add(mesh);
@@ -237,79 +215,45 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
     installations.forEach(inst => {
       const wall = wallsRef.current[inst.wallIndex];
       if (!wall) return;
-
-      let geo, mat;
-      if (inst.type === 'electrical') {
-        geo = new THREE.BoxGeometry(6, 10, 2);
-        mat = materials.elec;
-      } else if (inst.type === 'plumbing') {
-        geo = new THREE.CylinderGeometry(3, 3, 5, 16);
-        geo.rotateX(Math.PI / 2);
-        mat = materials.water;
-      } else {
-        return;
-      }
-
-      const mesh = new THREE.Mesh(geo, mat);
-      const wallLen = wall.userData.length;
-
-      const localX = -wallLen / 2 + (inst.distFromStart / SCALE_FACTOR);
+      const geo = inst.type === 'electrical'
+        ? new THREE.BoxGeometry(6, 10, 2)
+        : new THREE.CylinderGeometry(3, 3, 5, 16).rotateX(Math.PI / 2);
+      const mesh = new THREE.Mesh(geo, inst.type === 'electrical' ? materials.elec : materials.water);
+      const localX = -wall.userData.length / 2 + (inst.distFromStart / SCALE_FACTOR);
       const localY = (inst.heightFromFloor / SCALE_FACTOR) - (heightUnits / 2);
-      const zOffset = WALL_THICKNESS / 2 + 2;
-
-      mesh.position.set(localX, localY, zOffset);
+      mesh.position.set(localX, localY, WALL_THICKNESS / 2 + 2);
       mesh.userData = { isDynamic: true, isInstallation: true, id: inst.id, wallIndex: inst.wallIndex };
       wall.add(mesh);
     });
 
-    // D. GAS (CORREGIDO Y SEGURO)
-    if (gasConfig && gasConfig.required) {
-      // VALIDACIÓN DE SEGURIDAD: Verificar que el muro exista
-      const targetWall = wallsRef.current[gasConfig.wallIndex];
-
-      if (targetWall) {
-        const geo = new THREE.CylinderGeometry(1.5, 1.5, 5, 16);
-        geo.rotateX(Math.PI / 2);
-
-        const mesh = new THREE.Mesh(geo, materials.gas);
-        const wallLen = targetWall.userData.length;
-
-        const localX = -wallLen / 2 + (gasConfig.x / SCALE_FACTOR);
-        const localY = (gasConfig.z / SCALE_FACTOR) - (heightUnits / 2);
-        const zOffset = WALL_THICKNESS / 2 + 2.5;
-
-        mesh.position.set(localX, localY, zOffset);
-
-        // Importante: Guardar el wallIndex correcto en el objeto 3D
-        mesh.userData = {
-          isDynamic: true,
-          isGas: true,
-          wallIndex: gasConfig.wallIndex // Este índice es la verdad absoluta
-        };
-
-        targetWall.add(mesh);
-      } else {
-        console.warn(`[Room3D] Gas configurado para muro índice ${gasConfig.wallIndex}, pero no existe.`);
-      }
+    // D. GAS
+    if (gasConfig && gasConfig.required && wallsRef.current[gasConfig.wallIndex]) {
+      const wall = wallsRef.current[gasConfig.wallIndex];
+      const geo = new THREE.CylinderGeometry(1.5, 1.5, 5, 16).rotateX(Math.PI / 2);
+      const mesh = new THREE.Mesh(geo, materials.gas);
+      const localX = -wall.userData.length / 2 + (gasConfig.x / SCALE_FACTOR);
+      const localY = (gasConfig.z / SCALE_FACTOR) - (heightUnits / 2);
+      mesh.position.set(localX, localY, WALL_THICKNESS / 2 + 2.5);
+      mesh.userData = { isDynamic: true, isGas: true, wallIndex: gasConfig.wallIndex };
+      wall.add(mesh);
     }
 
-    // E. MOBILIARIO
+    // E. MOBILIARIO (INTEGRACIÓN PROCEDURAL - FACTORY CALL)
+    // -------------------------------------------------------------
     layoutItems.forEach(item => {
       const wall = wallsRef.current[item.wallIndex];
       if (!wall) return;
 
-      const geo = new THREE.BoxGeometry(
-        item.width / SCALE_FACTOR,
-        item.height / SCALE_FACTOR,
-        item.depth / SCALE_FACTOR
-      );
+      // 1. Invocamos la Fábrica en lugar de crear un cubo simple
+      const cabinetGroup = createProceduralCabinet(item, {
+        carcass: materials.cabinetCarcass,
+        door: materials.cabinetDoor,
+        kickplate: materials.cabinetKickplate,
+        countertop: materials.cabinetCountertop,
+        handle: materials.cabinetHandle
+      }, SCALE_FACTOR);
 
-      let mat = materials.furnitureBase;
-      if (item.type === 'wall') mat = materials.furnitureWall;
-      if (item.type === 'tall') mat = materials.furnitureTall;
-
-      const mesh = new THREE.Mesh(geo, mat);
-
+      // 2. Cálculo de Posición del GRUPO
       const wallLen = wall.userData.length;
       const itemWidth3D = item.width / SCALE_FACTOR;
       const itemHeight3D = item.height / SCALE_FACTOR;
@@ -318,191 +262,184 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
       const localY = (-heightUnits / 2) + (item.elevation / SCALE_FACTOR) + (itemHeight3D / 2);
       const zOffset = (WALL_THICKNESS / 2) + (item.depth / SCALE_FACTOR / 2);
 
-      mesh.position.set(localX, localY, zOffset);
-      mesh.userData = { isDynamic: true, isFurniture: true, id: item.id, wallIndex: item.wallIndex };
+      // 3. Aplicar transformaciones al Grupo
+      cabinetGroup.position.set(localX, localY, zOffset);
+      if (item.rotation) cabinetGroup.rotation.y = item.rotation;
 
-      wall.add(mesh);
+      wall.add(cabinetGroup);
     });
+    // -------------------------------------------------------------
 
-    // F. ELECTRODOMÉSTICOS
+    // F. APPLIANCES
     appliances.forEach(app => {
-      const mesh = new THREE.Mesh(
-        new THREE.BoxGeometry(app.width, app.height, app.depth),
-        new THREE.MeshStandardMaterial({ color: app.color })
-      );
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(app.width, app.height, app.depth), new THREE.MeshStandardMaterial({ color: app.color }));
       mesh.position.set(app.position.x, app.height / 2, app.position.z);
       mesh.rotation.y = app.rotation;
       mesh.userData = { isDynamic: true, isAppliance: true, id: app.id };
       roomGroup.add(mesh);
     });
 
-    // REFLEJO VISUAL DE SELECCIÓN
     if (activeWallIndex !== null && wallsRef.current[activeWallIndex]) {
-      const wall = wallsRef.current[activeWallIndex];
       wallsRef.current.forEach(w => (w.material as THREE.MeshStandardMaterial).copy(materials.wall));
-      (wall.material as THREE.MeshStandardMaterial).copy(materials.wallSelected);
+      (wallsRef.current[activeWallIndex].material as THREE.MeshStandardMaterial).copy(materials.wallSelected);
     }
 
   }, [points, height, openings, appliances, installations, gasConfig, layoutItems, activeWallIndex, materials]);
 
-  // CÁMARA (Sin cambios)
-  useEffect(() => {
-    if (!cameraRef.current || !controlsRef.current || points.length === 0) return;
-    const center = new THREE.Vector3(0, height / 20, 0);
-    // ... lógica de radio ...
-    // controlsRef.current.target.copy(center);
-    // controlsRef.current.update();
-  }, [points, height]);
 
-  // 6. LÓGICA DE INTERACCIÓN (CORE DEL PROBLEMA)
+  // 6. LÓGICA DE INTERACCIÓN (RAYCASTING JERÁRQUICO)
   useEffect(() => {
     const canvas = rendererRef.current?.domElement;
     if (!canvas) return;
 
-    const getIntersects = (e: MouseEvent, objects: THREE.Object3D[]) => {
+    // Helper: Activar 'recursive' permite detectar hijos dentro de grupos
+    const getIntersects = (e: MouseEvent, objects: THREE.Object3D[], recursive: boolean = false) => {
       const rect = canvas.getBoundingClientRect();
       mouse.current.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.current.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
       raycaster.current.setFromCamera(mouse.current, cameraRef.current!);
-      return raycaster.current.intersectObjects(objects, false);
+      return raycaster.current.intersectObjects(objects, recursive);
     };
 
     const handleDown = (e: MouseEvent) => {
-      const interactables: THREE.Mesh[] = [];
-      // Recolectar interactuables
-      roomGroupRef.current.children.forEach(c => c.userData.isAppliance && interactables.push(c as THREE.Mesh));
+      const interactables: THREE.Object3D[] = [];
+
+      // Appliances (Nivel Raíz)
+      roomGroupRef.current.children.forEach(c => {
+        if (c.userData.isAppliance) interactables.push(c);
+      });
+
+      // Elementos anclados a muros (Instalaciones, Gas, Muebles)
       wallsRef.current.forEach(w => w.children.forEach(c => {
+        // Si es un mueble (Grupo), el userData está en el grupo.
+        // Si es instalación, está en el Mesh.
         if (c.userData.isInstallation || c.userData.isOpening || c.userData.isGas || c.userData.isFurniture) {
-          interactables.push(c as THREE.Mesh);
+          interactables.push(c);
         }
       }));
 
-      const hits = getIntersects(e, interactables);
+      // --- CAMBIO CLAVE: RECURSIVIDAD ACTIVADA ---
+      const hits = getIntersects(e, interactables, true);
+
       if (hits.length > 0) {
         controlsRef.current!.enabled = false;
-        const hit = hits[0].object as THREE.Mesh;
 
-        // Identificación segura de tipo
-        let type: 'installation' | 'appliance' | 'opening' | 'gas' | 'furniture' = 'appliance';
-        if (hit.userData.isInstallation) type = 'installation';
-        if (hit.userData.isOpening) type = 'opening';
-        if (hit.userData.isGas) type = 'gas';
-        if (hit.userData.isFurniture) type = 'furniture';
+        // --- TRAVERSAL LOGIC (Subir al padre si golpeamos un hijo) ---
+        let targetObj = hits[0].object;
 
+        // Si golpeamos una puerta o manija (que no tienen el userData principal),
+        // subimos al padre (el Grupo del mueble) que sí lo tiene.
+        if (!targetObj.userData.isFurniture && targetObj.parent?.userData.isFurniture) {
+          targetObj = targetObj.parent;
+        }
+
+        const userData = targetObj.userData;
+
+        let type: DraggableItemType = 'appliance';
+        if (userData.isInstallation) type = 'installation';
+        else if (userData.isOpening) type = 'opening';
+        else if (userData.isGas) type = 'gas';
+        else if (userData.isFurniture) type = 'furniture';
+
+        // Guardamos la referencia al OBJETO COMPLETO (Mesh o Grupo)
         dragRef.current = {
-          id: hit.userData.id || 'gas-singleton',
-          wallIndex: hit.userData.wallIndex ?? -1,
-          mesh: hit,
+          id: userData.id || 'gas-singleton',
+          wallIndex: userData.wallIndex ?? -1,
+          mesh: targetObj, // Aquí guardamos el Grupo si es un mueble
           type: type
         };
 
-        // UX: Si toco un objeto del muro, selecciono ese muro automáticamente
-        if (type !== 'appliance') {
-          setActiveWall(hit.userData.wallIndex);
-        }
+        if (type !== 'appliance') setActiveWall(userData.wallIndex);
         manualRotationRef.current = 0;
         return;
       }
 
-      // Fallback: Selección de Muro
-      const wallHits = getIntersects(e, wallsRef.current);
-      if (wallHits.length > 0) {
-        // NOTA: Si hay overlap en esquinas, el raycaster puede dar el muro "trasero".
-        // Esto suele causar la confusión de "seleccioné el muro equivocado".
-        // Ordenamos por distancia, pero en esquinas exactas es tricky.
-        const index = wallHits[0].object.userData.index;
-        setActiveWall(index);
-      } else {
-        setActiveWall(null);
-      }
+      // Selección de Muro
+      const wallHits = getIntersects(e, wallsRef.current, false);
+      if (wallHits.length > 0) setActiveWall(wallHits[0].object.userData.index);
+      else setActiveWall(null);
     };
 
     const handleMove = (e: MouseEvent) => {
       if (!dragRef.current) return;
       const { mesh, type, wallIndex } = dragRef.current;
 
-      if (type === 'installation' || type === 'gas' || type === 'furniture') {
-        const wall = wallsRef.current[wallIndex];
-        if (!wall) return; // Protección contra referencias perdidas
+      // Wall Hopping Logic
+      if (type === 'gas' || type === 'installation' || type === 'furniture') {
+        const wallHits = getIntersects(e, wallsRef.current, false);
 
-        const hits = getIntersects(e, [wall]);
-        if (hits.length > 0) {
-          const pointLocal = wall.worldToLocal(hits[0].point.clone());
+        if (wallHits.length > 0) {
+          const hitWall = wallHits[0].object as THREE.Mesh;
+          const newWallIndex = hitWall.userData.index;
 
-          const wallLen = wall.userData.length;
+          // Salto de Muro
+          if (newWallIndex !== wallIndex) {
+            mesh.removeFromParent();
+            hitWall.add(mesh);
+            dragRef.current.wallIndex = newWallIndex;
+            mesh.userData.wallIndex = newWallIndex;
+            setActiveWall(newWallIndex);
+          }
+
+          const wallLen = hitWall.userData.length;
           const wallHeight = height / 10;
+          const pointLocal = hitWall.worldToLocal(wallHits[0].point.clone());
 
-          // Lógica de Clamping (Restricción de movimiento)
           let minX, maxX, minY, maxY;
 
           if (type === 'furniture') {
-            const itemWidth = (mesh.geometry as THREE.BoxGeometry).parameters.width;
-            const itemHeight = (mesh.geometry as THREE.BoxGeometry).parameters.height;
+            // Para Grupos, calculamos el Bounding Box exacto
+            const bbox = new THREE.Box3().setFromObject(mesh);
+            const w = bbox.max.x - bbox.min.x;
+            const h = bbox.max.y - bbox.min.y;
 
-            // Evitar que el mueble salga del muro
-            const limitX = (wallLen / 2) - (itemWidth / 2);
-            minX = -Math.max(0, limitX);
-            maxX = Math.max(0, limitX);
-
-            const limitY = (wallHeight / 2) - (itemHeight / 2);
-            minY = -Math.max(0, limitY);
-            maxY = Math.max(0, limitY);
+            const limitX = (wallLen / 2) - (w / 2);
+            minX = -Math.max(0, limitX); maxX = Math.max(0, limitX);
+            const limitY = (wallHeight / 2) - (h / 2);
+            minY = -Math.max(0, limitY); maxY = Math.max(0, limitY);
           } else {
-            // Instalaciones y Gas (Puntos)
             const halfLen = wallLen / 2;
             const halfHeight = wallHeight / 2;
             minX = -halfLen; maxX = halfLen;
             minY = -halfHeight; maxY = halfHeight;
           }
 
-          // Aplicar Clamping
-          const clampedX = Math.max(minX, Math.min(maxX, pointLocal.x));
-          const clampedY = Math.max(minY, Math.min(maxY, pointLocal.y));
-
-          mesh.position.x = clampedX;
-          mesh.position.y = clampedY;
+          mesh.position.x = Math.max(minX, Math.min(maxX, pointLocal.x));
+          mesh.position.y = Math.max(minY, Math.min(maxY, pointLocal.y));
         }
       }
       else if (type === 'opening') {
-        // ... (Lógica de ventanas existente, sin cambios) ...
+        // Lógica existente para ventanas
         const wall = wallsRef.current[wallIndex];
-        const hits = getIntersects(e, [wall]);
+        const hits = getIntersects(e, [wall], false);
         if (hits.length > 0) {
           const pointLocal = wall.worldToLocal(hits[0].point.clone());
-          const opWidth = (mesh.geometry as THREE.BoxGeometry).parameters.width;
-          const opHeight = (mesh.geometry as THREE.BoxGeometry).parameters.height;
+          const w = (mesh as THREE.Mesh).geometry.parameters.width;
+          const h = (mesh as THREE.Mesh).geometry.parameters.height;
           const wallLen = wall.userData.length;
-          const wallTotalHeight = height / 10;
-          let rawDist = pointLocal.x + wallLen / 2 - opWidth / 2;
-          let rawSill = pointLocal.y + wallTotalHeight / 2 - opHeight / 2;
-          rawDist = Math.max(0, Math.min(wallLen - opWidth, rawDist));
-          rawSill = Math.max(0, Math.min(wallTotalHeight - opHeight, rawSill));
-          const clampedX = -wallLen / 2 + rawDist + opWidth / 2;
-          const clampedY = (-wallTotalHeight / 2) + rawSill + (opHeight / 2);
-          mesh.position.set(clampedX, clampedY, 0);
+          const wallH = height / 10;
+          let dist = Math.max(0, Math.min(wallLen - w, pointLocal.x + wallLen / 2 - w / 2));
+          let sill = Math.max(0, Math.min(wallH - h, pointLocal.y + wallH / 2 - h / 2));
+          mesh.position.set(-wallLen / 2 + dist + w / 2, -wallH / 2 + sill + h / 2, 0);
         }
-      }
-      else if (type === 'appliance') {
-        // ... (Lógica de electrodomésticos existente) ...
-        const wallHits = getIntersects(e, wallsRef.current);
-        if (wallHits.length > 0) {
-          const hit = wallHits[0];
-          const wall = hit.object as THREE.Mesh;
-          let baseAngle = wall.rotation.y;
-          const pointLocal = wall.worldToLocal(hit.point.clone());
-          if (pointLocal.z < 0) baseAngle += Math.PI;
-          mesh.rotation.y = baseAngle + manualRotationRef.current;
-          // ... clamping appliance ...
+      } else if (type === 'appliance') {
+        // Lógica existente para appliances
+        const hits = getIntersects(e, wallsRef.current, false);
+        if (hits.length > 0) {
+          const wall = hits[0].object as THREE.Mesh;
+          const pt = wall.worldToLocal(hits[0].point.clone());
+          let ang = wall.rotation.y + (pt.z < 0 ? Math.PI : 0);
+          mesh.rotation.y = ang + manualRotationRef.current;
+
+          const w = (mesh as THREE.Mesh).geometry.parameters.width;
           const wallLen = (wall.geometry as THREE.BoxGeometry).parameters.width;
-          const objWidth = (mesh.geometry as THREE.BoxGeometry).parameters.width;
-          const minX = -wallLen / 2 + objWidth / 2;
-          const maxX = wallLen / 2 - objWidth / 2;
-          const clampedX = minX > maxX ? 0 : Math.max(minX, Math.min(maxX, pointLocal.x));
-          const wallThickness = WALL_THICKNESS;
-          const objDepth = (mesh.geometry as THREE.BoxGeometry).parameters.depth;
-          const finalZ = pointLocal.z > 0 ? (wallThickness / 2 + objDepth / 2) : -(wallThickness / 2 + objDepth / 2);
-          const finalWorld = new THREE.Vector3(clampedX, -height / 20 + (mesh.geometry as THREE.BoxGeometry).parameters.height / 2, finalZ).applyMatrix4(wall.matrixWorld);
-          mesh.position.copy(roomGroupRef.current.worldToLocal(finalWorld));
+          const minX = -wallLen / 2 + w / 2;
+          const maxX = wallLen / 2 - w / 2;
+          const cx = minX > maxX ? 0 : Math.max(minX, Math.min(maxX, pt.x));
+          const cz = pt.z > 0 ? (WALL_THICKNESS / 2 + (mesh as THREE.Mesh).geometry.parameters.depth / 2) : -(WALL_THICKNESS / 2 + (mesh as THREE.Mesh).geometry.parameters.depth / 2);
+
+          const worldPos = new THREE.Vector3(cx, -height / 20 + (mesh as THREE.Mesh).geometry.parameters.height / 2, cz).applyMatrix4(wall.matrixWorld);
+          mesh.position.copy(roomGroupRef.current.worldToLocal(worldPos));
           dragRef.current.wallIndex = wall.userData.index;
         }
       }
@@ -512,69 +449,60 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
       if (dragRef.current) {
         const { mesh, id, type, wallIndex } = dragRef.current;
         const wall = wallsRef.current[wallIndex];
+        const wallLen = wall.userData.length;
+        const wallH = height / 10;
 
-        if (wall) { // Check de seguridad
-          const wallLen = wall.userData.length;
-          const wallTotalHeight = height / 10;
+        if (type === 'furniture' && onLayoutUpdate) {
+          const bbox = new THREE.Box3().setFromObject(mesh);
+          const w = bbox.max.x - bbox.min.x;
+          const h = bbox.max.y - bbox.min.y;
 
-          if (type === 'furniture' && onLayoutUpdate) {
-            const itemWidth3D = (mesh.geometry as THREE.BoxGeometry).parameters.width;
-            const itemHeight3D = (mesh.geometry as THREE.BoxGeometry).parameters.height;
-            const distMM = (mesh.position.x + wallLen / 2 - itemWidth3D / 2) * SCALE_FACTOR;
-            const elevationMM = (mesh.position.y + wallTotalHeight / 2 - itemHeight3D / 2) * SCALE_FACTOR;
-
-            const originalItem = layoutItems.find(i => i.id === id);
-            if (originalItem) {
-              onLayoutUpdate({
-                ...originalItem,
-                distFromStart: Math.round(distMM),
-                elevation: Math.round(elevationMM)
-              });
-            }
-          }
-          else if (type === 'gas' && onGasUpdate && gasConfig) {
-            // Matemática Inversa para Gas
-            const distMM = (mesh.position.x + wallLen / 2) * SCALE_FACTOR;
-            const heightMM = (mesh.position.y + wallTotalHeight / 2) * SCALE_FACTOR;
-
-            onGasUpdate({
-              ...gasConfig,
-              x: Math.round(distMM),
-              z: Math.round(heightMM),
-              wallIndex: wallIndex // Mantiene el índice del muro donde está
+          const item = layoutItems.find(i => i.id === id);
+          if (item) onLayoutUpdate({
+            ...item,
+            distFromStart: Math.round((mesh.position.x + wallLen / 2 - w / 2) * SCALE_FACTOR),
+            elevation: Math.round((mesh.position.y + wallH / 2 - h / 2) * SCALE_FACTOR),
+            wallIndex: wallIndex,
+            rotation: 0
+          });
+        }
+        else if (type === 'gas' && onGasUpdate && gasConfig) {
+          onGasUpdate({
+            ...gasConfig,
+            x: Math.round((mesh.position.x + wallLen / 2) * SCALE_FACTOR),
+            z: Math.round((mesh.position.y + wallH / 2) * SCALE_FACTOR),
+            wallIndex: wallIndex
+          });
+        }
+        else if (type === 'installation' && onInstallationUpdate) {
+          const inst = installations.find(i => i.id === id);
+          if (inst) onInstallationUpdate({
+            ...inst,
+            distFromStart: Math.round((mesh.position.x + wallLen / 2) * SCALE_FACTOR),
+            heightFromFloor: Math.round((mesh.position.y + wallH / 2) * SCALE_FACTOR),
+            wallIndex: wallIndex
+          });
+        }
+        else if (type === 'opening' && onOpeningUpdate) {
+          const w = (mesh as THREE.Mesh).geometry.parameters.width;
+          const h = (mesh as THREE.Mesh).geometry.parameters.height;
+          const originalOp = openings.find(o => o.id === id);
+          if (originalOp) {
+            onOpeningUpdate({
+              ...originalOp,
+              distFromStart: Math.round((mesh.position.x + wallLen / 2 - w / 2) * SCALE_FACTOR),
+              sillHeight: Math.round((mesh.position.y + wallH / 2 - h / 2) * SCALE_FACTOR)
             });
           }
-          // ... resto de casos (installation, opening, etc.) igual que antes ...
-          else if (type === 'installation' && onInstallationUpdate) {
-            const distMM = (mesh.position.x + wallLen / 2) * SCALE_FACTOR;
-            const heightMM = (mesh.position.y + wallTotalHeight / 2) * SCALE_FACTOR;
-            const originalInst = installations.find(i => i.id === id);
-            if (originalInst) {
-              onInstallationUpdate({ ...originalInst, distFromStart: Math.round(distMM), heightFromFloor: Math.round(heightMM) });
-            }
-          }
-          else if (type === 'opening' && onOpeningUpdate) {
-            const opWidth = (mesh.geometry as THREE.BoxGeometry).parameters.width;
-            const opHeight = (mesh.geometry as THREE.BoxGeometry).parameters.height;
-            const finalDist3D = mesh.position.x + wallLen / 2 - opWidth / 2;
-            const finalSill3D = mesh.position.y + wallTotalHeight / 2 - opHeight / 2;
-            const originalOp = openings.find(o => o.id === id);
-            if (originalOp) {
-              onOpeningUpdate({
-                ...originalOp,
-                distFromStart: Math.round(finalDist3D * SCALE_FACTOR),
-                sillHeight: Math.round(finalSill3D * SCALE_FACTOR)
-              });
-            }
-          } else if (type === 'appliance' && onApplianceUpdate) {
-            const originalApp = appliances.find(a => a.id === id);
-            if (originalApp) {
-              onApplianceUpdate({
-                ...originalApp,
-                position: { x: mesh.position.x, y: mesh.position.y, z: mesh.position.z },
-                rotation: mesh.rotation.y
-              });
-            }
+        }
+        else if (type === 'appliance' && onApplianceUpdate) {
+          const originalApp = appliances.find(a => a.id === id);
+          if (originalApp) {
+            onApplianceUpdate({
+              ...originalApp,
+              position: { x: mesh.position.x, y: mesh.position.y, z: mesh.position.z },
+              rotation: mesh.rotation.y
+            });
           }
         }
       }
@@ -590,7 +518,7 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
       window.removeEventListener('mousemove', handleMove);
       window.removeEventListener('mouseup', handleUp);
     };
-  }, [height, onInstallationUpdate, onApplianceUpdate, onOpeningUpdate, onGasUpdate, onLayoutUpdate, appliances, openings, installations, gasConfig, layoutItems, materials]); // Se añade materials a deps
+  }, [height, onInstallationUpdate, onApplianceUpdate, onOpeningUpdate, onGasUpdate, onLayoutUpdate, appliances, openings, installations, gasConfig, layoutItems, materials]);
 
   return <div ref={mountRef} className="w-full h-full cursor-move" />;
 };
