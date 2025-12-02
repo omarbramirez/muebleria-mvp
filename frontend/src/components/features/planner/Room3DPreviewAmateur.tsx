@@ -424,8 +424,8 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
           const h = geom.parameters.height;
           const wallLen = wall.userData.length;
           const wallH = height / 10;
-          let dist = Math.max(0, Math.min(wallLen - w, pointLocal.x + wallLen / 2 - w / 2));
-          let sill = Math.max(0, Math.min(wallH - h, pointLocal.y + wallH / 2 - h / 2));
+          const dist = Math.max(0, Math.min(wallLen - w, pointLocal.x + wallLen / 2 - w / 2));
+          const sill = Math.max(0, Math.min(wallH - h, pointLocal.y + wallH / 2 - h / 2));
           mesh.position.set(-wallLen / 2 + dist + w / 2, -wallH / 2 + sill + h / 2, 0);
         }
       }   // === CORRECCIÓN CRÍTICA PARA APPLIANCES ===
@@ -439,7 +439,7 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
           const pt = wall.worldToLocal(hits[0].point.clone());
 
           // Rotación automática según la cara del muro
-          let ang = wall.rotation.y + (pt.z < 0 ? Math.PI : 0);
+          const ang = wall.rotation.y + (pt.z < 0 ? Math.PI : 0);
           mesh.rotation.y = ang + manualRotationRef.current;
 
           // Corrección de Tipado: Aserción explícita
