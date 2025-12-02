@@ -161,7 +161,7 @@ const Compatibility = () => {
                 <select
                   value={p.subtype}
                   onChange={(e) => updatePoint(p.id, 'subtype', e.target.value)}
-                  className="w-full text-xs border-gray-200 rounded py-1"
+                  className="w-full text-xs border border-gray-300 rounded-lg py-2 px-3 bg-white shadow-sm focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all text-black"
                 >
                   <option value="110v">110v (Común)</option>
                   <option value="220v">220v (Bifásica)</option>
@@ -215,7 +215,7 @@ const Compatibility = () => {
                 <select
                   value={p.subtype}
                   onChange={(e) => updatePoint(p.id, 'subtype', e.target.value)}
-                  className="flex-1 text-xs border-gray-200 rounded py-1"
+                  className="w-full text-xs border border-gray-300 rounded-lg py-2 px-3 bg-white shadow-sm focus:border-gray-500 focus:ring-1 focus:ring-gray-500 transition-all text-black"
                 >
                   <option value="sink">Tarja / Fregadero</option>
                   <option value="dishwasher">Lavavajillas</option>

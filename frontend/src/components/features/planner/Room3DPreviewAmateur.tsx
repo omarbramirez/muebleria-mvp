@@ -423,96 +423,226 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
           let sill = Math.max(0, Math.min(wallH - h, pointLocal.y + wallH / 2 - h / 2));
           mesh.position.set(-wallLen / 2 + dist + w / 2, -wallH / 2 + sill + h / 2, 0);
         }
-      } else if (type === 'appliance') {
-        // Lógica existente para appliances
+      }   // === CORRECCIÓN CRÍTICA PARA APPLIANCES ===
+      else if (type === 'appliance') {
+        // 1. Intentamos intersectar con MUROS (Comportamiento Pegajoso)
         const hits = getIntersects(e, wallsRef.current, false);
+
         if (hits.length > 0) {
+          // --- CASO A: PEGARSE A LA PARED ---
           const wall = hits[0].object as THREE.Mesh;
           const pt = wall.worldToLocal(hits[0].point.clone());
+
+          // Rotación automática según la cara del muro
           let ang = wall.rotation.y + (pt.z < 0 ? Math.PI : 0);
           mesh.rotation.y = ang + manualRotationRef.current;
 
-          // --- CORRECCIÓN DE TIPADO PARA APPLIANCE ---
+          // Corrección de Tipado: Aserción explícita
           const geom = (mesh as THREE.Mesh).geometry as THREE.BoxGeometry;
           const w = geom.parameters.width;
-          // El muro también es BoxGeometry
-          const wallGeom = (wall.geometry as THREE.BoxGeometry);
-          // ------------------------------------------
+          const d = geom.parameters.depth;
+          const h = geom.parameters.height;
 
+          // Clamping dentro del muro
+          const wallGeom = (wall.geometry as THREE.BoxGeometry);
           const wallLen = wallGeom.parameters.width;
+
           const minX = -wallLen / 2 + w / 2;
           const maxX = wallLen / 2 - w / 2;
+
+          // Si el objeto es más ancho que el muro, lo centramos
           const cx = minX > maxX ? 0 : Math.max(minX, Math.min(maxX, pt.x));
-          const cz = pt.z > 0 ? (WALL_THICKNESS / 2 + geom.parameters.depth / 2) : -(WALL_THICKNESS / 2 + geom.parameters.depth / 2);
-          const worldPos = new THREE.Vector3(cx, -height / 20 + geom.parameters.height / 2, cz).applyMatrix4(wall.matrixWorld);
+
+          // Offset de profundidad para que quede "besando" la pared
+          const cz = pt.z > 0 ? (WALL_THICKNESS / 2 + d / 2) : -(WALL_THICKNESS / 2 + d / 2);
+
+          // Convertir de Local Muro -> World -> Local RoomGroup
+          // Nota: Usamos -height/20 en Y porque el centro del muro está elevado
+          const worldPos = new THREE.Vector3(cx, -height / 20 + h / 2, cz).applyMatrix4(wall.matrixWorld);
           mesh.position.copy(roomGroupRef.current.worldToLocal(worldPos));
+
+          // Guardamos referencia de que está pegado a este muro
           dragRef.current.wallIndex = wall.userData.index;
+        }
+        else {
+          // --- CASO B: MOVIMIENTO LIBRE (ISLAS) ---
+          // Si el rayo no toca pared, intersectamos con un plano matemático en el suelo (Y=0)
+
+          // Creamos un plano virtual horizontal normalizado hacia arriba (0,1,0)
+          const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+          const target = new THREE.Vector3();
+
+          // Usamos el rayo actual del raycaster (ya configurado por getIntersects)
+          raycaster.current.ray.intersectPlane(floorPlane, target);
+
+          if (target) {
+            // Convertimos la posición mundial del plano a coordenadas locales del grupo
+            const localPos = roomGroupRef.current.worldToLocal(target.clone());
+
+            // Corrección de Tipado
+            const geom = (mesh as THREE.Mesh).geometry as THREE.BoxGeometry;
+            const h = geom.parameters.height;
+
+            // Asignamos posición libre (X, Z) manteniendo la altura correcta (Y)
+            // Y = h/2 asume que el pivote está en el centro del cubo y queremos que se apoye en el suelo (Y=0)
+            mesh.position.set(localPos.x, h / 2, localPos.z);
+
+            // Opcional: Podrías resetear la rotación o mantener la última manual
+            // mesh.rotation.y = manualRotationRef.current;
+
+            // Marcamos como "desvinculado" (-1) para indicar que no pertenece a ningún muro
+            dragRef.current.wallIndex = -1;
+          }
         }
       }
     };
 
     const handleUp = () => {
-      if (dragRef.current) {
-        const { mesh, id, type, wallIndex } = dragRef.current;
-        const wall = wallsRef.current[wallIndex];
-        const wallLen = wall.userData.length;
-        const wallH = height / 10;
+      // 1. Validación temprana: Si no hay arrastre, no hacemos nada.
+      if (!dragRef.current) return;
 
-        if (type === 'furniture' && onLayoutUpdate) {
-          const bbox = new THREE.Box3().setFromObject(mesh);
-          const w = bbox.max.x - bbox.min.x;
-          const h = bbox.max.y - bbox.min.y;
+      const { mesh, id, type, wallIndex } = dragRef.current;
 
-          const item = layoutItems.find(i => i.id === id);
-          if (item) onLayoutUpdate({
-            ...item,
-            distFromStart: Math.round((mesh.position.x + wallLen / 2 - w / 2) * SCALE_FACTOR),
-            elevation: Math.round((mesh.position.y + wallH / 2 - h / 2) * SCALE_FACTOR),
-            wallIndex: wallIndex,
-            rotation: 0
-          });
+      // 2. Determinamos si el objeto aterrizó en un Muro o en el Suelo
+      // Si wallIndex es válido y existe el muro en el ref, estamos en modo "Muro".
+      const targetWall = (wallIndex >= 0 && wallsRef.current[wallIndex])
+        ? wallsRef.current[wallIndex]
+        : null;
+
+      // Variables auxiliares para dimensiones del muro (solo si existe)
+      const wallLen = targetWall ? targetWall.userData.length : 0;
+      const wallH = height / 10;
+
+      // --- A. LÓGICA PARA MOBILIARIO (FURNITURE) ---
+      if (type === 'furniture' && onLayoutUpdate) {
+        // Calculamos BoundingBox para obtener dimensiones reales del Grupo/Mesh
+        const bbox = new THREE.Box3().setFromObject(mesh);
+        const w = bbox.max.x - bbox.min.x;
+        const h = bbox.max.y - bbox.min.y;
+
+        const item = layoutItems.find(i => i.id === id);
+
+        if (item) {
+          if (targetWall) {
+            // CASO 1: ATERRIZAJE EN MURO (Coordenadas Locales)
+            // Mapeamos la posición 3D (centro) a la lógica de "distancia desde el inicio del muro"
+            onLayoutUpdate({
+              ...item,
+              distFromStart: Math.round((mesh.position.x + wallLen / 2 - w / 2) * SCALE_FACTOR),
+              elevation: Math.round((mesh.position.y + wallH / 2 - h / 2) * SCALE_FACTOR),
+              wallIndex: wallIndex,
+              rotation: 0 // Reseteamos rotación al pegarse al muro (normalmente)
+            });
+          } else {
+            // CASO 2: ATERRIZAJE EN SUELO (Coordenadas Globales / Isla)
+            // Aquí el objeto es hijo del roomGroup directamente o se trata conceptualmente como libre.
+            // NOTA DE ARQUITECTURA: Tu tipo 'CabinetModule' debe soportar coordenadas X/Z absolutas.
+            // Si 'distFromStart' es tu única forma de guardar X, úsala, pero idealmente deberías tener 'position'.
+
+            // Asumimos que si wallIndex es -1, el backend/store interpreta distFromStart/elevation 
+            // o propiedades adicionales como coordenadas cartesianas.
+
+            // Para este ejemplo, enviamos las coordenadas mundiales transformadas.
+            onLayoutUpdate({
+              ...item,
+              // Opción A: Si tu store soporta x/z explícitos para islas
+              // x: Math.round(mesh.position.x * SCALE_FACTOR),
+              // z: Math.round(mesh.position.z * SCALE_FACTOR),
+
+              // Opción B: Reutilizar campos existentes (hack común si no quieres migrar la DB aún)
+              // Usamos distFromStart como X global y elevation como Z global (profundidad en planta)
+              distFromStart: Math.round(mesh.position.x * SCALE_FACTOR),
+              elevation: Math.round(mesh.position.z * SCALE_FACTOR),
+
+              wallIndex: -1, // Bandera de "Isla" o "Libre"
+              rotation: mesh.rotation.y // Preservamos la rotación manual
+            });
+          }
         }
-        else if (type === 'gas' && onGasUpdate && gasConfig) {
+      }
+
+      // --- B. LÓGICA PARA GAS ---
+      else if (type === 'gas' && onGasUpdate && gasConfig) {
+        if (targetWall) {
+          // Gas en Muro
           onGasUpdate({
             ...gasConfig,
             x: Math.round((mesh.position.x + wallLen / 2) * SCALE_FACTOR),
             z: Math.round((mesh.position.y + wallH / 2) * SCALE_FACTOR),
             wallIndex: wallIndex
           });
-        }
-        else if (type === 'installation' && onInstallationUpdate) {
-          const inst = installations.find(i => i.id === id);
-          if (inst) onInstallationUpdate({
-            ...inst,
-            distFromStart: Math.round((mesh.position.x + wallLen / 2) * SCALE_FACTOR),
-            heightFromFloor: Math.round((mesh.position.y + wallH / 2) * SCALE_FACTOR),
-            wallIndex: wallIndex
+        } else {
+          // Gas en Isla (Suelo)
+          onGasUpdate({
+            ...gasConfig,
+            x: Math.round(mesh.position.x * SCALE_FACTOR),
+            z: Math.round(mesh.position.z * SCALE_FACTOR), // En suelo, Z es la profundidad
+            wallIndex: -1
           });
         }
-        else if (type === 'opening' && onOpeningUpdate) {
-          const geom = (mesh as THREE.Mesh).geometry as THREE.BoxGeometry;
-          const w = geom.parameters.width;
-          const h = geom.parameters.height;
-          const originalOp = openings.find(o => o.id === id);
-          if (originalOp) {
-            onOpeningUpdate({
-              ...originalOp,
-              distFromStart: Math.round((mesh.position.x + wallLen / 2 - w / 2) * SCALE_FACTOR),
-              sillHeight: Math.round((mesh.position.y + wallH / 2 - h / 2) * SCALE_FACTOR)
+      }
+
+      // --- C. LÓGICA PARA INSTALACIONES ---
+      else if (type === 'installation' && onInstallationUpdate) {
+        const inst = installations.find(i => i.id === id);
+        if (inst) {
+          if (targetWall) {
+            onInstallationUpdate({
+              ...inst,
+              distFromStart: Math.round((mesh.position.x + wallLen / 2) * SCALE_FACTOR),
+              heightFromFloor: Math.round((mesh.position.y + wallH / 2) * SCALE_FACTOR),
+              wallIndex: wallIndex
             });
-          }
-        }
-        else if (type === 'appliance' && onApplianceUpdate) {
-          const originalApp = appliances.find(a => a.id === id);
-          if (originalApp) {
-            onApplianceUpdate({
-              ...originalApp,
-              position: { x: mesh.position.x, y: mesh.position.y, z: mesh.position.z },
-              rotation: mesh.rotation.y
+          } else {
+            // Instalación en suelo (ej. toma de piso)
+            onInstallationUpdate({
+              ...inst,
+              distFromStart: Math.round(mesh.position.x * SCALE_FACTOR), // X Global
+              heightFromFloor: Math.round(mesh.position.z * SCALE_FACTOR), // Z Global
+              wallIndex: -1
             });
           }
         }
       }
+
+      // --- D. LÓGICA PARA VANOS (Siempre requieren muro) ---
+      else if (type === 'opening' && onOpeningUpdate && targetWall) {
+        // Aserción de tipo segura
+        const geom = (mesh as THREE.Mesh).geometry as THREE.BoxGeometry;
+        const w = geom.parameters.width;
+        const h = geom.parameters.height;
+
+        const originalOp = openings.find(o => o.id === id);
+        if (originalOp) {
+          onOpeningUpdate({
+            ...originalOp,
+            distFromStart: Math.round((mesh.position.x + wallLen / 2 - w / 2) * SCALE_FACTOR),
+            sillHeight: Math.round((mesh.position.y + wallH / 2 - h / 2) * SCALE_FACTOR),
+            // Nota: Si wallIndex cambió (moviste ventana de un muro a otro), aquí se actualiza
+            wallIndex: wallIndex
+          });
+        }
+      }
+
+      // --- E. LÓGICA PARA ELECTRODOMÉSTICOS (APPLIANCES) ---
+      else if (type === 'appliance' && onApplianceUpdate) {
+        // Los appliances ya tienen una estructura de datos (position: {x,y,z}) que soporta
+        // coordenadas globales nativamente, así que es más directo.
+        const originalApp = appliances.find(a => a.id === id);
+        if (originalApp) {
+          onApplianceUpdate({
+            ...originalApp,
+            position: {
+              x: mesh.position.x,
+              y: mesh.position.y,
+              z: mesh.position.z
+            },
+            rotation: mesh.rotation.y
+          });
+        }
+      }
+
+      // Limpieza final
       dragRef.current = null;
       if (controlsRef.current) controlsRef.current.enabled = true;
     };
