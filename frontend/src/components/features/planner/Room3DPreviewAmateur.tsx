@@ -414,8 +414,9 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
         const hits = getIntersects(e, [wall], false);
         if (hits.length > 0) {
           const pointLocal = wall.worldToLocal(hits[0].point.clone());
-          const w = (mesh as THREE.Mesh).geometry.parameters.width;
-          const h = (mesh as THREE.Mesh).geometry.parameters.height;
+          const geom = (mesh as THREE.Mesh).geometry as THREE.BoxGeometry;
+          const w = geom.parameters.width;
+          const h = geom.parameters.height;
           const wallLen = wall.userData.length;
           const wallH = height / 10;
           let dist = Math.max(0, Math.min(wallLen - w, pointLocal.x + wallLen / 2 - w / 2));
@@ -431,14 +432,19 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
           let ang = wall.rotation.y + (pt.z < 0 ? Math.PI : 0);
           mesh.rotation.y = ang + manualRotationRef.current;
 
-          const w = (mesh as THREE.Mesh).geometry.parameters.width;
-          const wallLen = (wall.geometry as THREE.BoxGeometry).parameters.width;
+          // --- CORRECCIÓN DE TIPADO PARA APPLIANCE ---
+          const geom = (mesh as THREE.Mesh).geometry as THREE.BoxGeometry;
+          const w = geom.parameters.width;
+          // El muro también es BoxGeometry
+          const wallGeom = (wall.geometry as THREE.BoxGeometry);
+          // ------------------------------------------
+
+          const wallLen = wallGeom.parameters.width;
           const minX = -wallLen / 2 + w / 2;
           const maxX = wallLen / 2 - w / 2;
           const cx = minX > maxX ? 0 : Math.max(minX, Math.min(maxX, pt.x));
-          const cz = pt.z > 0 ? (WALL_THICKNESS / 2 + (mesh as THREE.Mesh).geometry.parameters.depth / 2) : -(WALL_THICKNESS / 2 + (mesh as THREE.Mesh).geometry.parameters.depth / 2);
-
-          const worldPos = new THREE.Vector3(cx, -height / 20 + (mesh as THREE.Mesh).geometry.parameters.height / 2, cz).applyMatrix4(wall.matrixWorld);
+          const cz = pt.z > 0 ? (WALL_THICKNESS / 2 + geom.parameters.depth / 2) : -(WALL_THICKNESS / 2 + geom.parameters.depth / 2);
+          const worldPos = new THREE.Vector3(cx, -height / 20 + geom.parameters.height / 2, cz).applyMatrix4(wall.matrixWorld);
           mesh.position.copy(roomGroupRef.current.worldToLocal(worldPos));
           dragRef.current.wallIndex = wall.userData.index;
         }
@@ -484,8 +490,9 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
           });
         }
         else if (type === 'opening' && onOpeningUpdate) {
-          const w = (mesh as THREE.Mesh).geometry.parameters.width;
-          const h = (mesh as THREE.Mesh).geometry.parameters.height;
+          const geom = (mesh as THREE.Mesh).geometry as THREE.BoxGeometry;
+          const w = geom.parameters.width;
+          const h = geom.parameters.height;
           const originalOp = openings.find(o => o.id === id);
           if (originalOp) {
             onOpeningUpdate({
