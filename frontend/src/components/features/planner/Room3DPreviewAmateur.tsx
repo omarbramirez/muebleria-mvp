@@ -105,15 +105,18 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
 
   // 4. INICIALIZACIÓN DEL MOTOR GRÁFICO
   useEffect(() => {
-    if (!mountRef.current) return;
-    const { clientWidth: w, clientHeight: h } = mountRef.current;
+    const mountNode = mountRef.current;
+    if (!mountNode) return;
+
+    const { clientWidth: w, clientHeight: h } = mountNode;
 
     // Renderer con sombras suaves
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(w, h);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    mountRef.current.appendChild(renderer.domElement);
+    // Usamos la variable local, no el ref
+    mountNode.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
     const camera = new THREE.PerspectiveCamera(45, w / h, 1, 5000);
@@ -149,7 +152,9 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
 
     return () => {
       renderer.dispose();
-      mountRef.current?.removeChild(renderer.domElement);
+      if (mountNode && renderer.domElement) {
+        mountNode.removeChild(renderer.domElement);
+      }
     };
   }, []);
 
@@ -655,7 +660,7 @@ const Room3DPreviewAmateur: React.FC<Room3DPreviewProps> = ({
       window.removeEventListener('mousemove', handleMove);
       window.removeEventListener('mouseup', handleUp);
     };
-  }, [height, onInstallationUpdate, onApplianceUpdate, onOpeningUpdate, onGasUpdate, onLayoutUpdate, appliances, openings, installations, gasConfig, layoutItems, materials]);
+  }, [height, onInstallationUpdate, onApplianceUpdate, onOpeningUpdate, onGasUpdate, onLayoutUpdate, appliances, openings, installations, gasConfig, layoutItems, materials, setActiveWall]);
 
   return <div ref={mountRef} className="w-full h-full cursor-move" />;
 };
