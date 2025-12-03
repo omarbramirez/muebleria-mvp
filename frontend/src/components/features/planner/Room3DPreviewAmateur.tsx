@@ -397,7 +397,7 @@ const Room3DPreviewExpert: React.FC<Room3DPreviewProps> = ({
       // Pero el `app.position` que viene del store ya debería tener la Y correcta si el usuario la movió.
       // Si es inicial (y=0), los objetos de piso (refri, estufa) se colocan sobre el piso.
 
-      let posY = app.position.y ?? 0;
+      const posY = app.position.y ?? 0;
 
       // Auto-corrección inicial para objetos de piso si y=0
       // if (app.type !== 'hood' && Math.abs(posY) < 0.1) {

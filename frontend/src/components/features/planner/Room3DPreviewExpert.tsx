@@ -492,7 +492,7 @@ const Room3DPreviewExpert: React.FC<Room3DPreviewProps> = ({
 
       // Si no golpeamos un interactuable, permitimos seleccionar muro
       const wallHits = getIntersectsFromClient(e.clientX, e.clientY, wallsRef.current, false);
-      if (wallHits.length > 0) setActiveWall((wallHits[0].object as any).userData.index);
+      if (wallHits.length > 0) setActiveWall((wallHits[0].object as unknown as THREE.Mesh).userData.index);
       else setActiveWall(null);
     };
 
