@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/Button';
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 // Imports de Componentes de Presentación (Vistas)
-import Room3DPreviewAmateur from '@/components/features/planner/Room3DPreviewAmateur';
-import Room3DPreviewProfessional from '@/components/features/planner/Room3DPreviewProfessional';
+// import Room3DPreviewAmateur from '@/components/features/planner/Room3DPreviewAmateur';
+// import Room3DPreviewProfessional from '@/components/features/planner/Room3DPreviewProfessional';
 import Room3DPreviewExpert from '@/components/features/planner/Room3DPreviewExpert';
 
 // Imports de Módulos de Configuración (Paneles de Opciones)
@@ -68,7 +68,7 @@ const RoomPlannerHeight: React.FC<roomPlannerProps> = ({ link }) => {
     const layoutItems = (values.layout_items as unknown as CabinetModule[]) || [];
 
     // 3. ESTADO LOCAL DE UI
-    const [activeLayout, setActiveLayout] = useState<number>(1);
+    const [activeLayout, setActiveLayout] = useState<number>(3);
     const [activeOption, setActiveOption] = useState<string>("MODULO");
     const [currentModule, setCurrentModule] = useState<string | null>("Geometría");
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -144,19 +144,18 @@ const RoomPlannerHeight: React.FC<roomPlannerProps> = ({ link }) => {
         <div className="flex flex-col select-none bg-[#FAFAF8] h-screen overflow-hidden relative">
 
             {/* Header Flotante: Selector de Nivel */}
-            <div className="absolute top-0 z-10 flex flex-row px-5 py-4 justify-center w-full gap-4 pointer-events-none">
-                <div className="pointer-events-auto bg-white/80 backdrop-blur-md p-1 rounded-lg shadow-sm border border-gray-200 flex gap-1">
-                    <Button variant={`${activeLayout === 1 ? "primary" : "secondary"}`} onClick={() => setActiveLayout(1)} size="sm">AMATEUR</Button>
-                    <Button variant={`${activeLayout === 2 ? "primary" : "secondary"}`} onClick={() => setActiveLayout(2)} size="sm">INTERMEDIO</Button>
+            <div className=" absolute top-0 z-10 flex flex-row px-5 py-4 justify-center w-full gap-4 pointer-events-none">
+                <div className="min-w-[300px] pointer-events-auto bg-white/80 backdrop-blur-md p-1 rounded-lg shadow-sm border border-gray-200 flex gap-1 flex flex-row items-center justify-center">
+                    {/* <Button variant={`${activeLayout === 1 ? "primary" : "secondary"}`} onClick={() => setActiveLayout(1)} size="sm">AMATEUR</Button>
+                    <Button variant={`${activeLayout === 2 ? "primary" : "secondary"}`} onClick={() => setActiveLayout(2)} size="sm">INTERMEDIO</Button> */}
                     <Button variant={`${activeLayout === 3 ? "primary" : "secondary"}`} onClick={() => setActiveLayout(3)} size="sm">EXPERTO</Button>
                 </div>
             </div>
 
             {/* Área Principal: Visor 3D */}
             <div className="h-full w-full">
-                {activeLayout === 1 && (
+                {/* {activeLayout === 1 && (
                     <Room3DPreviewAmateur
-                        // Props de Datos (Data Down)
                         points={points}
                         height={heightMm}
                         openings={openings}
@@ -164,18 +163,34 @@ const RoomPlannerHeight: React.FC<roomPlannerProps> = ({ link }) => {
                         installations={installations}
                         gasConfig={gasConfig}
                         layoutItems={layoutItems}
-
-                        // Props de Funciones (Actions Up)
                         onInstallationUpdate={handleInstallationDrag}
                         onApplianceUpdate={handleApplianceDrag}
                         onOpeningUpdate={handleOpeningDrag}
                         onLayoutUpdate={handleLayoutUpdate}
-                        onGasUpdate={handleGasUpdate} // <--- Conexión del Handler
+                        onGasUpdate={handleGasUpdate} 
                     />
-                )}
+                )} */}
                 {/* Placeholders para futuros niveles */}
-                {activeLayout === 2 && <Room3DPreviewProfessional points={points} height={heightMm} openings={openings} />}
-                {activeLayout === 3 && <Room3DPreviewExpert points={points} height={heightMm} openings={openings} />}
+                {/* {activeLayout === 2 && <Room3DPreviewProfessional
+                    points={points} height={heightMm} openings={openings}
+                />} */}
+                {activeLayout === 3 && <Room3DPreviewExpert
+                    // Props de Datos (Data Down)
+                    points={points}
+                    height={heightMm}
+                    openings={openings}
+                    appliances={appliances}
+                    installations={installations}
+                    gasConfig={gasConfig}
+                    layoutItems={layoutItems}
+
+                    // Props de Funciones (Actions Up)
+                    onInstallationUpdate={handleInstallationDrag}
+                    onApplianceUpdate={handleApplianceDrag}
+                    onOpeningUpdate={handleOpeningDrag}
+                    onLayoutUpdate={handleLayoutUpdate}
+                    onGasUpdate={handleGasUpdate} // <--- Conexión del Handler
+                />}
             </div>
 
             {/* Panel Inferior: Opciones y Configuración */}
