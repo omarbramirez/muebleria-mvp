@@ -61,7 +61,7 @@ const PlannerWelcomeModal: React.FC<PlannerWelcomeModalProps> = ({ isOpen, onClo
                         <div>
                             <h3 className="font-bold text-gray-900">Arrastrar y Soltar Inteligente</h3>
                             <p className="text-sm text-gray-500 mt-1">
-                                Toma cualquier mueble o electrodoméstico y arrástralo. El sistema detecta automáticamente las paredes y "pega" los objetos a ellas.
+                                Toma cualquier mueble o electrodoméstico y arrástralo. El sistema detecta automáticamente las paredes y &quot;pega&quot; los objetos a ellas.
                                 ¡Funciona con el mouse o con tu dedo en el celular!
                             </p>
                         </div>
