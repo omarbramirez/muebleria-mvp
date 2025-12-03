@@ -6,7 +6,8 @@ import {
     Droplet,
     DoorOpen,
     CheckCircle2,
-    X
+    X,
+    CreditCard // Nuevo icono para Presupuesto
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
@@ -45,7 +46,7 @@ const PlannerWelcomeModal: React.FC<PlannerWelcomeModalProps> = ({ isOpen, onClo
                             <RefreshCw size={24} />
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-900">Todo está Conectado</h3>
+                            <h3 className="font-bold text-gray-900">Todo está Conectado (Sincronización Bidireccional)</h3>
                             <p className="text-sm text-gray-500 mt-1">
                                 Es magia bidireccional. Si escribes una medida en el menú, el 3D cambia.
                                 Si arrastras algo en el 3D, el menú se actualiza. Tú decides cómo trabajar.
@@ -59,7 +60,7 @@ const PlannerWelcomeModal: React.FC<PlannerWelcomeModalProps> = ({ isOpen, onClo
                             <Move size={24} />
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-900">Arrastrar y Soltar Inteligente</h3>
+                            <h3 className="font-bold text-gray-900">Arrastrar y Soltar Inteligente (Mouse & Touch)</h3>
                             <p className="text-sm text-gray-500 mt-1">
                                 Toma cualquier mueble o electrodoméstico y arrástralo. El sistema detecta automáticamente las paredes y &quot;pega&quot; los objetos a ellas.
                                 ¡Funciona con el mouse o con tu dedo en el celular!
@@ -67,7 +68,20 @@ const PlannerWelcomeModal: React.FC<PlannerWelcomeModalProps> = ({ isOpen, onClo
                         </div>
                     </div>
 
-                    {/* Feature 3: Instalaciones */}
+                    {/* Feature 3: Gestión de Presupuesto (NUEVO) */}
+                    <div className="flex gap-4">
+                        <div className="mt-1 bg-yellow-100 p-2 rounded-lg text-yellow-600 h-fit">
+                            <CreditCard size={24} />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-gray-900">Ajuste Inteligente de Presupuesto</h3>
+                            <p className="text-sm text-gray-500 mt-1">
+                                Usa el módulo de Presupuesto para establecer un límite. Si este es menor, el sistema te ofrecerá **restricción de opciones a lo más económico** y **recomendaciones personalizadas** para ajustar el diseño a tu nuevo presupuesto.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Feature 4: Instalaciones */}
                     <div className="flex gap-4">
                         <div className="mt-1 bg-orange-100 p-2 rounded-lg text-orange-600 h-fit">
                             <div className="flex gap-1">
@@ -76,21 +90,20 @@ const PlannerWelcomeModal: React.FC<PlannerWelcomeModalProps> = ({ isOpen, onClo
                             </div>
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-900">Instalaciones Claras</h3>
+                            <h3 className="font-bold text-gray-900">Instalaciones Claras (Semántica de Color)</h3>
                             <p className="text-sm text-gray-500 mt-1">
-                                Visualiza dónde va todo. Busca los iconos rojos para salidas de Gas y azules para tomas de Agua.
-                                El sistema valida que todo esté en su lugar correcto.
+                                Visualiza dónde va todo. Busca los iconos **rojos** para salidas de Gas, **azules** para tomas de Agua y **amarillos** para tomas Eléctricas. El sistema valida que tu diseño respete los puntos de conexión.
                             </p>
                         </div>
                     </div>
 
-                    {/* Feature 4: Vanos */}
+                    {/* Feature 5: Vanos */}
                     <div className="flex gap-4">
                         <div className="mt-1 bg-green-100 p-2 rounded-lg text-green-600 h-fit">
                             <DoorOpen size={24} />
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-900">Respeto por tu Espacio</h3>
+                            <h3 className="font-bold text-gray-900">Vanos (Puertas y Ventanas)</h3>
                             <p className="text-sm text-gray-500 mt-1">
                                 Configura puertas y ventanas. El planner sabe que ahí no puede haber muros sólidos y te ayuda a distribuir tu cocina respetando la luz y los accesos.
                             </p>
