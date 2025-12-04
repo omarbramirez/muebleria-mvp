@@ -40,7 +40,6 @@ interface Room3DPreviewProps {
 const WALL_THICKNESS = 4; // Unidades 3D
 const OPENING_DEPTH = WALL_THICKNESS + 8;
 const SCALE_FACTOR = 10; // 1 unidad 3D = 10 mm
-const DIMENSION_COLOR = 0x3b82f6; // Azul técnico para líneas guía
 
 const Room3DPreview: React.FC<Room3DPreviewProps> = ({
   points,
@@ -104,39 +103,56 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
     cabinetHandle: new THREE.MeshStandardMaterial({ color: 0xf1c232, metalness: 0.8, roughness: 0.2 }),
   }), []);
 
+  // --- HELPER: BÚSQUEDA DE RAÍZ JERÁRQUICA (CRÍTICO PARA GRUPOS) ---
+  // Este método soluciona el problema de que al mover la manija no se mueva el refri completo.
+  const findRootObject = (obj: THREE.Object3D): THREE.Object3D | null => {
+    let current: THREE.Object3D | null = obj;
+    while (current) {
+      // Verificamos si el objeto actual tiene la metadata de identidad
+      if (
+        current.userData.isAppliance ||
+        current.userData.isFurniture ||
+        current.userData.isInstallation ||
+        current.userData.isGas ||
+        current.userData.isOpening
+      ) {
+        return current;
+      }
+      // Si llegamos a la escena o al grupo raíz sin encontrar nada, paramos
+      if (current.parent === roomGroupRef.current || current.parent === sceneRef.current || !current.parent) {
+        return null;
+      }
+      // Subimos un nivel
+      current = current.parent;
+    }
+    return null;
+  };
+
   // --- HELPER: GENERADOR DE COTAS DINÁMICAS ---
   // Esta función es el núcleo de la nueva característica de ingeniería de interfaz.
   const updateMeasurements = (target: THREE.Object3D, wall: THREE.Mesh | null) => {
     const mGroup = measurementsGroupRef.current;
-    // 1. Limpieza eficiente: Eliminar hijos previos (líneas y etiquetas)
-    while (mGroup.children.length > 0) {
-      const child = mGroup.children[0];
-      mGroup.remove(child);
-    }
-
+    while (mGroup.children.length > 0) mGroup.remove(mGroup.children[0]);
     if (!target) return;
 
-    // 2. Obtener Geometría y Bounding Box en Coordenadas Locales (si es muro) o Globales
+    // Calcular Bounding Box del GRUPO completo, no solo del mesh golpeado
     const bbox = new THREE.Box3().setFromObject(target);
     const size = new THREE.Vector3();
     bbox.getSize(size);
     const center = new THREE.Vector3();
     bbox.getCenter(center);
 
-    // Helpers para crear etiquetas HTML
     const createLabel = (text: string) => {
       const div = document.createElement('div');
       div.className = 'px-2 py-0.5 bg-blue-600 text-white text-xs font-mono rounded shadow-md pointer-events-none select-none border border-blue-400';
       div.textContent = text;
-      const label = new CSS2DObject(div);
-      return label;
+      return new CSS2DObject(div);
     };
 
-    // A. COTAS DE DIMENSIÓN DEL OBJETO (Siempre visibles al arrastrar)
-    // Etiqueta de Ancho (Arriba del objeto)
     const widthLabel = createLabel(`${Math.round(size.x * SCALE_FACTOR)} mm`);
-    widthLabel.position.copy(center).add(new THREE.Vector3(0, size.y / 2 + 2, 0)); // Flotando arriba
+    widthLabel.position.copy(center).add(new THREE.Vector3(0, size.y / 2 + 2, 0));
     mGroup.add(widthLabel);
+
 
     // B. COTAS RELATIVAS AL MURO (Solo si estamos sobre un muro)
     if (wall) {
@@ -170,7 +186,7 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
 
         // Etiqueta Elevación
         const elevLabel = createLabel(`Elev: ${Math.round(distFloor * SCALE_FACTOR)}`);
-        elevLabel.position.copy(bottomObj).lerp(floorPoint, 0.5);
+        elevLabel.position.copy(bottomObj);
         mGroup.add(elevLabel);
       }
 
@@ -481,11 +497,17 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
 
     // F. APPLIANCES
     appliances.forEach(app => {
-      const mesh = new THREE.Mesh(new THREE.BoxGeometry(app.width, app.height, app.depth), new THREE.MeshStandardMaterial({ color: app.color }));
-      mesh.position.set(app.position.x, app.height / 2, app.position.z);
-      mesh.rotation.y = app.rotation;
-      mesh.userData = { isDynamic: true, isAppliance: true, id: app.id };
-      roomGroup.add(mesh);
+      // USAMOS LA NUEVA FACTORY
+      const applianceGroup = createProceduralAppliance(app, SCALE_FACTOR);
+
+      // La factory ya devuelve el grupo con el pivote corregido en la base
+      // Solo necesitamos posicionarlo en X/Z
+      applianceGroup.position.set(app.position.x, 0, app.position.z); // Y=0 porque el pivote ya está en la base
+      applianceGroup.rotation.y = app.rotation;
+
+      // La metadata ya viene en el grupo desde la factory, pero aseguramos la referencia
+      // para que el raycaster lo encuentre.
+      roomGroup.add(applianceGroup);
     });
 
     if (activeWallIndex !== null && wallsRef.current[activeWallIndex]) {
@@ -560,53 +582,63 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
       const interactables: THREE.Object3D[] = [];
 
       roomGroupRef.current.children.forEach(c => {
+        // Filtrar un poco para no raycastear el piso si no quieres
         if (c.userData.isAppliance) interactables.push(c);
       });
 
-      wallsRef.current.forEach(w => w.children.forEach(c => {
-        if (c.userData.isInstallation || c.userData.isOpening || c.userData.isGas || c.userData.isFurniture) {
-          interactables.push(c);
-        }
-      }));
+
+      wallsRef.current.forEach(w => {
+        // interactables.push(w);
+        w.children.forEach(c => {
+          if (c.userData.isInstallation || c.userData.isOpening || c.userData.isGas || c.userData.isFurniture) {
+            interactables.push(c);
+          }
+        });
+      });
+
 
       const hits = getIntersectsFromClient(e.clientX, e.clientY, interactables, true);
 
       if (hits.length > 0) {
         controlsRef.current!.enabled = false;
 
-        let targetObj = hits[0].object;
-        if (!targetObj.userData.isFurniture && targetObj.parent?.userData.isFurniture) {
-          targetObj = targetObj.parent;
+        // --- CORRECCIÓN DE BUBBLING PARA MODELOS COMPLEJOS ---
+        // Usamos el helper findRootObject para subir por el árbol hasta encontrar el grupo contenedor
+        const rootObject = findRootObject(hits[0].object);
+
+        if (rootObject) {
+          const userData = rootObject.userData;
+
+          let type: DraggableItemType = 'appliance';
+          if (userData.isInstallation) type = 'installation';
+          else if (userData.isOpening) type = 'opening';
+          else if (userData.isGas) type = 'gas';
+          else if (userData.isFurniture) type = 'furniture';
+
+          dragRef.current = {
+            id: userData.id || 'unknown',
+            wallIndex: userData.wallIndex ?? -1,
+            mesh: rootObject, // <--- Ahora movemos el GRUPO, no el mesh hijo
+            type: type
+          };
+
+          if (type !== 'appliance') setActiveWall(userData.wallIndex);
+          manualRotationRef.current = 0;
+
+          const currentWall = userData.wallIndex >= 0 ? wallsRef.current[userData.wallIndex] : null;
+          updateMeasurements(rootObject, currentWall);
+          return;
         }
-
-        const userData = targetObj.userData;
-
-        let type: DraggableItemType = 'appliance';
-        if (userData.isInstallation) type = 'installation';
-        else if (userData.isOpening) type = 'opening';
-        else if (userData.isGas) type = 'gas';
-        else if (userData.isFurniture) type = 'furniture';
-
-        dragRef.current = {
-          id: userData.id || 'gas-singleton',
-          wallIndex: userData.wallIndex ?? -1,
-          mesh: targetObj,
-          type: type
-        };
-
-        if (type !== 'appliance') setActiveWall(userData.wallIndex);
-        manualRotationRef.current = 0;
-
-        const currentWall = userData.wallIndex >= 0 ? wallsRef.current[userData.wallIndex] : null;
-        updateMeasurements(targetObj, currentWall);
-
-        return;
       }
 
       // Si no golpeamos un interactuable, permitimos seleccionar muro
       const wallHits = getIntersectsFromClient(e.clientX, e.clientY, wallsRef.current, false);
-      if (wallHits.length > 0) setActiveWall((wallHits[0].object as unknown as THREE.Mesh).userData.index);
-      else setActiveWall(null);
+      if (wallHits.length > 0) {
+        // Seleccionamos el muro, PERO NO DESACTIVAMOS LOS CONTROLES
+        setActiveWall((wallHits[0].object as unknown as THREE.Mesh).userData.index);
+      } else {
+        setActiveWall(null);
+      }
     };
 
     // Debes usar requestAnimationFrame para movimientos intensivos -> aquí lo hacemos sencillo
@@ -685,27 +717,73 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
           const wall = hits[0].object as THREE.Mesh;
           const pt = wall.worldToLocal(hits[0].point.clone());
 
+          // 1. ROTACIÓN
+          // Calculamos la rotación base del muro + la rotación manual del objeto
           const ang = wall.rotation.y + (pt.z < 0 ? Math.PI : 0);
           mesh.rotation.y = ang + manualRotationRef.current;
 
-          const geom = (mesh as THREE.Mesh).geometry as THREE.BoxGeometry;
-          const w = geom.parameters.width;
-          const d = geom.parameters.depth;
-          const h = geom.parameters.height;
+          // 2. OBTENCIÓN DE DIMENSIONES ROBUSTA (FIX DEL CRASH)
+          // En lugar de acceder a .geometry.parameters (que falla en Grupos),
+          // calculamos la Bounding Box Axis-Aligned (AABB).
+          const bbox = new THREE.Box3().setFromObject(mesh);
+          const size = new THREE.Vector3();
+          bbox.getSize(size);
 
-          const wallGeom = (wall.geometry as THREE.BoxGeometry);
+          const w = size.x;
+          const d = size.z;
+          const h = size.y; // Altura total visual
+
+          // 3. DATOS DEL MURO (Aquí sí es seguro usar geometry porque los muros son primitivas controladas)
+          const wallGeom = wall.geometry as THREE.BoxGeometry;
           const wallLen = wallGeom.parameters.width;
 
+          // 4. CÁLCULO DE CLAMPING (Límites)
+          // Evitamos que el objeto se salga del largo del muro
           const minX = -wallLen / 2 + w / 2;
           const maxX = wallLen / 2 - w / 2;
+
+          // Math.min/max anidados aseguran que 'cx' esté siempre dentro del rango válido
+          // Si el objeto es más grande que el muro (minX > maxX), lo centramos (0).
           const cx = minX > maxX ? 0 : Math.max(minX, Math.min(maxX, pt.x));
-          const cz = pt.z > 0 ? (WALL_THICKNESS / 2 + d / 2) : -(WALL_THICKNESS / 2 + d / 2);
 
-          const worldPos = new THREE.Vector3(cx, -height / 20 + h / 2, cz).applyMatrix4(wall.matrixWorld);
+          // 5. CÁLCULO DE PROFUNDIDAD (Z)
+          // Decidimos si va al frente o atrás del muro basándonos en qué lado golpeó el raycast
+          const cz = pt.z > 0
+            ? (WALL_THICKNESS / 2 + d / 2)
+            : -(WALL_THICKNESS / 2 + d / 2);
+
+          // 6. CÁLCULO DE POSICIÓN FINAL
+          // Normalización de altura según tipo de objeto (Grupo vs Mesh simple)
+          const isComplexModel = mesh.type === 'Group';
+
+          // Offset Y: 
+          // - Si es Grupo (Factory), su pivote es 0, así que 'h/2' en coords locales del muro puede necesitar ajuste
+          //   dependiendo de cómo quieras que flote. 
+          // - Si es mueble bajo/appliance, usualmente va al suelo.
+          // - La fórmula original: -height/20 (mitad altura muro) + h/2 (mitad altura objeto)
+          //   alinea el CENTRO del objeto con el SUELO del muro.
+
+          let targetYLoc: number;
+
+          if (isComplexModel) {
+            // Si el pivote está en la base (0), necesitamos bajarlo a la base del muro.
+            // Base del muro en local Y = -wallHeight / 2
+            const wallHeight = height / 10;
+            targetYLoc = (-wallHeight / 2);
+          } else {
+            // Si es primitiva (pivote en centro), mantenemos lógica anterior
+            const wallHeight = height / 10;
+            targetYLoc = (-wallHeight / 2) + (h / 2);
+          }
+
+          // Transformación Local -> Mundo -> Local del RoomGroup
+          const worldPos = new THREE.Vector3(cx, targetYLoc, cz).applyMatrix4(wall.matrixWorld);
           mesh.position.copy(roomGroupRef.current.worldToLocal(worldPos));
-          dragRef.current!.wallIndex = wall.userData.index;
 
+          // Actualización de Referencias
+          dragRef.current!.wallIndex = wall.userData.index;
           updateMeasurements(mesh, wall);
+
         } else {
           const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
           const target = new THREE.Vector3();
@@ -713,9 +791,29 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
 
           if (target) {
             const localPos = roomGroupRef.current.worldToLocal(target.clone());
-            const geom = (mesh as THREE.Mesh).geometry as THREE.BoxGeometry;
-            const h = geom.parameters.height;
-            mesh.position.set(localPos.x, h / 2, localPos.z);
+
+            // --- CORRECCIÓN DE INGENIERÍA: CÁLCULO DIMENSIONAL ROBUSTO ---
+            // 1. Ya no asumimos que es un Mesh con BoxGeometry.
+            // 2. Usamos Box3 para calcular las dimensiones físicas reales del objeto (o grupo).
+            const bbox = new THREE.Box3().setFromObject(mesh);
+            const size = new THREE.Vector3();
+            bbox.getSize(size); // Extrae ancho, alto y profundidad en 'size'
+
+            const h = size.y;
+
+            // --- CORRECCIÓN DE PIVOTE (CRÍTICA) ---
+            // Tu ApplianceFactory ya coloca el pivote en la BASE del objeto (y=0).
+            // Las primitivas antiguas (cubos) tienen el pivote en el CENTRO (y=h/2).
+
+            // Detectamos si es un Grupo (Appliance complejo) o una Malla (Primitiva antigua)
+            const isComplexModel = mesh.type === 'Group';
+
+            // Si es complejo, lo ponemos al ras del suelo (0). 
+            // Si es simple, lo subimos la mitad de su altura para que no quede enterrado.
+            const targetY = isComplexModel ? 0 : h / 2;
+
+            mesh.position.set(localPos.x, targetY, localPos.z);
+
             dragRef.current!.wallIndex = -1;
             updateMeasurements(mesh, null);
           }
@@ -742,6 +840,8 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
       // Cleanup UI
       clearMeasurements();
 
+      if (controlsRef.current) controlsRef.current.enabled = true;
+      // Si no estábamos arrastrando nada, terminamos aquí.
       if (!dragRef.current) return;
       const { mesh, id, type, wallIndex } = dragRef.current;
 
