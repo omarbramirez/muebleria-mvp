@@ -85,12 +85,12 @@ export const createProceduralCabinet = (
     group.add(door);
 
     // C. LA MANIJA (HANDLE)
-    const handleGeo = new THREE.BoxGeometry(width * 0.3, 0.5 / scaleFactor, 1.5 / scaleFactor);
+    const handleGeo = new THREE.BoxGeometry(width * 0.5, 9 / scaleFactor, 10 / scaleFactor);
     const handle = new THREE.Mesh(handleGeo, materials.handle);
 
     const handleYOffset = item.type === 'wall'
-        ? -doorHeight / 2 + (5 / scaleFactor) // Aéreos: manija abajo
-        : doorHeight / 2 - (5 / scaleFactor); // Base: manija arriba
+        ? -doorHeight / 2 + (20 / scaleFactor) // Aéreos: manija abajo
+        : doorHeight / 2 - (20 / scaleFactor); // Base: manija arriba
 
     handle.position.set(0, carcassY + handleYOffset, doorZ + DOOR_THICKNESS);
     handle.castShadow = true;
