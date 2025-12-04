@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react"; // Importar HelpCircle
 
 // Imports de Componentes de Presentación (Vistas)
-import Room3DPreviewExpert from '@/components/features/planner/Room3DPreviewExpert';
+import Room3DPreviewSaved from '@/components/features/planner/Room3DPreviewSaved';
 
 // Imports de Módulos de Configuración
 import Materials from '@/components/features/planner/options/Materials';
@@ -150,7 +150,7 @@ const RoomPlannerHeight: React.FC<roomPlannerProps> = ({ link }) => {
 
             {/* Área Principal: Visor 3D */}
             <div className="h-full w-full">
-                {activeLayout === 3 && <Room3DPreviewExpert
+                {activeLayout === 3 && <Room3DPreviewSaved
                     points={points}
                     height={heightMm}
                     openings={openings}
