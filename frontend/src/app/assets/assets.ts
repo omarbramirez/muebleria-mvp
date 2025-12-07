@@ -36,6 +36,9 @@ export interface WizardOption {
   key: string;
   label: string;
   description?: string;
+  imageSrc?: string | StaticImageData;
+
+
 }
 
 // 2. Definimos la forma de un "Electrodoméstico" (Para la sección perdida que recuperamos)
@@ -62,6 +65,7 @@ export interface WizardSection {
   options?: WizardOption[];     // Array de opciones seleccionables
   fields?: WizardField[];       // Array de inputs manuales
   appliances?: ApplianceOption[];
+  layout?: string;
   // Array especial de electrodomésticos
 }
 
@@ -256,31 +260,31 @@ export const PREFERENCE_WIZARD_ITEMS: WizardSection[] = [
       {
         key: "en_l",
         label: "En L",
-        imageSrc: "/images/planner/layout-l-shape.jpg",
+        imageSrc: assets.l_shape,
         description: "Muebles en dos paredes perpendiculares."
       },
       {
         key: "en_u",
         label: "En U",
-        imageSrc: "/images/planner/layout-u-shape.jpg",
+        imageSrc: assets.u_shape,
         description: "Muebles en tres paredes."
       },
       {
         key: "con_isla",
         label: "Con Isla",
-        imageSrc: "/images/planner/layout-island.jpg",
+        imageSrc: assets.island,
         description: "Distribución con módulo central aislado."
       },
       {
         key: "doble_linea",
         label: "Paralela",
-        imageSrc: "/images/planner/layout-parallel.jpg",
+        imageSrc: assets.parallel,
         description: "Dos filas de muebles frente a frente."
       },
       {
         key: "peninsula",
         label: "Con Península",
-        imageSrc: "/images/planner/layout-peninsula.jpg",
+        imageSrc: assets.peninsula,
         description: "Un extremo unido a la pared o muebles."
       }
     ]

@@ -1,47 +1,20 @@
 'use client'
 import React, { useState } from 'react'
 import PageLayout from "@/components/layout/PageLayout";
-import { PREFERENCE_WIZARD_ITEMS } from "@/app/assets/assets";
+import { PREFERENCE_WIZARD_ITEMS, WizardSection, ApplianceOption } from "@/app/assets/assets";
 import { Heading } from '@/components/ui/Heading';
 import { Paragraph } from '@/components/ui/Paragraph';
 import { LinkItem } from "@/components/ui/LinkItem";
 import { Button } from '@/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import { usePreferenceWizardStore } from '@/store/preferenceWizardStore';
+import Image from 'next/image';
 
 // --- DEFINICIONES DE TIPOS LOCALES ---
 
-interface DimensionFields {
-  [key: string]: number | '';
-}
-interface WizardOption {
-  key: string;
-  label: string;
-  description?: string;
-  imageSrc?: string; // Propiedad para la imagen
-}
-
-interface Appliance {
-  key: string;
-  label: string;
-  fields?: string[];
-}
-
-interface WizardSection {
-  key: string;
-  completed: boolean;
-  title: string;
-  description: string;
-  options?: WizardOption[];
-  fields?: { name: string; label: string; type: string }[];
-  appliances?: Appliance[];
-  upload?: boolean;
-  layout?: 'list' | 'grid-2' | 'grid-3'; // Control de Layout
-}
-
 // Type Guard para appliances
 interface SectionWithAppliances extends WizardSection {
-  appliances: Appliance[];
+  appliances: ApplianceOption[];
 }
 
 const Preferences = () => {
@@ -206,10 +179,11 @@ const Preferences = () => {
                         {/* ZONA DE IMAGEN (Solo si existe imageSrc) */}
                         {option.imageSrc && (
                           <div className="w-full h-40 bg-gray-100 relative overflow-hidden border-b border-gray-100">
-                            <img
+                            <Image
                               src={option.imageSrc}
                               alt={option.label}
-                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                              fill
+                              className="object-cover transition-transform duration-500 group-hover:scale-105 object-contain! bg-white"
                             />
                             {/* Overlay de selección visual */}
                             {isSelected && (
