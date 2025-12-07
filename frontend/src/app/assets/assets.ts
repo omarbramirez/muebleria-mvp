@@ -22,6 +22,13 @@ import lower_kitchen_units from './lower_kitchen_units.jpg'
 import upper_kitchen_units from './upper_kitchen_units.jpg'
 import open_shelf from './open_shelf.jpg'
 
+import lineal from './preference_wizard/lineal.png'
+import l_shape from './preference_wizard/l_shape.png'
+import u_shape from './preference_wizard/u_shape.png'
+import island from './preference_wizard/island.png'
+import parallel from './preference_wizard/parallel.png'
+import peninsula from './preference_wizard/peninsula.png'
+
 // src/app/assets/assets.ts
 
 // 1. Definimos la forma de una "Opción" (El botón seleccionable)
@@ -29,7 +36,6 @@ export interface WizardOption {
   key: string;
   label: string;
   description?: string;
-  imageUrl?: string | StaticImageData; // <--- Permite ambos formatos
 }
 
 // 2. Definimos la forma de un "Electrodoméstico" (Para la sección perdida que recuperamos)
@@ -55,7 +61,8 @@ export interface WizardSection {
   upload?: boolean;
   options?: WizardOption[];     // Array de opciones seleccionables
   fields?: WizardField[];       // Array de inputs manuales
-  appliances?: ApplianceOption[]; // Array especial de electrodomésticos
+  appliances?: ApplianceOption[];
+  // Array especial de electrodomésticos
 }
 
 
@@ -85,7 +92,8 @@ export const assets = {
   bathroomSet,
   generate,
   preview,
-  dining_table,armchair,bar_stool,ottoman,lower_kitchen_units,upper_kitchen_units, open_shelf
+  dining_table, armchair, bar_stool, ottoman, lower_kitchen_units, upper_kitchen_units, open_shelf,
+  lineal, l_shape, u_shape, island, parallel, peninsula
 }
 
 export const serviceProcess: ServiceProcess[] = [
@@ -117,7 +125,7 @@ export const serviceProcess: ServiceProcess[] = [
     img: assets.preview,
     icon: PackageCheck,
   },
-    {
+  {
     id: 'reserve',
     label: 'processes.reserve.title',
     call_to_action: 'processes.reserve.call_to_action',
@@ -157,7 +165,7 @@ export const setCategories: SetCategory[] = [
 ];
 
 
-export const PREFERENCE_WIZARD_ITEMS:WizardSection[] = [
+export const PREFERENCE_WIZARD_ITEMS: WizardSection[] = [
   /* -------------------------------------------------------------------------- */
   /* 1. Perfil de uso y tipo de proyecto                                        */
   /* -------------------------------------------------------------------------- */
@@ -234,15 +242,47 @@ export const PREFERENCE_WIZARD_ITEMS:WizardSection[] = [
   {
     key: "room_type",
     completed: false,
-    title: "Configuración arquitectónica del espacio",
-    description: "Seleccione el tipo de distribución general del área donde se ubicará la cocina.",
+    title: "Configuración arquitectónica",
+    description: "Seleccione el diagrama que mejor represente la forma actual de su cocina.",
+    layout: 'grid-3', // ACTIVAMOS EL MODO GRID
     options: [
-      { key: "lineal", label: "Lineal" },
-      { key: "doble_linea", label: "Doble línea" },
-      { key: "en_l", label: "En L" },
-      { key: "en_u", label: "En U" },
-      { key: "con_isla", label: "Con isla central" },
-      { key: "abierta", label: "Cocina abierta hacia sala/comedor" }
+      {
+        key: "lineal",
+        label: "Lineal",
+        // Referencia a la imagen que muestra la cocina en una sola pared
+        imageSrc: assets.lineal,
+        description: "Distribución en una sola pared."
+      },
+      {
+        key: "en_l",
+        label: "En L",
+        imageSrc: "/images/planner/layout-l-shape.jpg",
+        description: "Muebles en dos paredes perpendiculares."
+      },
+      {
+        key: "en_u",
+        label: "En U",
+        imageSrc: "/images/planner/layout-u-shape.jpg",
+        description: "Muebles en tres paredes."
+      },
+      {
+        key: "con_isla",
+        label: "Con Isla",
+        imageSrc: "/images/planner/layout-island.jpg",
+        description: "Distribución con módulo central aislado."
+      },
+      {
+        key: "doble_linea",
+        label: "Paralela",
+        imageSrc: "/images/planner/layout-parallel.jpg",
+        description: "Dos filas de muebles frente a frente."
+      },
+      {
+        key: "peninsula",
+        label: "Con Península",
+        imageSrc: "/images/planner/layout-peninsula.jpg",
+        description: "Un extremo unido a la pared o muebles."
+      }
     ]
   },
 
