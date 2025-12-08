@@ -9,6 +9,7 @@
 - Opciones de nombres de dominio (si aún no tienes uno elegido). ✅
 
 2. Escribir a Leonardo (si no lo has hecho ya) para confirmar: ✅✅
+
 - Nombre o posibles nombres de dominio.  ✅
 - Logo, textos iniciales, imágenes o eslogan que quiera usar.  ✅
 
@@ -21,7 +22,7 @@
   /sitemap.xml
   /api
     /leads/route.ts        // POST: guarda en DynamoDB + Mailchimp
-  /layout.tsx              // <html>, <body>, JSON-LD Organization
+  /layout.tsx              // `<html>`, `<body>`, JSON-LD Organization
   /page.tsx                // Landing (todas las secciones)
   /(components)
     Header.tsx
@@ -38,7 +39,6 @@
     mailchimp.ts           // helper integración
     dynamodb.ts            // helper AWS SDK v3
     schemas.ts             // zod/yup para validar formulario
-
 
 6. Hacer un diagrama general de secciones (mapa del sitio con Home, Catálogo, Contacto, etc.). ✅
 
@@ -77,19 +77,19 @@
 └───────────────────────────────────────────────────────────────────┘
    [Chat flotante]
 
-
 7. Documentar la estructura en un archivo simple (ej. docs/estructura.md). ✅
-
 8. Crear wireframes de baja fidelidad (pueden ser en Figma, Whimsical o incluso papel escaneado). ✅
+
 - https://www.relume.io/
 
-
 9. Definir: ✅
+
 - Orden y jerarquía de secciones.
 - Distribución de elementos clave (header, hero, formulario, catálogo, footer).
 
 10. Preparar un mockup principal de la landing page. ✅
-- Chair: Three.js : https://threejs.org/examples/#webgl_loader_gltf_sheen 
+
+- Chair: Three.js : https://threejs.org/examples/#webgl_loader_gltf_sheen
 - Progressive building/customization: https://threejs.org/examples/#webgl_loader_ldraw
 - How to create simplified furnitures in ThreeJS: https://amrishodiq.medium.com/how-to-create-simplified-furnitures-in-threejs-6373d1a5363f
 - Template 1: https://www.behance.net/gallery/227943121/E-commerce-B2B-Furniture-Platform-Redesign-UI-UX?tracking_source=search_projects|furniture+store+web+design&l=0
@@ -97,28 +97,31 @@
 - Template 3: https://www.behance.net/gallery/232570025/Furniture-Store-Modern-Website-Template
 
 11. Si el cliente ya envió logo/nombre, integrarlo en el diseño. ❌
-
 12. Exportar imágenes o PDF de los bocetos para revisión. ✅
 
 ## 22 de Agosto - 23 de Agosto
 
 1. Inicializar repositorio privado en GitHub  ✅ ✅
+
 - Crear repo muebleria-mvp. ✅
 - Subir carpeta inicial con estructura básica /frontend, /design, /docs. ✅
 - Configurar .gitignore para Node, .env y dependencias. ✅
 
 2. Configurar frontend ✅ ✅
+
 - Decide si usarás Next.js (ideal SEO) o React + Vite (más ligero). ✅
 - Ejecuta npx create-next-app@latest o npm create vite@latest. ✅
 - Instala TailwindCSS (npm install -D tailwindcss postcss autoprefixer). ✅
 - Configura tailwind.config.js y globals.css. ✅
 
 3. Montar entorno en Vercel ✅ ✅
+
 - Conectar repositorio Git en Vercel para hosting automático. ✅
 - Desplegar con push a rama principal; usa CDN global integrado. ✅
 - Usar subdominio temporal tipo demo-muebleria.vercel.app (luego vincular dominio personalizado en Vercel Domains). ✅
 
 4. Estructura de componentes React (según wireframes): ✅✅
+
 - Header (logo, menú ancla). ✅
 - Hero (texto y CTA). ✅
 - CatalogPreview (cards vacías con imágenes dummy). ✅
@@ -126,6 +129,7 @@
 - Footer. ✅
 
 5. Primera versión navegable básica ✅✅
+
 - Rutas ancla (#inicio, #catalogo, #contacto). ✅
 - Contenido de prueba (texto lorem ipsum y placeholders). ✅
 - Push al repo y deploy a AWS. ❌
@@ -146,7 +150,7 @@ rafce
 
 ✅ Subir cambios a GitHub y desplegar en Vercel.
 
-✅ Definir paleta de colores y tipografía base (inspirado en referencias de UI de muebles). 
+✅ Definir paleta de colores y tipografía base (inspirado en referencias de UI de muebles).
 
 ✅ Aplicar estilos a Header, Hero y Footer con Tailwind (consistencia estética).
 
@@ -177,25 +181,24 @@ rafce
 ✅ Subir versión preliminar (v0.2) al servidor Vercel.
 
 ✅✅ Preparar mensaje para Leonardo con:
+
 - Link a la demo navegable.
 - Mockups refinados con estilos iniciales.
 - Preguntar feedback sobre colores, tono de textos y orden de secciones.
 
 **Icons** => https://lucide.dev/
 
-
 ## 05 OCT
 
 1. Generación automatizada de modelos 3D => dejarlo al final del desarrollo por costos operativos.
-- Plan de trabajo: desarrollo paralelo mientras se trabaja desarrolla la página principal.
 
+- Plan de trabajo: desarrollo paralelo mientras se trabaja desarrolla la página principal.
 
 ‼️ Three.js 101 Crash Course: Beginner’s Guide to 3D Web Design => https://www.youtube.com/watch?v=KM64t3pA4fs&t=133s
 
 ## 06 OCT
 
 1) Conseguir un modelo de cocina o espacio hoguareño para desarrollar .
-
 2) Enviar minuta con plan de trabajo semanal.
 
 ‼️ https://www.youtube.com/watch?v=UqX0Jc04vio
@@ -204,10 +207,11 @@ rafce
 
 🧩 Objetivos específicos de la semana
 ✅ Dominar los fundamentos prácticos y avanzados de Three.js, especialmente en carga, renderizado y manipulación de modelos 3D.
-- Diseñar la lógica del sondeo dentro del formulario principal.
-✅ Comenzar la fase exploratoria de integración IA para automatización de modelos
 
-📦 Entregables finales de la semana
+- Diseñar la lógica del sondeo dentro del formulario principal.
+  ✅ Comenzar la fase exploratoria de integración IA para automatización de modelos
+
+📦 Entregables finales de la semana 
 ✅ Prototipo 3D experimental con modelo GLTF/FBX/OBJ renderizado en entorno web (Three.js).
 ✅ Diagrama de flujo del formulario con sondeo (estructura lógica y UX).
 👉 Documento técnico sobre la integración y viabilidad de IA + Three.js
@@ -227,10 +231,10 @@ Jueves 9
 ✅ Borrador de contenido para la sección principal del sitio (alineado con “accesibilidad y confianza”).
 Viernes 10
 
-
 ## 11 OCT
 
 Páginas muestra:
+
 1) https://www.tallergama.com/
 2) https://kitchen.planner.ikea.com/mx/es/
 3) modelado 3D de Muebles en producción: https://www.perch.mx/
@@ -275,12 +279,12 @@ TASK FLOW
 ![alt text](image-28.png)
 
 # 12 OCT
+
 guia para la realizacion de "Análisis técnico" y "Estudio de Mercado": https://www.domnguyen.co/spotify
 
 # 13 OCT
 
 PenPot Tutorial - The Open Source UI/UX Design App https://www.youtube.com/watch?v=To9lZhP7084
-
 
 # 14 OCT
 
@@ -307,6 +311,7 @@ Entregables Totales:
 1) Three.js 101 Crash Course: Beginner’s Guide to 3D Web Design (7 HOURS!) [03:31:00] https://www.youtube.com/watch?v=KM64t3pA4fs&t=133s
 
 # 17 OCT
+
 aprovechar modelo 3d para mostrar estructura de mueble: ![alt text](image-27.png)
 
 **Carga entre secciones** => https://linkinpark.com/tour » animación de opacity a cero con pantalla en negro para quitar contenido anterior, opacity a 1 con blur para mostrar nuevo contenido.
@@ -371,7 +376,6 @@ src/
 │   ├── models/                         # Carpeta con modelos de prueba (.gltf, .obj)
 │   └── textures/                       # Carpeta con texturas
 
-
 Flujo de navegación (Task Flow):
 
 Pantalla inicial → selección de tipo de mueble.
@@ -413,30 +417,25 @@ Código estructurado y documentado con comentarios técnicos en inglés.
 Objetivo final del entregable:
 Mostrar una demostración navegable del flujo de personalización (UX) y la integración del visor 3D modular que servirá de base para futuras implementaciones de IA y automatización de diseño.
 
-
 ## 24 OCT
 
 1) hacer planos por metro cuadrado para facilitar acomodo
-![alt text](image-30.png)
-
-
+   ![alt text](image-30.png)
 2) Server-Driven UI: El Costo Oculto de la Flexibilidad [00:00:00] https://www.youtube.com/watch?v=gJWBHk0ZwiA
-
-3) SEO programático en Next.js: guía completa [00:11:00] https://www.youtube.com/watch?v=290Ytj96vL4 
+3) SEO programático en Next.js: guía completa [00:11:00] https://www.youtube.com/watch?v=290Ytj96vL4
 
 ## 25 OCT
 
 Entregables Totales (sábado 25 de Octubre):
 
 1) Desarrollo avanzado del Prototipo navegable de configuradores para optimizar la personalización del usuario, integrado a la página principal en la sección /products.
-✅ App de renderizado 3D (Three.js) con nuevas funciones de personalización: selección de color y material.
-3) (Extra) Interacción directa dentro del modelo 3D: el usuario podrá mover objetos con el mouse.
+   ✅ App de renderizado 3D (Three.js) con nuevas funciones de personalización: selección de color y material.
+2) (Extra) Interacción directa dentro del modelo 3D: el usuario podrá mover objetos con el mouse.
 
 ## 28 OCT
 
 todavia tengo que regionalizar los links
 ![alt text](image-31.png)
-
 
 tengo en navbar y el responsive navbar separados, debo mejorar eso
 
@@ -448,7 +447,6 @@ aun no me queda clara la logica de negocio, es decir, cómo se va a implementar 
 
 porque seria explore/creation explore/generation explore/planner
 
-
 COSAS IMPORTANTES
 
 accesibilidad web (a11y) garantiza que personas con discapacidades visuales, auditivas o motrices
@@ -459,11 +457,13 @@ El navegador pinta y reacomoda el contenido constantemente cuando cambian estilo
 Estos procesos consumen CPU y son la causa principal de micro-lags o baja fluidez visual en UI complejas (animaciones, scroll, 3D, etc.).
 
 <<<<<<< HEAD
-## 03 NOV 
+
+## 03 NOV
 
 1) motor de ensamblado inteligente
-=======
-##  30 OCT
+   =======
+
+## 30 OCT
 
 ya debería estar seleccionada la cocina o baño si se accede desde sus botones
 
@@ -472,8 +472,6 @@ ya debería estar seleccionada la cocina o baño si se accede desde sus botones
 necesito refactorizar esto para usar params y router.get("from") en flujos con componentes compartidos como el area
 
 ![alt text](image-35.png)
-
-
 
 ## 1 NOV
 
@@ -487,13 +485,12 @@ Agregar altura,
 Agregar ventanas y puertas
 Hacer que el modelo se mueve ? en un plano isometrico
 
-
-
 Testing
 
 ## 07 NOV
 
 he estado trabajando hoy en 3 nuevas características:
+
 1) Asignación de altura
 2) Asignación de puertas y ventanas
 3) Perspectiva isométrica simplificada
@@ -518,7 +515,6 @@ he estado trabajando hoy en 3 nuevas características:
 
 ![alt text](image-46.png)
 
-## 18 NOV
+## 07 DIC
 
-
-BRIEF
+Cabinets => es importante definir cuántos cajones o puertas debe tener un mueble? cómo validamos eso?

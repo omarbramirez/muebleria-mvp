@@ -37,9 +37,10 @@ interface Room3DPreviewProps {
 }
 
 // --- CONSTANTES DE INGENIERÍA ---
-const WALL_THICKNESS = 4; // Unidades 3D
+const WALL_THICKNESS = 10; // Unidades 3D
 const OPENING_DEPTH = WALL_THICKNESS + 8;
 const SCALE_FACTOR = 10; // 1 unidad 3D = 10 mm
+const CORNER_SAFETY_MARGIN = WALL_THICKNESS / 2;
 
 const Room3DPreview: React.FC<Room3DPreviewProps> = ({
   points,
@@ -548,7 +549,7 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
       // (wallsRef.current[activeWallIndex].material as THREE.MeshStandardMaterial).copy(materials.wallSelected);
     }
 
-  }, [points, height, openings, appliances, installations, gasConfig, layoutItems, activeWallIndex, materials]);
+  }, [points, height, openings, appliances, installations, gasConfig, layoutItems, activeWallIndex, materials, viewMode]);
 
 
   // 6. LÓGICA DE INTERACCIÓN (RAYCASTING JERÁRQUICO)
@@ -651,13 +652,13 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
       const { mesh, type, wallIndex } = dragRef.current;
 
       // Lógica prácticamente idéntica a tu handleMove pero usando clientX/clientY
-      if (type === 'gas' || type === 'installation' || type === 'furniture') {
+      if (type === 'gas' || type === 'installation' || type === 'furniture' || type === 'appliance') {
         const wallHits = getIntersectsFromClient(e.clientX, e.clientY, wallsRef.current, false);
         if (wallHits.length > 0) {
           const hitWall = wallHits[0].object as THREE.Mesh;
           const newWallIndex = hitWall.userData.index;
 
-          if (newWallIndex !== wallIndex) {
+          if (newWallIndex !== wallIndex && type !== 'appliance') {
             mesh.removeFromParent();
             hitWall.add(mesh);
             dragRef.current!.wallIndex = newWallIndex;
@@ -668,32 +669,95 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
           const wallLen = hitWall.userData.length;
           const wallHeight = height / 10;
           const pointLocal = hitWall.worldToLocal(wallHits[0].point.clone());
+          // --- LOGICA DE CLAMPING CORREGIDA (INGENIERÍA) ---
+          const bbox = new THREE.Box3().setFromObject(mesh);
+          const size = new THREE.Vector3();
+          bbox.getSize(size);
+          const w = size.x;
+          const h = size.y;
+          const d = size.z;
 
-          let minX, maxX, minY, maxY;
+          // Límites en X: Considerar grosor del muro en esquinas para evitar colisiones
+          // Limitamos el movimiento para que el objeto no invada el espacio de un muro perpendicular
+          const limitX = (wallLen / 2) - (w / 2) - CORNER_SAFETY_MARGIN;
+          const minX = -Math.max(0, limitX);
+          const maxX = Math.max(0, limitX);
 
-          if (type === 'furniture') {
-            const bbox = new THREE.Box3().setFromObject(mesh);
-            const w = bbox.max.x - bbox.min.x;
-            const h = bbox.max.y - bbox.min.y;
+          // Aplicamos clamping robusto (si el muro es más pequeño que el objeto, centramos)
+          const cx = minX > maxX ? 0 : Math.max(minX, Math.min(maxX, pointLocal.x));
 
-            const limitX = (wallLen / 2) - (w / 2);
-            minX = -Math.max(0, limitX); maxX = Math.max(0, limitX);
-            const limitY = (wallHeight / 2) - (h / 2);
-            minY = -Math.max(0, limitY); maxY = Math.max(0, limitY);
+          // Límites en Y
+          const limitY = (wallHeight / 2) - (h / 2);
+          const minY = -Math.max(0, limitY);
+          const maxY = Math.max(0, limitY);
+
+          // ACTUALIZACIÓN DE POSICIÓN
+          if (type === 'appliance') {
+            // 1. Rotación Relativa
+            const ang = hitWall.rotation.y + (pointLocal.z < 0 ? Math.PI : 0);
+            mesh.rotation.y = ang + manualRotationRef.current;
+
+            // 2. Clamping Depth (Z) - Evitar penetración
+            // Usamos Box3 'd' que ya considera la rotación del objeto.
+            // Posicionamos el centro del objeto a una distancia tal que su cara trasera toque la cara del muro.
+            const cz = pointLocal.z > 0
+              ? (WALL_THICKNESS / 2 + d / 2)
+              : -(WALL_THICKNESS / 2 + d / 2);
+
+            // 3. Normalización de Altura (Suelo)
+            // Si es un modelo complejo (Grupo), su pivote suele estar en Y=0 (Base).
+            // Necesitamos que Y=0 del objeto coincida con la base del muro (-wallHeight/2).
+            const isComplexModel = mesh.type === 'Group';
+            const targetYLoc = isComplexModel ? (-wallHeight / 2) : (-wallHeight / 2) + (h / 2);
+
+            // Convertimos al espacio del RoomGroup
+            const worldPos = new THREE.Vector3(cx, targetYLoc, cz).applyMatrix4(hitWall.matrixWorld);
+            mesh.position.copy(roomGroupRef.current.worldToLocal(worldPos));
+
+            dragRef.current!.wallIndex = hitWall.userData.index;
+
           } else {
-            const halfLen = wallLen / 2;
-            const halfHeight = wallHeight / 2;
-            minX = -halfLen; maxX = halfLen;
-            minY = -halfHeight; maxY = halfHeight;
+            // Muebles, Gas, Instalaciones (viven dentro del muro localmente)
+            mesh.position.x = cx;
+
+            // Gas e Instalaciones pueden moverse libremente en Y (dentro de limites)
+            // Muebles tienen elevación controlada, usualmente pegados al suelo o elevados manualmente
+            if (type === 'furniture') {
+              // Permitir movimiento libre en Y pero clampeado
+              // NOTA: Si prefieres que el mueble "snapee" al suelo, ajusta aquí.
+              // Por ahora respetamos el drag vertical clampeado.
+              const cy = Math.max(minY, Math.min(maxY, pointLocal.y));
+              mesh.position.y = cy;
+            } else {
+              mesh.position.y = Math.max(minY, Math.min(maxY, pointLocal.y));
+            }
           }
 
-          mesh.position.x = Math.max(minX, Math.min(maxX, pointLocal.x));
-          mesh.position.y = Math.max(minY, Math.min(maxY, pointLocal.y));
-
           updateMeasurements(mesh, hitWall);
+        } else if (type === 'appliance') {
+          // Drag en el suelo (fuera de muros)
+          const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+          const target = new THREE.Vector3();
+          raycaster.current.ray.intersectPlane(floorPlane, target);
+
+          if (target) {
+            const localPos = roomGroupRef.current.worldToLocal(target.clone());
+            const bbox = new THREE.Box3().setFromObject(mesh);
+            const size = new THREE.Vector3();
+            bbox.getSize(size);
+
+            // Reset a piso
+            const isComplexModel = mesh.type === 'Group';
+            const targetY = isComplexModel ? 0 : size.y / 2;
+
+            mesh.position.set(localPos.x, targetY, localPos.z);
+            dragRef.current!.wallIndex = -1;
+            updateMeasurements(mesh, null);
+          }
         }
       }
       else if (type === 'opening') {
+        // Lógica simplificada para aberturas (sin cambios mayores requeridos)
         const wall = wallsRef.current[wallIndex];
         const hits = getIntersectsFromClient(e.clientX, e.clientY, [wall], false);
         if (hits.length > 0) {
@@ -701,122 +765,19 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
           const geom = (mesh as THREE.Mesh).geometry as THREE.BoxGeometry;
           const w = geom.parameters.width;
           const h = geom.parameters.height;
-
           const wallLen = wall.userData.length;
           const wallH = height / 10;
-          const dist = Math.max(0, Math.min(wallLen - w, pointLocal.x + wallLen / 2 - w / 2));
-          const sill = Math.max(0, Math.min(wallH - h, pointLocal.y + wallH / 2 - h / 2));
-          mesh.position.set(-wallLen / 2 + dist + w / 2, -wallH / 2 + sill + h / 2, 0);
 
+          // Clamping estricto
+          const limitX = (wallLen / 2) - (w / 2) - CORNER_SAFETY_MARGIN; // También aplicamos margen aquí
+          const cx = Math.max(-limitX, Math.min(limitX, pointLocal.x));
+
+          // Sill Height Clamping
+          const limitY = (wallH / 2) - (h / 2);
+          const cy = Math.max(-limitY, Math.min(limitY, pointLocal.y));
+
+          mesh.position.set(cx, cy, 0);
           updateMeasurements(mesh, wall);
-        }
-      } else if (type === 'appliance') {
-        const hits = getIntersectsFromClient(e.clientX, e.clientY, wallsRef.current, false);
-
-        if (hits.length > 0) {
-          const wall = hits[0].object as THREE.Mesh;
-          const pt = wall.worldToLocal(hits[0].point.clone());
-
-          // 1. ROTACIÓN
-          // Calculamos la rotación base del muro + la rotación manual del objeto
-          const ang = wall.rotation.y + (pt.z < 0 ? Math.PI : 0);
-          mesh.rotation.y = ang + manualRotationRef.current;
-
-          // 2. OBTENCIÓN DE DIMENSIONES ROBUSTA (FIX DEL CRASH)
-          // En lugar de acceder a .geometry.parameters (que falla en Grupos),
-          // calculamos la Bounding Box Axis-Aligned (AABB).
-          const bbox = new THREE.Box3().setFromObject(mesh);
-          const size = new THREE.Vector3();
-          bbox.getSize(size);
-
-          const w = size.x;
-          const d = size.z;
-          const h = size.y; // Altura total visual
-
-          // 3. DATOS DEL MURO (Aquí sí es seguro usar geometry porque los muros son primitivas controladas)
-          const wallGeom = wall.geometry as THREE.BoxGeometry;
-          const wallLen = wallGeom.parameters.width;
-
-          // 4. CÁLCULO DE CLAMPING (Límites)
-          // Evitamos que el objeto se salga del largo del muro
-          const minX = -wallLen / 2 + w / 2;
-          const maxX = wallLen / 2 - w / 2;
-
-          // Math.min/max anidados aseguran que 'cx' esté siempre dentro del rango válido
-          // Si el objeto es más grande que el muro (minX > maxX), lo centramos (0).
-          const cx = minX > maxX ? 0 : Math.max(minX, Math.min(maxX, pt.x));
-
-          // 5. CÁLCULO DE PROFUNDIDAD (Z)
-          // Decidimos si va al frente o atrás del muro basándonos en qué lado golpeó el raycast
-          const cz = pt.z > 0
-            ? (WALL_THICKNESS / 2 + d / 2)
-            : -(WALL_THICKNESS / 2 + d / 2);
-
-          // 6. CÁLCULO DE POSICIÓN FINAL
-          // Normalización de altura según tipo de objeto (Grupo vs Mesh simple)
-          const isComplexModel = mesh.type === 'Group';
-
-          // Offset Y: 
-          // - Si es Grupo (Factory), su pivote es 0, así que 'h/2' en coords locales del muro puede necesitar ajuste
-          //   dependiendo de cómo quieras que flote. 
-          // - Si es mueble bajo/appliance, usualmente va al suelo.
-          // - La fórmula original: -height/20 (mitad altura muro) + h/2 (mitad altura objeto)
-          //   alinea el CENTRO del objeto con el SUELO del muro.
-
-          let targetYLoc: number;
-
-          if (isComplexModel) {
-            // Si el pivote está en la base (0), necesitamos bajarlo a la base del muro.
-            // Base del muro en local Y = -wallHeight / 2
-            const wallHeight = height / 10;
-            targetYLoc = (-wallHeight / 2);
-          } else {
-            // Si es primitiva (pivote en centro), mantenemos lógica anterior
-            const wallHeight = height / 10;
-            targetYLoc = (-wallHeight / 2) + (h / 2);
-          }
-
-          // Transformación Local -> Mundo -> Local del RoomGroup
-          const worldPos = new THREE.Vector3(cx, targetYLoc, cz).applyMatrix4(wall.matrixWorld);
-          mesh.position.copy(roomGroupRef.current.worldToLocal(worldPos));
-
-          // Actualización de Referencias
-          dragRef.current!.wallIndex = wall.userData.index;
-          updateMeasurements(mesh, wall);
-
-        } else {
-          const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-          const target = new THREE.Vector3();
-          raycaster.current.ray.intersectPlane(floorPlane, target);
-
-          if (target) {
-            const localPos = roomGroupRef.current.worldToLocal(target.clone());
-
-            // --- CORRECCIÓN DE INGENIERÍA: CÁLCULO DIMENSIONAL ROBUSTO ---
-            // 1. Ya no asumimos que es un Mesh con BoxGeometry.
-            // 2. Usamos Box3 para calcular las dimensiones físicas reales del objeto (o grupo).
-            const bbox = new THREE.Box3().setFromObject(mesh);
-            const size = new THREE.Vector3();
-            bbox.getSize(size); // Extrae ancho, alto y profundidad en 'size'
-
-            const h = size.y;
-
-            // --- CORRECCIÓN DE PIVOTE (CRÍTICA) ---
-            // Tu ApplianceFactory ya coloca el pivote en la BASE del objeto (y=0).
-            // Las primitivas antiguas (cubos) tienen el pivote en el CENTRO (y=h/2).
-
-            // Detectamos si es un Grupo (Appliance complejo) o una Malla (Primitiva antigua)
-            const isComplexModel = mesh.type === 'Group';
-
-            // Si es complejo, lo ponemos al ras del suelo (0). 
-            // Si es simple, lo subimos la mitad de su altura para que no quede enterrado.
-            const targetY = isComplexModel ? 0 : h / 2;
-
-            mesh.position.set(localPos.x, targetY, localPos.z);
-
-            dragRef.current!.wallIndex = -1;
-            updateMeasurements(mesh, null);
-          }
         }
       }
     };
@@ -859,16 +820,16 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
       // === Empieza =============
       if (type === 'furniture' && onLayoutUpdate) {
         const bbox = new THREE.Box3().setFromObject(mesh);
-        const w = bbox.max.x - bbox.min.x;
-        const h = bbox.max.y - bbox.min.y;
-
+        const size = new THREE.Vector3();
+        bbox.getSize(size);
         const item = layoutItems.find(i => i.id === id);
+
         if (item) {
           if (targetWall) {
             onLayoutUpdate({
               ...item,
-              distFromStart: Math.round((mesh.position.x + wallLen / 2 - w / 2) * SCALE_FACTOR),
-              elevation: Math.round((mesh.position.y + wallH / 2 - h / 2) * SCALE_FACTOR),
+              distFromStart: Math.round((mesh.position.x + wallLen / 2 - size.x / 2) * SCALE_FACTOR),
+              elevation: Math.round((mesh.position.y + wallH / 2 - size.y / 2) * SCALE_FACTOR),
               wallIndex: wallIndex,
               rotation: 0
             });
@@ -883,59 +844,28 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
           }
         }
       }
-
       else if (type === 'gas' && onGasUpdate && gasConfig) {
         if (targetWall) {
-          onGasUpdate({
-            ...gasConfig,
-            x: Math.round((mesh.position.x + wallLen / 2) * SCALE_FACTOR),
-            z: Math.round((mesh.position.y + wallH / 2) * SCALE_FACTOR),
-            wallIndex: wallIndex
-          });
+          onGasUpdate({ ...gasConfig, x: Math.round((mesh.position.x + wallLen / 2) * SCALE_FACTOR), z: Math.round((mesh.position.y + wallH / 2) * SCALE_FACTOR), wallIndex });
         } else {
-          onGasUpdate({
-            ...gasConfig,
-            x: Math.round(mesh.position.x * SCALE_FACTOR),
-            z: Math.round(mesh.position.z * SCALE_FACTOR),
-            wallIndex: -1
-          });
+          onGasUpdate({ ...gasConfig, x: Math.round(mesh.position.x * SCALE_FACTOR), z: Math.round(mesh.position.z * SCALE_FACTOR), wallIndex: -1 });
         }
       }
-
       else if (type === 'installation' && onInstallationUpdate) {
         const inst = installations.find(i => i.id === id);
-        if (inst) {
-          if (targetWall) {
-            onInstallationUpdate({
-              ...inst,
-              distFromStart: Math.round((mesh.position.x + wallLen / 2) * SCALE_FACTOR),
-              heightFromFloor: Math.round((mesh.position.y + wallH / 2) * SCALE_FACTOR),
-              wallIndex: wallIndex
-            });
-          } else {
-            onInstallationUpdate({
-              ...inst,
-              distFromStart: Math.round(mesh.position.x * SCALE_FACTOR),
-              heightFromFloor: Math.round(mesh.position.z * SCALE_FACTOR),
-              wallIndex: -1
-            });
-          }
+        if (inst && targetWall) {
+          onInstallationUpdate({ ...inst, distFromStart: Math.round((mesh.position.x + wallLen / 2) * SCALE_FACTOR), heightFromFloor: Math.round((mesh.position.y + wallH / 2) * SCALE_FACTOR), wallIndex });
+        } else if (inst) {
+          onInstallationUpdate({ ...inst, distFromStart: Math.round(mesh.position.x * SCALE_FACTOR), heightFromFloor: Math.round(mesh.position.z * SCALE_FACTOR), wallIndex: -1 });
         }
       }
-
       else if (type === 'opening' && onOpeningUpdate && targetWall) {
         const geom = (mesh as THREE.Mesh).geometry as THREE.BoxGeometry;
         const w = geom.parameters.width;
         const h = geom.parameters.height;
-
-        const originalOp = openings.find(o => o.id === id);
-        if (originalOp) {
-          onOpeningUpdate({
-            ...originalOp,
-            distFromStart: Math.round((mesh.position.x + wallLen / 2 - w / 2) * SCALE_FACTOR),
-            sillHeight: Math.round((mesh.position.y + wallH / 2 - h / 2) * SCALE_FACTOR),
-            wallIndex: wallIndex
-          });
+        const op = openings.find(o => o.id === id);
+        if (op) {
+          onOpeningUpdate({ ...op, distFromStart: Math.round((mesh.position.x + wallLen / 2 - w / 2) * SCALE_FACTOR), sillHeight: Math.round((mesh.position.y + wallH / 2 - h / 2) * SCALE_FACTOR), wallIndex });
         }
       }
 
@@ -944,11 +874,7 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
         if (originalApp) {
           onApplianceUpdate({
             ...originalApp,
-            position: {
-              x: mesh.position.x,
-              y: mesh.position.y,
-              z: mesh.position.z
-            },
+            position: { x: mesh.position.x, y: mesh.position.y, z: mesh.position.z },
             rotation: mesh.rotation.y
           });
         }
