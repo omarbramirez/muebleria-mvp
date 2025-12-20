@@ -11,7 +11,7 @@ import {
   Hammer,
   MousePointer2,
   Plus,
-  Minus
+  Minus,
 } from "lucide-react";
 
 // Importamos el hook Y EL TIPO para el casting estricto
@@ -43,6 +43,16 @@ interface NumberControlProps {
   value: number;
   onChange: (val: number) => void;
   step?: number; // Paso por defecto (ej. 10mm)
+}
+
+
+interface WallDragState {
+  isActive: boolean;
+  wallIndex: number;
+  startPoint: Point;      // Dónde hizo clic el mouse (Coords SVG)
+  originalP1: Point;      // Posición original del vértice inicio
+  originalP2: Point;      // Posición original del vértice fin
+  hasMoved: boolean;      // Flag para diferenciar click de drag
 }
 
 const DEFAULT_POINTS: Point[] = [
@@ -90,9 +100,8 @@ const NumberControl = ({ label, value, onChange, step = 10 }: NumberControlProps
   </div>
 );
 
-
 const RoomGeometryPlanner = () => {
-
+  const [wallDrag, setWallDrag] = useState<WallDragState | null>(null);
   // 1. USAR ESTADO GLOBAL EN LUGAR DE LOCAL
   const { values, setValue, activeWallIndex, setActiveWall } = usePreferenceWizardStore();
 
@@ -259,6 +268,50 @@ const RoomGeometryPlanner = () => {
     }
   };
 
+
+
+  // LÓGICA: Iniciar interacción con Muro (Click o Drag)
+  const handleWallDown = (index: number, e: React.PointerEvent<SVGLineElement>) => {
+    // Solo permitimos esto en modo estructura y si no estamos haciendo otra cosa
+    if (editMode !== 'geometry' || dragging !== null) return;
+
+    e.stopPropagation();
+    e.preventDefault();
+
+    const svg = e.currentTarget.closest("svg") as SVGSVGElement;
+    if (!svg) return;
+
+    // Captura del puntero para asegurar fluidez aunque el mouse salga de la línea
+    e.currentTarget.setPointerCapture(e.pointerId);
+
+    // Obtener coordenadas SVG del clic
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return;
+    const transformed = pt.matrixTransform(ctm.inverse());
+
+    // Guardamos el estado inicial exacto (Snapshot)
+    const nextIndex = (index + 1) % points.length;
+
+    setWallDrag({
+      isActive: true,
+      wallIndex: index,
+      startPoint: { x: transformed.x, y: transformed.y },
+      originalP1: { ...points[index] },
+      originalP2: { ...points[nextIndex] },
+      hasMoved: false
+    });
+  };
+
+
+
+
+
+
+
+
+
   // --- LÓGICA DE VANOS ---
   const addOpening = (type: OpeningType) => {
     if (activeWallIndex === null) return;
@@ -334,8 +387,8 @@ const RoomGeometryPlanner = () => {
   const handlePointerMove = useCallback((e: React.PointerEvent<SVGSVGElement>) => {
     e.preventDefault();
 
-    // Caso 0: No estamos arrastrando nada
-    if (dragging === null && draggingOpeningId === null) return;
+    // Si no hay acción activa, salir
+    if (dragging === null && draggingOpeningId === null && !wallDrag?.isActive) return;
 
     const svg = e.currentTarget;
     const pt = svg.createSVGPoint();
@@ -424,7 +477,55 @@ const RoomGeometryPlanner = () => {
         return newOpenings;
       });
     }
-  }, [dragging, draggingOpeningId, wallMetrics]); // Dependencias críticas
+
+    // --- CASO C: ARRASTRE PARALELO DE MURO (CON BLOQUEO ORTOGONAL) ---
+    if (wallDrag && wallDrag.isActive) {
+      const rawDx = transformed.x - wallDrag.startPoint.x;
+      const rawDy = transformed.y - wallDrag.startPoint.y;
+
+      // 1. Filtro de Jitter (Zona muerta inicial)
+      if (!wallDrag.hasMoved && Math.abs(rawDx) < 5 && Math.abs(rawDy) < 5) return;
+
+      if (!wallDrag.hasMoved) {
+        setWallDrag(prev => prev ? { ...prev, hasMoved: true } : null);
+      }
+
+      // 2. Lógica de Bloqueo de Eje (Ortho-Lock)
+      // Determinamos cuál es el eje dominante del movimiento del mouse
+      let finalDx = rawDx;
+      let finalDy = rawDy;
+
+      if (Math.abs(rawDx) > Math.abs(rawDy)) {
+        // Movimiento Horizontal predominante -> Bloqueamos Y
+        finalDy = 0;
+      } else {
+        // Movimiento Vertical predominante -> Bloqueamos X
+        finalDx = 0;
+      }
+
+      setPoints(prev => {
+        // Captura segura de valores
+        const { wallIndex, originalP1, originalP2 } = wallDrag;
+
+        const newPoints = [...prev];
+        const i1 = wallIndex;
+        const i2 = (wallIndex + 1) % prev.length;
+
+        // Aplicamos el Delta restringido a los puntos originales
+        newPoints[i1] = {
+          x: originalP1.x + finalDx,
+          y: originalP1.y + finalDy
+        };
+        newPoints[i2] = {
+          x: originalP2.x + finalDx,
+          y: originalP2.y + finalDy
+        };
+
+        return newPoints;
+      });
+    }
+
+  }, [dragging, draggingOpeningId, wallDrag, wallMetrics]);// Dependencias críticas
 
   // --- RENDERIZADO DE VANOS SVG ---
   // Reemplaza tu función renderOpeningsOnSVG con esta:
@@ -538,11 +639,37 @@ const RoomGeometryPlanner = () => {
                         ${editMode === 'geometry' ? 'cursor-crosshair' : 'cursor-default'}
                     `}
             onPointerMove={handlePointerMove}
-            onPointerUp={() => {
+            onPointerUp={(e) => {
+              // 1. Limpieza de arrastres previos
               setDragging(null);
-              setDraggingOpeningId(null); // <--- Limpieza nueva
+              setDraggingOpeningId(null);
+
+              // 2. Lógica de finalización de Muro
+              if (wallDrag?.isActive) {
+                // Si NO se movió (hasMoved === false), significa que fue un Clic rápido.
+                // Ejecutamos la lógica original de "Añadir Vértice".
+                if (!wallDrag.hasMoved) {
+                  // Requerimos recrear el evento sintético o llamar a la lógica directamente.
+                  // Para simplificar y reutilizar, llamamos a una versión modificada de handleAddVertex
+                  // O simplemente insertamos el punto aquí usando wallDrag.startPoint
+
+                  setPoints(prev => {
+                    const newPoints = [...prev];
+                    // Insertamos en el punto exacto del clic inicial
+                    newPoints.splice(wallDrag.wallIndex + 1, 0, {
+                      x: wallDrag.startPoint.x,
+                      y: wallDrag.startPoint.y
+                    });
+                    return newPoints;
+                  });
+                }
+                // Limpiamos estado
+                setWallDrag(null);
+              }
+
+              // 3. Persistencia (Existente)
               setValue("room_openings", openings as unknown as WizardStoreValue);
-              setValue("room_points", points as unknown as WizardStoreValue); // Opcional: guardar puntos también aquí
+              setValue("room_points", points as unknown as WizardStoreValue);
             }}
             onClick={() => setActiveWall(null)}
           >
@@ -563,20 +690,22 @@ const RoomGeometryPlanner = () => {
 
               return (
                 <g key={`wall-${i}`}>
-                  {/* ZONA DE CLIC DE LA LÍNEA (Invisible y gruesa) */}
+                  {/* ZONA DE CLIC / ARRASTRE */}
                   <line
                     x1={p.x} y1={p.y} x2={next.x} y2={next.y}
                     stroke="transparent" strokeWidth={30}
-                    onPointerDown={(e) => editMode === 'geometry' && handleAddVertex(i, e)}
+                    // CAMBIO AQUÍ: Usamos handleWallDown en lugar de handleAddVertex directo
+                    onPointerDown={(e) => editMode === 'geometry' && handleWallDown(i, e)}
                     onClick={(e) => {
                       if (editMode === 'openings') {
                         e.stopPropagation();
                         setActiveWall(i);
                       }
                     }}
-                    className={editMode === 'geometry' ? 'cursor-copy' : 'cursor-pointer'}
+                    // CAMBIO VISUAL: Cursor 'move' para indicar arrastre
+                    className={editMode === 'geometry' ? 'cursor-move' : 'cursor-pointer'}
                   />
-                  {/* LÍNEA VISIBLE */}
+                  {/* ... (Línea visible sin cambios) ... */}
                   <line
                     x1={p.x} y1={p.y} x2={next.x} y2={next.y}
                     stroke={isSelected && editMode === 'openings' ? "#2563EB" : "#3E4C59"}
@@ -588,7 +717,6 @@ const RoomGeometryPlanner = () => {
                 </g>
               );
             })}
-
             {renderOpeningsOnSVG()}
 
             {/* Vértices (Puntos) */}
@@ -630,11 +758,53 @@ const RoomGeometryPlanner = () => {
                   Modifica la forma de tu espacio.
                 </p>
               </div>
-              <ul className="text-left text-xs text-yellow-800 space-y-2 bg-white/50 p-4 rounded-lg">
-                <li className="flex gap-2">🔹 <b>Arrastra</b> los puntos naranjas para mover esquinas.</li>
-                <li className="flex gap-2">🔹 <b>Clic</b> en una línea gris para crear un nuevo vértice.</li>
-                <li className="flex gap-2">🔹 <b>Doble Clic</b> en un punto para borrarlo.</li>
+
+
+
+
+              <ul className="text-left text-xs text-yellow-900/80 space-y-1.5 bg-yellow-50/80 p-3 rounded-lg border border-yellow-100/50">
+                <li>
+                  <h3 className="font-bold text-yellow-900 mb-1">Control de Vértices</h3>
+                </li>
+                <li className="flex gap-2 items-start">
+                  <span className="mt-0.5">🔹</span>
+                  <span>
+                    <b>Arrastrar:</b> Reubica las esquinas y ajusta ángulos.
+                  </span>
+                </li>
+                <li className="flex gap-2 items-start">
+                  <span className="mt-0.5">🔹</span>
+                  <span>
+                    <b>Doble Clic:</b> Elimina el vértice seleccionado.
+                  </span>
+                </li>
               </ul>
+
+              {/* Sección Muros */}
+              <ul className="text-left text-xs text-yellow-900/80 space-y-1.5 bg-yellow-50/80 p-3 rounded-lg border border-yellow-100/50">
+                <li>
+                  <h3 className="font-bold text-yellow-900 mb-1">Control de Muros</h3>
+                </li>
+                <li className="flex gap-2 items-start">
+                  <span className="mt-0.5">🔹</span>
+                  <span>
+                    <b>Clic Simple:</b> Divide el muro creando un nuevo nodo.
+                  </span>
+                </li>
+                <li className="flex gap-2 items-start">
+                  <span className="mt-0.5">🔹</span>
+                  <span>
+                    <b>Arrastrar:</b> Desplaza el segmento completo (movimiento ortogonal).
+                  </span>
+                </li>
+              </ul>
+
+
+
+
+
+
+
               {/* Input de Altura Global */}
               <div className="pt-4 border-t border-yellow-200">
                 <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-2 mb-2">
