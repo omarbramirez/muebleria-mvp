@@ -518,3 +518,12 @@ he estado trabajando hoy en 3 nuevas características:
 ## 07 DIC
 
 Cabinets => es importante definir cuántos cajones o puertas debe tener un mueble? cómo validamos eso?
+
+
+## 14 DIC
+
+LANGCHAIN https://www.youtube.com/watch?v=GoSbWL0_eGI
+
+EXCELENTES EJEMPLOS VISUALES DE LO QUE DEBO CONSTRUIR https://discourse.threejs.org/t/how-create-3d-building-configurator-bim-with-autodesk-aps-or-three-js-is-better-or-maybe-other-things/68993
+
+![alt text](image-49.png)

@@ -9,7 +9,9 @@ import {
   AppWindow,
   Trash2,
   Hammer,
-  MousePointer2
+  MousePointer2,
+  Plus,
+  Minus
 } from "lucide-react";
 
 // Importamos el hook Y EL TIPO para el casting estricto
@@ -36,10 +38,58 @@ export interface WallOpening {
   sillHeight: number;
 }
 
+interface NumberControlProps {
+  label: string;
+  value: number;
+  onChange: (val: number) => void;
+  step?: number; // Paso por defecto (ej. 10mm)
+}
+
 const DEFAULT_POINTS: Point[] = [
   { x: 50, y: 100 }, { x: 450, y: 100 },
   { x: 450, y: 400 }, { x: 50, y: 400 },
 ];
+
+
+const NumberControl = ({ label, value, onChange, step = 10 }: NumberControlProps) => (
+  <div>
+    <label className="text-[10px] font-bold text-gray-500 block mb-1.5 tracking-wide uppercase">
+      {label}
+    </label>
+    <div className="flex items-center border border-gray-300 rounded-md bg-white overflow-hidden shadow-sm hover:border-blue-400 transition-colors group focus-within:ring-1 focus-within:ring-blue-400 focus-within:border-blue-400">
+
+      {/* Botón Decrementar */}
+      <button
+        type="button"
+        onClick={() => onChange(value - step)}
+        className="px-2 py-1.5 bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-blue-600 border-r border-gray-200 active:bg-gray-200 transition-colors"
+      >
+        <Minus size={14} strokeWidth={2.5} />
+      </button>
+
+      {/* Input Numérico */}
+      <div className="flex-1 flex items-center bg-white px-2">
+        <input
+          type="number"
+          value={Math.round(value)}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="w-full bg-transparent py-1 text-xs font-mono font-medium text-gray-700 outline-none text-center appearance-none"
+        />
+        <span className="text-[10px] text-gray-400 font-medium select-none">mm</span>
+      </div>
+
+      {/* Botón Incrementar */}
+      <button
+        type="button"
+        onClick={() => onChange(value + step)}
+        className="px-2 py-1.5 bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-blue-600 border-l border-gray-200 active:bg-gray-200 transition-colors"
+      >
+        <Plus size={14} strokeWidth={2.5} />
+      </button>
+    </div>
+  </div>
+);
+
 
 const RoomGeometryPlanner = () => {
 
@@ -70,20 +120,32 @@ const RoomGeometryPlanner = () => {
   // MODO DE EDICIÓN
   const [editMode, setEditMode] = useState<'geometry' | 'openings'>('geometry');
 
+  const [draggingOpeningId, setDraggingOpeningId] = useState<string | null>(null);
+
   // ==============================================================================
   // 🟢 SOLUCIÓN DE SINCRONIZACIÓN (NUEVO CÓDIGO)
   // ==============================================================================
 
-  // 1. Escuchar cambios EXTERNOS del Store (ej. vienen del 3D) y actualizar localmente
+  // Sincronización Global -> Local (MODIFICADA)
   useEffect(() => {
+    // CLÁUSULA DE PROTECCIÓN (CRÍTICA):
+    // Si estamos editando activamente (arrastrando muro o ventana),
+    // bloqueamos la entrada de datos externos. Nosotros somos la autoridad ahora.
+    if (dragging !== null || draggingOpeningId !== null) return;
+
     const storeOpenings = values.room_openings as unknown as WallOpening[];
-    // IMPORTANTE: Comparamos JSON para evitar bucles infinitos (Store -> Local -> Store...)
-    // Solo actualizamos si los datos son realmente diferentes.
+
+    // VALIDACIÓN DE PROFUNDIDAD:
+    // Solo actualizamos si la data entrante es semánticamente diferente a la local.
+    // Esto rompe el ciclo cuando no estamos arrastrando (ej. al agregar una ventana nueva).
     if (storeOpenings && JSON.stringify(storeOpenings) !== JSON.stringify(openings)) {
       setOpenings(storeOpenings);
     }
+
+    // Es vital incluir los estados de dragging en las dependencias para que
+    // el efecto se "reactive" apenas soltemos el mouse.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [values.room_openings]); // Solo dependemos del valor del store
+  }, [values.room_openings, dragging, draggingOpeningId]);
 
   // (Opcional) Hacemos lo mismo para puntos y altura por si en el futuro el 3D los edita
   useEffect(() => {
@@ -267,50 +329,160 @@ const RoomGeometryPlanner = () => {
   };
 
   // --- MOVIMIENTO SVG ---
+  // Reemplaza tu handlePointerMove actual con este:
+
   const handlePointerMove = useCallback((e: React.PointerEvent<SVGSVGElement>) => {
-    if (dragging === null) return;
     e.preventDefault();
+
+    // Caso 0: No estamos arrastrando nada
+    if (dragging === null && draggingOpeningId === null) return;
+
     const svg = e.currentTarget;
     const pt = svg.createSVGPoint();
-    pt.x = e.clientX; pt.y = e.clientY;
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+
+    // Transformación de coordenadas de pantalla a SVG
     const ctm = svg.getScreenCTM();
     if (!ctm) return;
     const transformed = pt.matrixTransform(ctm.inverse());
 
-    setPoints(prev => {
-      const newPoints = [...prev];
-      let x = transformed.x; let y = transformed.y;
-      prev.forEach((p, i) => {
-        if (i === dragging) return;
-        if (Math.abs(p.x - x) < SNAP_THRESHOLD) x = p.x;
-        if (Math.abs(p.y - y) < SNAP_THRESHOLD) y = p.y;
+    // --- CASO A: ARRASTRAR VÉRTICES (GEOMETRÍA) ---
+    if (dragging !== null) {
+      setPoints(prev => {
+        const newPoints = [...prev];
+        let x = transformed.x;
+        let y = transformed.y;
+
+        // Snapping simple a otros puntos
+        prev.forEach((p, i) => {
+          if (i === dragging) return;
+          if (Math.abs(p.x - x) < SNAP_THRESHOLD) x = p.x;
+          if (Math.abs(p.y - y) < SNAP_THRESHOLD) y = p.y;
+        });
+
+        newPoints[dragging] = { x, y };
+        return newPoints;
       });
-      newPoints[dragging] = { x, y };
-      return newPoints;
-    });
-  }, [dragging]);
+      return;
+    }
+
+    // --- CASO B: DESLIZAR ABERTURA (PUERTA/VENTANA) ---
+    if (draggingOpeningId !== null) {
+      setOpenings(prev => {
+        // 1. Encontrar la abertura y su muro correspondiente
+        const openingIndex = prev.findIndex(op => op.id === draggingOpeningId);
+        if (openingIndex === -1) return prev;
+
+        const op = prev[openingIndex];
+        const wall = wallMetrics[op.wallIndex];
+        if (!wall) return prev;
+
+        // 2. Definir vectores
+        // P1: Inicio del muro, P2: Fin del muro, M: Mouse
+        const x1 = wall.p1.x;
+        const y1 = wall.p1.y;
+        const x2 = wall.p2.x;
+        const y2 = wall.p2.y;
+
+        // Vector del Muro (V)
+        const vx = x2 - x1;
+        const vy = y2 - y1;
+
+        // Vector Mouse desde P1 (W)
+        const wx = transformed.x - x1;
+        const wy = transformed.y - y1;
+
+        // 3. Proyección Escalar: t = (W · V) / |V|^2
+        // Esto nos da la posición normalizada (0 a 1) del mouse a lo largo del muro
+        const wallLengthSq = vx * vx + vy * vy;
+        // Evitar división por cero
+        if (wallLengthSq === 0) return prev;
+
+        const t = (wx * vx + wy * vy) / wallLengthSq;
+
+        // 4. Convertir 't' a milímetros reales
+        // Distancia en píxeles desde el inicio
+        const distPx = t * Math.sqrt(wallLengthSq);
+        let distMm = distPx * PX_TO_MM;
+
+        // 5. Aplicar Clamping (Restricciones)
+        // No puede ser menor a 0
+        // No puede ser mayor que (LargoMuro - AnchoAbertura)
+        const maxDistMm = wall.lengthMm - op.width;
+
+        if (distMm < 0) distMm = 0;
+        if (distMm > maxDistMm) distMm = maxDistMm;
+
+        // 6. Actualizar inmutablemente
+        const newOpenings = [...prev];
+        newOpenings[openingIndex] = {
+          ...op,
+          distFromStart: distMm
+        };
+
+        return newOpenings;
+      });
+    }
+  }, [dragging, draggingOpeningId, wallMetrics]); // Dependencias críticas
 
   // --- RENDERIZADO DE VANOS SVG ---
+  // Reemplaza tu función renderOpeningsOnSVG con esta:
+
   const renderOpeningsOnSVG = () => {
     return openings.map(op => {
       const wall = wallMetrics[op.wallIndex];
       if (!wall) return null;
-      const ratioStart = op.distFromStart / wall.lengthMm;
-      const ratioEnd = (op.distFromStart + op.width) / wall.lengthMm;
+
+      // Convertir mm a píxeles para renderizar
+      const distPx = op.distFromStart / PX_TO_MM;
+      const widthPx = op.width / PX_TO_MM;
+
+      // Cálculo de interpolación lineal para coordenadas (x,y)
+      // ratioStart: porcentaje del recorrido donde empieza la abertura
+      const ratioStart = distPx / (wall.lengthMm / PX_TO_MM);
+      const ratioEnd = (distPx + widthPx) / (wall.lengthMm / PX_TO_MM);
+
       const x1 = wall.p1.x + (wall.p2.x - wall.p1.x) * ratioStart;
       const y1 = wall.p1.y + (wall.p2.y - wall.p1.y) * ratioStart;
       const x2 = wall.p1.x + (wall.p2.x - wall.p1.x) * ratioEnd;
       const y2 = wall.p1.y + (wall.p2.y - wall.p1.y) * ratioEnd;
 
+      const isSelected = editMode === 'openings' && activeWallIndex === op.wallIndex;
+      const isDraggingThis = draggingOpeningId === op.id;
+
       return (
-        <g key={op.id} onClick={(e) => {
-          if (editMode === 'openings') {
-            e.stopPropagation();
-            setActiveWall(op.wallIndex);
-          }
-        }}>
-          <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={op.type === 'door' ? '#F87171' : '#60A5FA'} strokeWidth={8} />
-          {editMode === 'openings' && activeWallIndex === op.wallIndex && (
+        <g
+          key={op.id}
+          // EVENTO DE INICIO DE ARRASTRE
+          onPointerDown={(e) => {
+            if (editMode === 'openings') {
+              e.stopPropagation(); // Evita seleccionar el muro o crear puntos
+              e.currentTarget.setPointerCapture(e.pointerId); // Captura crítica para UX fluida
+              setDraggingOpeningId(op.id);
+              setActiveWall(op.wallIndex); // Opcional: selecciona el muro al tocar la ventana
+            }
+          }}
+          onClick={(e) => e.stopPropagation()} // Evita burbujeo al clic simple
+          className={editMode === 'openings' ? 'cursor-grab active:cursor-grabbing' : ''}
+          style={{ pointerEvents: editMode === 'openings' ? 'all' : 'none' }}
+        >
+          {/* Línea de representación */}
+          <line
+            x1={x1} y1={y1} x2={x2} y2={y2}
+            stroke={op.type === 'door' ? '#F87171' : '#60A5FA'}
+            strokeWidth={8}
+          />
+
+          {/* Hitbox transparente para facilitar el agarre (UX Senior) */}
+          <line
+            x1={x1} y1={y1} x2={x2} y2={y2}
+            stroke="transparent"
+            strokeWidth={20}
+          />
+
+          {/* Indicador de selección */}
+          {(isSelected || isDraggingThis) && (
             <circle cx={(x1 + x2) / 2} cy={(y1 + y2) / 2} r={4} fill="white" stroke="black" />
           )}
         </g>
@@ -366,7 +538,12 @@ const RoomGeometryPlanner = () => {
                         ${editMode === 'geometry' ? 'cursor-crosshair' : 'cursor-default'}
                     `}
             onPointerMove={handlePointerMove}
-            onPointerUp={() => setDragging(null)}
+            onPointerUp={() => {
+              setDragging(null);
+              setDraggingOpeningId(null); // <--- Limpieza nueva
+              setValue("room_openings", openings as unknown as WizardStoreValue);
+              setValue("room_points", points as unknown as WizardStoreValue); // Opcional: guardar puntos también aquí
+            }}
             onClick={() => setActiveWall(null)}
           >
             {/* ... Defs (Patrón) ... */}
@@ -461,11 +638,11 @@ const RoomGeometryPlanner = () => {
               {/* Input de Altura Global */}
               <div className="pt-4 border-t border-yellow-200">
                 <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-2 mb-2">
-                  <ArrowDownUp className="w-3 h-3" /> Altura Techo (Z)
+                  <ArrowDownUp className="w-3 h-3" /> Altura Techo (Z) uwu
                 </label>
                 <div className="flex items-center gap-2">
                   <input type="number" value={roomHeight} onChange={(e) => setRoomHeight(Number(e.target.value))} className="flex-1 border rounded p-2 text-center" />
-                  <span className="text-xs font-bold">mm</span>
+                  <span className="text-xs font-bold text-black">mm</span>
                 </div>
               </div>
             </div>
@@ -521,61 +698,35 @@ const RoomGeometryPlanner = () => {
                     </div>
 
                     {/* FILA 1: HORIZONTAL (Ubicación X y Ancho) */}
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="text-[9px] font-bold text-gray-400 block mb-1">DISTANCIA (X)</label>
-                        <div className="flex items-center border rounded bg-gray-50">
-                          <input
-                            type="number"
-                            value={Math.round(op.distFromStart)}
-                            onChange={(e) => updateOpening(op.id, 'distFromStart', Number(e.target.value))}
-                            className="w-full bg-transparent px-2 py-1 text-xs outline-none"
-                          />
-                          <span className="text-[9px] text-gray-400 pr-1">mm</span>
-                        </div>
-                      </div>
-                      <div>
-                        <label className="text-[9px] font-bold text-gray-400 block mb-1">ANCHO</label>
-                        <div className="flex items-center border rounded bg-gray-50">
-                          <input
-                            type="number"
-                            value={Math.round(op.width)}
-                            onChange={(e) => updateOpening(op.id, 'width', Number(e.target.value))}
-                            className="w-full bg-transparent px-2 py-1 text-xs outline-none"
-                          />
-                          <span className="text-[9px] text-gray-400 pr-1">mm</span>
-                        </div>
-                      </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <NumberControl
+                        label="Distancia (X)"
+                        value={op.distFromStart}
+                        onChange={(val) => updateOpening(op.id, 'distFromStart', val)}
+                        step={50} // Pasos grandes para mover rápido
+                      />
+                      <NumberControl
+                        label="Ancho"
+                        value={op.width}
+                        onChange={(val) => updateOpening(op.id, 'width', val)}
+                        step={10} // Pasos precisos para dimensionar
+                      />
                     </div>
 
                     {/* FILA 2: VERTICAL (Altura y Elevación) - NUEVO */}
                     <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="text-[9px] font-bold text-gray-400 block mb-1">ALTURA (Y)</label>
-                        <div className="flex items-center border rounded bg-gray-50">
-                          <input
-                            type="number"
-                            value={Math.round(op.height)}
-                            onChange={(e) => updateOpening(op.id, 'height', Number(e.target.value))}
-                            className="w-full bg-transparent px-2 py-1 text-xs outline-none"
-                          />
-                          <span className="text-[9px] text-gray-400 pr-1">mm</span>
-                        </div>
-                      </div>
-                      <div>
-                        <label className="text-[9px] font-bold text-gray-400 block mb-1">ELEVACIÓN</label>
-                        <div className="flex items-center border rounded bg-gray-50">
-                          <input
-                            type="number"
-                            value={Math.round(op.sillHeight)}
-                            onChange={(e) => updateOpening(op.id, 'sillHeight', Number(e.target.value))}
-                            className="w-full bg-transparent px-2 py-1 text-xs outline-none"
-                          // Opcional: Deshabilitar antepecho si es puerta, aunque a veces hay escalones
-                          // disabled={op.type === 'door'} 
-                          />
-                          <span className="text-[9px] text-gray-400 pr-1">mm</span>
-                        </div>
-                      </div>
+                      <NumberControl
+                        label="Altura (Y)"
+                        value={op.height}
+                        onChange={(val) => updateOpening(op.id, 'height', val)}
+                        step={10}
+                      />
+                      <NumberControl
+                        label="Elevación (Z)"
+                        value={op.sillHeight}
+                        onChange={(val) => updateOpening(op.id, 'sillHeight', val)}
+                        step={50}
+                      />
                     </div>
 
                   </div>
