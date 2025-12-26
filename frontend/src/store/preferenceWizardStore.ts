@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 
-
+// --- CONSTANTES DE CONFIGURACIÓN ---
+const MAX_HISTORY_STEPS = 10;
 // --- DEFINICIÓN DE TIPOS PARA EL 3D ---
-
+export type OpeningType = 'door' | 'window' | 'opening';
 export interface WallOpening {
   id: string;
-  type: 'window' | 'door';
+  type: OpeningType;
   wallIndex: number;      // Índice del muro en el array 'points'
   distFromStart: number;  // Distancia en cm desde el inicio del muro
   width: number;
@@ -50,9 +51,7 @@ export interface GasConfig {
 
 }
 
-// 1. TIPO RECURSIVO (La solución definitiva a 'any')
-// Este tipo define exactamente qué es un dato válido en tu aplicación.
-// Al ser recursivo, permite objetos anidados sin usar 'any' ni 'unknown'.
+
 export type WizardStoreValue =
   | string
   | number
@@ -65,7 +64,6 @@ export type WizardStoreValue =
   | WizardStoreValue[]
   | { [key: string]: WizardStoreValue };
 
-// 2. Claves para anidación
 type NestedCategory = 'space' | 'budget' | 'style';
 
 // NUEVA INTERFAZ: Módulo de Mobiliario (Carpintería)
@@ -87,6 +85,19 @@ export interface CabinetModule {
 
   // Estado
   rotation: number; // Generalmente 0 si está pegado al muro, pero útil para islas
+}
+
+
+// --- TIPOS EXISTENTES (Reafirmación) ---
+export interface Point {
+  x: number;
+  y: number;
+}
+
+// --- NUEVOS TIPOS PARA HISTORIAL ---
+interface HistoryState<T> {
+  past: T[];
+  future: T[];
 }
 
 // 3. Estructura del Store
@@ -128,6 +139,20 @@ interface WizardState {
   setInstallationPoints: (points: InstallationPoint[]) => void;
   updateInstallationPoint: (id: string, data: Partial<InstallationPoint>) => void;
   setLayoutItems: (items: CabinetModule[]) => void;
+
+  // ... tus otros estados (budget, appliances, etc)
+  roomShape: {
+    points: Point[];
+    // otras propiedades de roomShape si existen
+  };
+  
+  // Estado del Historial específico para Geometría
+  geometryHistory: HistoryState<Point[]>;
+  // Acciones de Geometría
+  updateRoomShape: (shape: { points: Point[] }) => void;
+  commitGeometryChange: (newPoints: Point[]) => void; 
+  undoGeometry: () => void;
+  redoGeometry: () => void;
 }
 
 export const usePreferenceWizardStore = create<WizardState>((set, get) => ({
@@ -239,5 +264,93 @@ export const usePreferenceWizardStore = create<WizardState>((set, get) => ({
       p.id === id ? { ...p, ...data } : p
     )
   })),
-  setLayoutItems: (items) => set(() => ({ layout_items: items }))
+  setLayoutItems: (items) => set(() => ({ layout_items: items })),
+  // ... Estado inicial existente ...
+  roomShape: {
+    points: [
+{ x: 50, y: 100 }, { x: 450, y: 100 },
+  { x: 450, y: 400 }, { x: 50, y: 400 },
+    ], // Ejemplo inicial
+  },
+
+  // Inicialización del historial vacío
+  geometryHistory: {
+    past: [],
+    future: []
+  },
+
+  // ... Otras acciones existentes ...
+
+  updateRoomShape: (shape) => set((state) => ({
+    roomShape: { ...state.roomShape, ...shape }
+  })),
+
+  /**
+   * ACCIÓN: commitGeometryChange
+   * Descripción: Se debe llamar CADA VEZ que el usuario termina una acción destructiva o de modificación
+   * (ej: soltar el drag del mouse, borrar un vértice, añadir un vértice).
+   */
+  commitGeometryChange: (newPoints: Point[]) => {
+    const currentPoints = get().roomShape.points;
+
+    // Validación de integridad: No guardar historial si no hubo cambios reales
+    if (JSON.stringify(currentPoints) === JSON.stringify(newPoints)) return;
+
+    set((state) => ({
+      // 1. Empujar el estado actual al PASADO
+      geometryHistory: {
+        past: [...state.geometryHistory.past, currentPoints],
+        future: [] // 2. Limpiar el FUTURO (nueva línea temporal)
+      },
+      // 3. Actualizar el PRESENTE
+      roomShape: {
+        ...state.roomShape,
+        points: newPoints
+      }
+    }));
+  },
+
+  undoGeometry: () => {
+    const { geometryHistory, roomShape } = get();
+    if (geometryHistory.past.length === 0) return;
+
+    // Obtener el último estado del pasado
+    const previousPoints = geometryHistory.past[geometryHistory.past.length - 1];
+    
+    // Crear nuevo array de pasado (sin el último elemento)
+    const newPast = geometryHistory.past.slice(0, -1);
+
+    set((state) => ({
+      geometryHistory: {
+        past: newPast,
+        future: [state.roomShape.points, ...state.geometryHistory.future] // El presente actual se va al futuro
+      },
+      roomShape: {
+        ...state.roomShape,
+        points: previousPoints // Restauramos el pasado
+      }
+    }));
+  },
+
+  redoGeometry: () => {
+    const { geometryHistory } = get();
+    if (geometryHistory.future.length === 0) return;
+
+    // Obtener el primer estado del futuro
+    const nextPoints = geometryHistory.future[0];
+    
+    // Crear nuevo array de futuro (sin el primer elemento)
+    const newFuture = geometryHistory.future.slice(1);
+
+    set((state) => ({
+      geometryHistory: {
+        past: [...state.geometryHistory.past, state.roomShape.points], // El presente actual se va al pasado
+        future: newFuture
+      },
+      roomShape: {
+        ...state.roomShape,
+        points: nextPoints // Restauramos el futuro
+      }
+    }));
+  }
 }));
