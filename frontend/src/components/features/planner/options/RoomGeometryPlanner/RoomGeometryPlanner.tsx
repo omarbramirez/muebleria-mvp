@@ -88,18 +88,18 @@ const NumberControl = ({ label, value, onChange, step = 10 }: NumberControlProps
 const RoomGeometryPlanner = () => {
   const [wallDrag, setWallDrag] = useState<WallDragState | null>(null);
 
-// 1. CONSUMO DEL STORE (ZUSTAND)
+  // 1. CONSUMO DEL STORE (ZUSTAND)
   // Extraemos TODO lo necesario, incluyendo historial y setters genéricos
- const { 
+  const {
     values,
     setValue,
     activeWallIndex,
     setActiveWall,
-    roomShape, 
-    commitGeometryChange, 
-    undoGeometry, 
-    redoGeometry, 
-    geometryHistory 
+    roomShape,
+    commitGeometryChange,
+    undoGeometry,
+    redoGeometry,
+    geometryHistory
   } = usePreferenceWizardStore(
     useShallow((state) => ({
       values: state.values,
@@ -429,10 +429,25 @@ const RoomGeometryPlanner = () => {
         </div>
 
         {/* CONTROLES PRINCIPALES */}
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-col gap-4 items-end">
+          {/* SWITCHER DE MODO */}
+          <div className="bg-gray-100 p-1 rounded-lg flex gap-1">
+            <button
+              onClick={() => { setEditMode('geometry'); setActiveWall(null); }}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${editMode === 'geometry' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            >
+              <Hammer className="w-3 h-3" /> Estructura
+            </button>
+            <button
+              onClick={() => setEditMode('openings')}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${editMode === 'openings' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            >
+              <DoorOpen className="w-3 h-3" /> Aberturas
+            </button>
+          </div>
 
           {/* GRUPO UNDO/REDO */}
-          <div className="flex bg-gray-100 p-1 rounded-lg gap-1 mr-4">
+          <div className="flex bg-gray-100 p-1 rounded-lg gap-1 ">
             <button
               onClick={undoGeometry}
               disabled={geometryHistory.past.length === 0}
@@ -448,22 +463,6 @@ const RoomGeometryPlanner = () => {
               title="Rehacer"
             >
               <Redo2 size={18} />
-            </button>
-          </div>
-
-          {/* SWITCHER DE MODO */}
-          <div className="bg-gray-100 p-1 rounded-lg flex gap-1">
-            <button
-              onClick={() => { setEditMode('geometry'); setActiveWall(null); }}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${editMode === 'geometry' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              <Hammer className="w-3 h-3" /> Estructura
-            </button>
-            <button
-              onClick={() => setEditMode('openings')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-all ${editMode === 'openings' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              <DoorOpen className="w-3 h-3" /> Aberturas
             </button>
           </div>
         </div>
@@ -633,21 +632,56 @@ const RoomGeometryPlanner = () => {
             </div>
           )}
 
-          {/* Métricas */}
+          {/* Resumen de Métricas Avanzado */}
           <div className="space-y-3 p-4 border rounded-lg bg-blue-50 mt-auto">
-            <h3 className="text-sm font-bold text-blue-800 flex items-center gap-2"><Move3D className="w-4 h-4" /> Cómputo</h3>
-            <div className="text-xs space-y-1">
-              <div className="flex justify-between"><span>Área:</span><b>{floorAreaM2} m²</b></div>
-              <div className="flex justify-between"><span>Muros Neto:</span><b>{wallAreaNetM2} m²</b></div>
+            <h3 className="text-sm font-bold text-blue-800 flex items-center gap-2 border-b border-blue-200 pb-2">
+              <Move3D className="w-4 h-4" />
+              Cómputo Métrico
+            </h3>
+            <div className="text-xs space-y-2">
+              {/* Grupo: Superficies Horizontales */}
+              <div className="flex justify-between font-medium text-gray-600">
+                <span>Área Piso (Planta):</span>
+                <span className="font-bold text-gray-900">{floorAreaM2} m²</span>
+              </div>
+
+              {/* Grupo: Volumen */}
+              <div className="flex justify-between font-medium text-gray-600">
+                <span>Volumen Aire:</span>
+                <span className="font-bold text-gray-900">{(parseFloat(floorAreaM2) * (roomHeight / 1000)).toFixed(2)} m³</span>
+              </div>
+
+              <div className="border-t border-blue-200 my-1"></div>
+
+              {/* Grupo: Superficies Verticales (Muros) */}
+              <div className="flex justify-between font-medium text-gray-600">
+                <span>Muros (Bruto):</span>
+                <span className="text-gray-500">{wallAreaGrossM2.toFixed(2)} m²</span>
+              </div>
+
+              {/* Resta de huecos (Feedback Visual) */}
+              {openings.length > 0 && (
+                <div className="flex justify-between font-medium text-red-400 pl-2 border-l-2 border-red-200">
+                  <span>- {openings.length} Vanos:</span>
+                  <span>-{openingsAreaM2.toFixed(2)} m²</span>
+                </div>
+              )}
+
+              {/* Resultado Neto */}
+              <div className="flex justify-between font-bold text-blue-900 bg-blue-100/50 p-1 rounded">
+                <span>Muros (Neto):</span>
+                <span>{wallAreaNetM2} m²</span>
+              </div>
             </div>
           </div>
+
+          {/* Consejos de Usabilidad */}
+          <div className="bg-gray-100 p-3 rounded-lg text-xs text-gray-600">
+            **Tip:** Las paredes del SVG representan el **eje central** del muro. Asegúrate de que las medidas en milímetros (visibles en el plano) coincidan con tu levantamiento. El sistema usará la Altura Z para generar las paredes virtuales.
+          </div>
         </div>
-        {/* Consejos de Usabilidad */}
-        <div className="bg-gray-100 p-3 rounded-lg text-xs text-gray-600">
-          **Tip:** Las paredes del SVG representan el **eje central** del muro. Asegúrate de que las medidas en milímetros (visibles en el plano) coincidan con tu levantamiento. El sistema usará la Altura Z para generar las paredes virtuales.
-        </div>
-      </div >
-    </div >
+      </div>
+    </div>
   );
 };
 
