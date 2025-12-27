@@ -87,22 +87,84 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
 
   const manualRotationRef = useRef<number>(0);
 
-  // 3. MATERIALES
-  const materials = useMemo(() => ({
-    wall: new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.05, side: THREE.DoubleSide, depthWrite: false, roughness: 1, metalness: 0 }),
-    wallSelected: new THREE.MeshStandardMaterial({ color: 0xd5a6bd, transparent: true, opacity: 0.45, roughness: 0.8, metalness: 0, side: THREE.DoubleSide }),
-    floor: new THREE.MeshStandardMaterial({ color: 0xf3f4f6, roughness: 0.8 }),
-    window: new THREE.MeshBasicMaterial({ color: 0x60a5fa, transparent: true, opacity: 0.4, depthWrite: false }),
-    door: new THREE.MeshBasicMaterial({ color: 0xf87171, transparent: true, opacity: 0.3, depthWrite: false }),
-    elec: new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xccaa00, emissiveIntensity: 0.2 }),
-    water: new THREE.MeshStandardMaterial({ color: 0x3b82f6 }),
-    gas: new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.5, metalness: 0.3 }),
-    cabinetCarcass: new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.9 }),
-    cabinetDoor: new THREE.MeshStandardMaterial({ color: 0xd5d0c2, roughness: 0.9 }),
-    cabinetKickplate: new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.9 }),
-    cabinetCountertop: new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.2, metalness: 0.1 }),
-    cabinetHandle: new THREE.MeshStandardMaterial({ color: 0xf1c232, metalness: 0.8, roughness: 0.2 }),
-  }), []);
+// 3. DEFINICIÓN DE MATERIALES (Síncrono - Seguro para SSR)
+  const materials = useMemo(() => {
+    // Definimos los materiales BASE sin texturas para que el servidor pueda renderizar
+    // el estado inicial sin crashear.
+    
+    const matCabinetDoor = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.8,
+      metalness: 0.0, 
+    });
+
+    const matCabinetCarcass = new THREE.MeshStandardMaterial({
+       color: 0xeeeeee, 
+       roughness: 0.9,
+       metalness: 0.0
+    });
+
+    const matCabinetHandle = new THREE.MeshStandardMaterial({
+        color: 0xffd700,
+        roughness: 0.3,
+        metalness: 1.0
+    });
+
+    return {
+      wall: new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.05, side: THREE.DoubleSide, depthWrite: false, roughness: 1, metalness: 0 }),
+      wallSelected: new THREE.MeshStandardMaterial({ color: 0xd5a6bd, transparent: true, opacity: 0.45, roughness: 0.8, metalness: 0, side: THREE.DoubleSide }),
+      floor: new THREE.MeshStandardMaterial({ color: 0xf3f4f6, roughness: 0.8 }),
+      window: new THREE.MeshBasicMaterial({ color: 0x60a5fa, transparent: true, opacity: 0.4, depthWrite: false }),
+      door: new THREE.MeshBasicMaterial({ color: 0xf87171, transparent: true, opacity: 0.3, depthWrite: false }),
+      elec: new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xccaa00, emissiveIntensity: 0.2 }),
+      water: new THREE.MeshStandardMaterial({ color: 0x3b82f6 }),
+      gas: new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.5, metalness: 0.3 }),
+      
+      // Referencias PBR
+      cabinetCarcass: matCabinetCarcass,
+      cabinetDoor: matCabinetDoor, // Se inicia sin textura
+      cabinetKickplate: new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9 }),
+      cabinetCountertop: new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.2, metalness: 0.1 }),
+      cabinetHandle: matCabinetHandle,
+    };
+  }, []); // Se ejecuta una vez al montar
+
+  // 4. CARGA ASÍNCRONA DE TEXTURAS (Cliente - Efecto Secundario)
+  // Este hook SOLO corre en el navegador, donde "document" existe.
+  useEffect(() => {
+    // Protección adicional por si acaso
+    if (typeof window === 'undefined') return;
+
+    const loader = new THREE.TextureLoader();
+    
+    // Ruta corregida: Desde la raíz pública
+    const texturePath = '/textures/wood_oak.jpg'; 
+    // OJO: Si usas la URL de prueba de internet, ponla aquí:
+    // const texturePath = 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/crate.gif';
+
+    loader.load(
+      texturePath,
+      (texture) => {
+        // Configuración de Ingeniería de Imagen
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.minFilter = THREE.LinearMipmapLinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+
+        // Inyección en caliente al material existente
+        // Como 'materials' es un objeto constante (por el useMemo), 
+        // podemos mutar sus propiedades y Three.js lo detectará.
+        if (materials.cabinetDoor) {
+            materials.cabinetDoor.map = texture;
+            materials.cabinetDoor.needsUpdate = true; // Flag vital
+        }
+      },
+      undefined,
+      (err) => console.warn(`[Texture Loader] Fallo en ${texturePath}`, err)
+    );
+
+  }, [materials]); // Dependencia: solo si materials existe
 
   // --- HELPER: BÚSQUEDA DE RAÍZ JERÁRQUICA (CRÍTICO PARA GRUPOS) ---
   // Este método soluciona el problema de que al mover la manija no se mueva el refri completo.
@@ -258,14 +320,19 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
     mountNode.appendChild(labelRenderer.domElement);
     labelRendererRef.current = labelRenderer;
 
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.9);
+    // AJUSTE DE ILUMINACIÓN PARA PBR
+    // 1. Luz Ambiental (Relleno suave)
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6); // Bajamos intensidad para permitir contraste
     sceneRef.current.add(hemiLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    dirLight.position.set(500, 1000, 500);
+    // 2. Luz Principal (Sol/Foco)
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.2); // Más potencia
+    dirLight.position.set(500, 1500, 1000); // Posición más cenital para evitar sombras muy largas
     dirLight.castShadow = true;
-    dirLight.shadow.mapSize.width = 5000;
-    dirLight.shadow.mapSize.height = 5000;
+    // 3. Calidad de Sombras (Vital para percepción de profundidad en texturas)
+    dirLight.shadow.bias = -0.0001; // Reduce el "shadow acne" en superficies texturizadas
+    dirLight.shadow.mapSize.width = 2048; // Aumentar resolución (antes 5000 es mucho mapa pero poca resolución si no se define)
+    dirLight.shadow.mapSize.height = 2048;
     dirLight.shadow.camera.near = 1;
     dirLight.shadow.camera.far = 5000;
     sceneRef.current.add(dirLight);
@@ -470,10 +537,12 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
     }
 
     // E. MOBILIARIO
+    // E. MOBILIARIO (IMPLEMENTACIÓN PBR COMPLETA)
     layoutItems.forEach(item => {
       const wall = wallsRef.current[item.wallIndex];
       if (!wall) return;
 
+      // 1. Generación Procedural
       const cabinetGroup = createProceduralCabinet(item, {
         carcass: materials.cabinetCarcass,
         door: materials.cabinetDoor,
@@ -482,12 +551,57 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
         handle: materials.cabinetHandle
       }, SCALE_FACTOR);
 
+      // 2. Ingeniería de Materiales & UV Mapping (Corrección de texturas)
+      // Recorremos cada parte del mueble generado
+      cabinetGroup.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          // a. Habilitar sombras (vital para PBR)
+          child.castShadow = true;
+          child.receiveShadow = true;
+
+          // b. Corrección de densidad de textura (UV Mapping Automático)
+          // Si el objeto usa el material de madera, ajustamos sus UVs a su tamaño físico
+          if (child.material === materials.cabinetDoor && child.geometry instanceof THREE.BoxGeometry) {
+            // Como tu Factory crea una geometría nueva por cada mueble,
+            // podemos modificar los UVs directamente sin afectar a otros muebles.
+
+            const geom = child.geometry;
+            const { width, height, depth } = geom.parameters;
+
+            // Obtenemos el atributo UV original
+            const uvAttribute = geom.attributes.uv;
+
+            // Factor de escala: Ajusta este 0.05 según el tamaño de tu imagen jpg
+            // Si la madera se ve muy grande, aumenta a 0.1. Si muy chica, baja a 0.02.
+            const textureScale = 0.05;
+
+            // Iteramos sobre los vértices (BoxGeometry tiene mapeo predecible)
+            // Esto es un "Hack" simple: escalamos los UVs basándonos en las dimensiones X/Y
+            // Para un mapeo BoxMapping perfecto se requeriría más lógica, pero esto cubre el 90% de los casos (frentes).
+            for (let i = 0; i < uvAttribute.count; i++) {
+              const u = uvAttribute.getX(i);
+              const v = uvAttribute.getY(i);
+
+              // Aplicamos la escala para que la textura no se estire
+              // Nota: Esto asume que la cara frontal es la principal.
+              uvAttribute.setXY(i, u * width * textureScale, v * height * textureScale);
+            }
+
+            // Marcamos para actualización
+            uvAttribute.needsUpdate = true;
+          }
+        }
+      });
+
+      // 3. Posicionamiento en el Muro (Lógica existente)
       const wallLen = wall.userData.length;
       const itemWidth3D = item.width / SCALE_FACTOR;
       const itemHeight3D = item.height / SCALE_FACTOR;
 
       const localX = -wallLen / 2 + (item.distFromStart / SCALE_FACTOR) + (itemWidth3D / 2);
       const localY = (-heightUnits / 2) + (item.elevation / SCALE_FACTOR) + (itemHeight3D / 2);
+
+      // Z-Offset: Muro/2 + ProfundidadMueble/2
       const zOffset = (WALL_THICKNESS / 2) + (item.depth / SCALE_FACTOR / 2);
 
       cabinetGroup.position.set(localX, localY, zOffset);
