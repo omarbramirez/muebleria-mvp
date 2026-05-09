@@ -1,127 +1,317 @@
 {
-    "navbar": {
-        "home": "Home",
-        "how_it_works": "How it works",
-        "catalog": "Catalog",
-        "reserve": "Reserve"
+  "locale_switcher": {
+    "label": "Choose your language"
+  },
+  "navbar": {
+    "home": "Home",
+    "how_it_works": "How it works",
+    "search": "Search",
+    "explore": "Explore"
+  },
+  "pop_ups": {
+    "space_configuration": {
+      "title": "Interactive Floor Plan Editor",
+      "description": "Draw and modify your space's outline directly on the floor plan. Tap or click lines to add vertices, drag points to adjust measurements, and double tap or click a vertex to delete it. The scale and total area update automatically in real-time.",
+      "link": "Confirm",
+      "total_area": "Total area",
+      "planner_info": {
+        "title": "Floor plan data",
+        "scale": "Scale",
+        "area": "Area",
+        "vertices": "Vertices"
+      }
     },
-    "header": {
-        "call_to_action": "Book now",
-        "title": "Customizable furniture online",
-        "description": "Design, customize and order your furniture online, ready to be manufactured on demand by specialized workshops.",
-        "link": "Reserve"
-    },
-    "process_menu": {
-        "title": "How does it work?",
-        "processes": {
-            "choose": {
-                "call_to_action": "Explore the catalog",
-                "title": "Choose",
-                "description": "Select the product that best suits your needs. Explore our range of options and find the perfect design.",
-                "button": "Catalog",
-                "link": "#"
-            },
-            "customize": {
-                "call_to_action": "Make it your own",
-                "title": "Customize",
-                "description": "Customize your product with colors, materials and unique details so it reflects your style.",
-                "button": "Sign up",
-                "link": "#"
-            },
-            "receive": {
-                "call_to_action": "Complete your order",
-                "title": "Receive",
-                "description": "Receive your customized product directly at your door, ready to use.",
-                "button": "Reserve",
-                "link": "#"
-            }
+    "wizard": {
+      "roomType": {
+        "title": "What space or type of product are you interested in optimizing?",
+        "tag": "Room",
+        "description": "Tell us which area of your home or project you want to transform. We will show you ideas and products designed to fit your needs.",
+        "options": {
+          "1": {
+            "title": "Kitchen",
+            "description": "Organize, decorate and optimize every corner: from modular cabinets to lighting and storage solutions."
+          },
+          "2": {
+            "title": "Bathroom",
+            "description": "Turn your bathroom into a functional and relaxing space, with combinations that balance comfort and aesthetics."
+          },
+          "3": {
+            "title": "Other",
+            "description": "Select this option if you are looking for solutions for another type of space or want a more open recommendation."
+          }
         }
-    },
-    "contact": {
-        "user_types": {
-            "clients": {
-                "label": "Clients",
-                "title": "Join the presale",
-                "call_to_action": "Be among the first to try our service",
-                "description": "Register and we will notify you as soon as our platform is ready. This way, you can customize and order your furniture before anyone else."
-            },
-            "providers": {
-                "label": "Providers",
-                "title": "Collaborate with us",
-                "call_to_action": "Be part of our network of providers",
-                "description": "Register and we will contact you to explore collaboration opportunities. You will be able to offer your products on our platform and reach clients interested in personalized furniture."
-            }
-        },
-        "form": {
-            "name": "Full name",
-            "email": "Email",
-            "message": "Leave us your comments",
-            "submit": "Register",
-            "msgOnSuccess": "Successful registration! We will contact you soon.",
-            "msgOnError": "Something went wrong, please try again later."
+      },
+      "budget": {
+        "title": "What is your approximate budget range?",
+        "tag": "Budget",
+        "description": "Select the range that comes closest to your planned investment. We will help you find products that balance quality and cost.",
+        "options": {
+          "1": {
+            "title": "Under $12,000 MXN",
+            "description": "Small changes with great impact. Ideal for accessories or accent details."
+          },
+          "2": {
+            "title": "Between $15,000 and $20,000 MXN",
+            "description": "Balanced options to renovate entire areas without compromising style."
+          },
+          "3": {
+            "title": "Over $25,000 MXN",
+            "description": "Comprehensive transformations with premium materials and custom designs."
+          }
         }
-    },
-    "product_grid": {
-        "call_to_action": "Book now",
-        "title": "Customizable furniture online",
-        "description": "Design, customize and order your furniture online, ready to be manufactured on demand by specialized workshops.",
-        "link": "Reserve",
-        "categories": {
-            "desks": {
-                "id": "desks",
-                "name": "Desks"
-            },
-            "chairs": {
-                "id": "chairs",
-                "name": "Chairs"
-            },
-            "stools": {
-                "id": "stools",
-                "name": "Stools"
-            },
-            "shelves": {
-                "id": "shelves",
-                "name": "Shelves"
-            }
+      },
+      "style": {
+        "title": "What style do you prefer?",
+        "tag": "Style",
+        "description": "Your style defines the character of the space. Choose the one that best reflects your personality and way of living.",
+        "options": {
+          "1": {
+            "title": "Classic",
+            "description": "Elegant shapes, symmetry and noble materials that never go out of style."
+          },
+          "2": {
+            "title": "Modern",
+            "description": "Clean lines, smooth surfaces and an aesthetic focused on functionality."
+          },
+          "3": {
+            "title": "Contemporary",
+            "description": "Balance between trend and timelessness, with a versatile and dynamic approach."
+          },
+          "4": {
+            "title": "Minimalist",
+            "description": "Less is more: clear spaces and visual harmony with a touch of calm."
+          },
+          "5": {
+            "title": "Industrial",
+            "description": "Exposed textures, metals and wood in contrast for a bold and urban personality."
+          }
         }
-    },
-    "news_letter_form": {
-        "call_to_action": "Be part of this exclusive experience",
-        "title": "Your time is now",
-        "description": "By continuing you agree to receive news and updates. You can unsubscribe at any time.",
-        "email": "Email",
-        "button": {
-            "idle": "Reserve",
-            "loading": "Sending"
-        },
-        "messages": {
-            "msgOnSuccess": "Successful registration! We will contact you soon",
-            "msgOnError": "Something went wrong, please try again later"
-        },
-        "errors": {
-            "EMAIL_REQUIRED": "Email is required",
-            "MISSING_ENV": "Internal configuration error",
-            "ALREADY_SUBSCRIBED": "This email is already subscribed",
-            "MAILCHIMP_ERROR": "There was an error with Mailchimp",
-            "SERVER_ERROR": "Internal server error"
-        },
-        "success": "You have successfully subscribed 🎉"
-    },
-    "footer": {
-        "contact": "Contact",
-        "privacy_policy": "Privacy policy",
-        "terms": "Terms and conditions"
-    },
-    "policies": {
-        "title": "Privacy Notice",
-        "content": "Dear clients and visitors of {empresa}:\n\nAt {empresa} we understand the importance of protecting the personal data of our clients and visitors (hereinafter “The Holders”), which is why we commit to handle it lawfully, confidentially, and in compliance with the Federal Law on the Protection of Personal Data Held by Private Parties and other applicable regulations.\n\nDATA CONTROLLER\n{empresaLegal}, located at {domicilioEmpresa}, is responsible for collecting, using, and protecting the personal data of The Holders.\n\nCONSENT OF THE HOLDER\nIt will be considered that The Holders have granted their consent if they do not expressly object to this Notice.\n\nPERSONAL DATA SUBJECT TO PROCESSING\nWe may collect data such as: full name, email, phone number, address, RFC (for invoicing), payment details, as well as access information to {sitioWeb}. We do not collect sensitive data unless strictly necessary for the provision of services.\n\nPURPOSES OF THE PROCESSING\nThe data may be used for:\n1) Provision of services and commercialization of {empresa} products.\n2) Creation and administration of accounts in {sitioWeb}.\n3) Processing of orders, payments, and invoicing.\n4) Customer service (complaints, inquiries, returns).\n5) Compliance with legal obligations.\n\nSecondarily, we may use the data to send promotions, surveys, event invitations, and advertising related to {empresa}.\n\nDATA TRANSFER\nThe data may be shared with:\n- Business partners and authorized providers for service provision.\n- Banking institutions to process payments.\n- Competent authorities when required by law.\n\nARCO RIGHTS\nThe Holders may exercise their rights of Access, Rectification, Cancellation, and Opposition (ARCO) by sending an email to {correoDatosPersonales}.\n\nMODIFICATIONS\n{empresa} may modify this Notice at any time. Updates will be published on {sitioWeb}.\n\nCONTACT\n📧 {correoDatosPersonales}\n📍 {domicilioEmpresa}"
-    },
-    "terms": {
-        "title": "Terms and Conditions",
-        "content": "Welcome to {empresa}.\n\nBy using our website {sitioWeb}, you agree to these Terms and Conditions. If you do not agree, please do not use the site or provide your data.\n\nI. General provisions\n{empresaLegal}, located at {domicilioEmpresa}, operates this website {sitioWeb}. This site aims to provide information about our products and services, as well as opportunities for contact and lead generation.\n\nAll content, including texts, images, logos, and trademarks, is the property of {empresaLegal} and is protected by law. Reproduction or use without authorization is not allowed.\n\nII. User obligations\n- Provide truthful and complete information in the site’s forms.\n- Do not spread viruses, malware, or illegal content.\n- Do not use third-party information without authorization.\n- Use the site only for legal purposes and in good faith.\n\nIII. Use of personal data\nThe use of your personal data is governed by our Privacy Notice. By submitting your data through the site, you agree that we process it for purposes of contact, information delivery, and lead generation.\n\nIV. Modifications\n{empresa} may update these Terms and Conditions at any time. Modifications will be published on {sitioWeb} and will become effective upon publication.\n\nV. Contact\nFor any questions or comments about these Terms and Conditions, you can contact us at {correoContacto}."
-    },
-    "sitemap": {
-        "main_pages": "Main pages",
-        "resources": "Resources"
+      },
+      "color": {
+        "title": "What color palette do you prefer?",
+        "tag": "Color",
+        "description": "The tones you choose will determine the atmosphere of the space. Select according to the feeling you want to project.",
+        "options": {
+          "1": {
+            "title": "Light tones",
+            "description": "Visually expand spaces and provide a feeling of brightness and calm."
+          },
+          "2": {
+            "title": "Dark tones",
+            "description": "Transmit elegance, depth and character. Perfect for sophisticated environments."
+          },
+          "3": {
+            "title": "Neutrals and naturals",
+            "description": "Soft combinations that harmonize with any style and highlight the texture of materials."
+          }
+        }
+      },
+      "materials": {
+        "title": "What materials do you prefer?",
+        "tag": "Materials",
+        "button": "Finish",
+        "link": "/area",
+        "description": "Select the materials that best align with your style and desired maintenance.",
+        "options": {
+          "1": {
+            "title": "Wood and stone",
+            "description": "Warm and natural finishes that add texture and a homely feel."
+          },
+          "2": {
+            "title": "Metal and glass",
+            "description": "Modern combination, ideal for clean designs and high durability."
+          },
+          "3": {
+            "title": "Laminates or composites",
+            "description": "Practical, resistant and with multiple visual finishes for customization."
+          }
+        }
+      },
+      "space_size": {
+        "title": "How is your family composed?",
+        "tag": "Space size",
+        "description": "Select the option that best describes the people living in the home. This will help us estimate the ideal space size and the amount of furniture needed.",
+        "options": {
+          "1": {
+            "title": "Single",
+            "description": "Compact, functional, and easy-to-maintain spaces. Prioritizes multifunctional design, vertical storage, and integrated areas."
+          },
+          "2": {
+            "title": "Couple or couple with pet",
+            "description": "Medium size, with shared and flexible areas. Requires comfortable, modular furniture capable of adapting to different lifestyles."
+          },
+          "3": {
+            "title": "Family with children",
+            "description": "Ample spaces with well-defined zones for socializing, resting, and storage. Durable materials and furniture resistant to daily use are recommended."
+          },
+          "4": {
+            "title": "Extended family or shared housing",
+            "description": "Large surface area, with multiple common areas and high foot traffic. Ideal for integrating large-capacity furniture and smart organization solutions."
+          }
+        }
+      }
     }
+  },
+  "header": {
+    "call_to_action": "Book now",
+    "title": "Customizable furniture online",
+    "description": "Design, customize and order your furniture online, ready to be manufactured on demand by specialized workshops.",
+    "link": "Explore"
+  },
+  "service_process": {
+    "title": "How does it work?",
+    "link": "Start",
+    "processes": {
+      "generate": {
+        "call_to_action": "Start your configuration",
+        "title": "Generate your set",
+        "description": "Our system analyzes your preferences and available space to automatically create an initial design proposal. Get a set tailored to you in seconds.",
+        "button": "Start",
+        "link": "#"
+      },
+      "adjust": {
+        "call_to_action": "Fine-tune details",
+        "title": "Customize online",
+        "description": "Modify materials, colors and distribution directly from the 3D configurator. Every change updates your set in real time with smart suggestions.",
+        "button": "Customize",
+        "link": "#"
+      },
+      "preview": {
+        "call_to_action": "Visualize your result",
+        "title": "Preview your space",
+        "description": "Explore an interactive view of the final design. You will see measurements, combinations and optimized recommendations according to your family profile and space usage.",
+        "button": "Visualize",
+        "link": "#"
+      },
+      "reserve": {
+        "call_to_action": "Confirm your order",
+        "title": "Reserve or request advice",
+        "description": "Save your configuration, request a quote or schedule a consultation with our team to fine-tune final details before production.",
+        "button": "Reserve",
+        "link": "#"
+      }
+    }
+  },
+  "sets": {
+    "title": "Our sets",
+    "kitchen": {
+      "id": "kitchen",
+      "title": "Integral kitchens",
+      "description": "Modular and functional designs that optimize your space. Each integral kitchen is custom-made, with customizable materials and distribution options adapted to your lifestyle.",
+      "call_to_action": "Explore kitchens",
+      "button_create": "Create",
+      "button_generate": "Generate",
+      "img": "assets.kitchenSet",
+      "icon": "CookingPot"
+    },
+    "bathroom": {
+      "id": "bathroom",
+      "title": "Complete bathrooms",
+      "description": "Ready-to-install bathroom sets, combining furniture, sinks and accessories in a single aesthetic proposal. Customize finishes, colors and measurements according to your needs.",
+      "call_to_action": "Discover bathrooms",
+      "button_create": "Create",
+      "button_generate": "Generate",
+      "img": "assets.bathroomSet",
+      "icon": "Bath"
+    }
+  },
+  "contact": {
+    "user_types": {
+      "clients": {
+        "label": "Clients",
+        "title": "Join the presale",
+        "call_to_action": "Be among the first to try our service",
+        "description": "Register and we will notify you as soon as our platform is ready. This way, you can customize and order your furniture before anyone else."
+      },
+      "providers": {
+        "label": "Providers",
+        "title": "Collaborate with us",
+        "call_to_action": "Be part of our provider network",
+        "description": "Register and we will contact you to explore collaboration opportunities. You will be able to offer your products on our platform and reach clients interested in personalized furniture."
+      }
+    },
+    "form": {
+      "name": "Full name",
+      "email": "Email",
+      "message": "Leave us your comments",
+      "submit": "Register",
+      "msgOnSuccess": "Successful registration! We will contact you soon.",
+      "msgOnError": "Something went wrong, please try again later."
+    }
+  },
+  "product_grid": {
+    "call_to_action": "Book now",
+    "title": "Customizable furniture online",
+    "description": "Design, customize and order your furniture online, ready to be manufactured on demand by specialized workshops.",
+    "link": "Reserve",
+    "categories": {
+      "desks": {
+        "id": "desks",
+        "name": "Desks"
+      },
+      "chairs": {
+        "id": "chairs",
+        "name": "Chairs"
+      },
+      "stools": {
+        "id": "stools",
+        "name": "Stools"
+      },
+      "shelves": {
+        "id": "shelves",
+        "name": "Shelves"
+      }
+    }
+  },
+  "news_letter_form": {
+    "call_to_action": "Be part of this exclusive experience",
+    "title": "Your time is now",
+    "description": "By continuing you agree to receive news and updates. You can unsubscribe at any time.",
+    "email": "Email",
+    "button": {
+      "idle": "Reserve",
+      "loading": "Sending"
+    },
+    "messages": {
+      "msgOnSuccess": "Successful registration! We will contact you soon",
+      "msgOnError": "Something went wrong, please try again later"
+    },
+    "errors": {
+      "EMAIL_REQUIRED": "Email is required",
+      "MISSING_ENV": "Internal configuration error",
+      "ALREADY_SUBSCRIBED": "This email is already subscribed",
+      "MAILCHIMP_ERROR": "There was an error with Mailchimp",
+      "SERVER_ERROR": "Internal server error"
+    },
+    "success": "You have successfully subscribed 🎉"
+  },
+  "catalog": {
+    "call_to_action": "Every piece combines design and functionality",
+    "title": "Explore unique furniture created to fit your space",
+    "description": "From tables and cabinets to modular shelving, find inspiration in our carefully designed collection for modern environments.",
+    "link": ""
+  },
+  "explore": {
+    "call_to_action": "Each piece is manufactured on demand",
+    "title": "Acquire furniture by complete sets such as living rooms, kitchens or bathrooms",
+    "description": "Design your spaces personally or generate a proposal automatically by completing a few steps.",
+    "link": "Start"
+  },
+  "footer": {
+    "contact": "Contact",
+    "privacy_policy": "Privacy policy",
+    "terms": "Terms and conditions"
+  },
+  "policies": {
+    "title": "Privacy Notice",
+    "content": "Dear clients and visitors of {empresa}:\n\nAt {empresa} we understand the importance of protecting the personal data of our clients and visitors (hereinafter “The Holders”), which is why we commit to handle it lawfully, confidentially, and in compliance with the Federal Law on the Protection of Personal Data Held by Private Parties and other applicable regulations.\n\nDATA CONTROLLER\n{empresaLegal}, located at {domicilioEmpresa}, is responsible for collecting, using, and protecting the personal data of The Holders.\n\nCONSENT OF THE HOLDER\nIt will be considered that The Holders have granted their consent if they do not expressly object to this Notice.\n\nPERSONAL DATA SUBJECT TO PROCESSING\nWe may collect data such as: full name, email, phone number, address, RFC (for invoicing), payment details, as well as access information to {sitioWeb}. We do not collect sensitive data unless strictly necessary for the provision of services.\n\nPURPOSES OF THE PROCESSING\nThe data may be used for:\n1) Provision of services and commercialization of {empresa} products.\n2) Creation and administration of accounts in {sitioWeb}.\n3) Processing of orders, payments, and invoicing.\n4) Customer service (complaints, inquiries, returns).\n5) Compliance with legal obligations.\n\nSecondarily, we may use the data to send promotions, surveys, event invitations, and advertising related to {empresa}.\n\nDATA TRANSFER\nThe data may be shared with:\n- Business partners and authorized providers for service provision.\n- Banking institutions to process payments.\n- Competent authorities when required by law.\n\nARCO RIGHTS\nThe Holders may exercise their rights of Access, Rectification, Cancellation, and Opposition (ARCO) by sending an email to {correoDatosPersonales}.\n\nMODIFICATIONS\n{empresa} may modify this Notice at any time. Updates will be published on {sitioWeb}.\n\nCONTACT\n📧 {correoDatosPersonales}\n📍 {domicilioEmpresa}"
+  },
+  "terms": {
+    "title": "Terms and Conditions",
+    "content": "Welcome to {empresa}.\n\nBy using our website {sitioWeb}, you agree to these Terms and Conditions. If you do not agree, please do not use the site or provide your data.\n\nI. General provisions\n{empresaLegal}, located at {domicilioEmpresa}, operates this website {sitioWeb}. This site aims to provide information about our products and services, as well as opportunities for contact and lead generation.\n\nAll content, including texts, images, logos, and trademarks, is the property of {empresaLegal} and is protected by law. Reproduction or use without authorization is not allowed.\n\nII. User obligations\n- Provide truthful and complete information in the site’s forms.\n- Do not spread viruses, malware, or illegal content.\n- Do not use third-party information without authorization.\n- Use the site only for legal purposes and in good faith.\n\nIII. Use of personal data\nThe use of your personal data is governed by our Privacy Notice. By submitting your data through the site, you agree that we process it for purposes of contact, information delivery, and lead generation.\n\nIV. Modifications\n{empresa} may update these Terms and Conditions at any time. Modifications will be published on {sitioWeb} and will become effective upon publication.\n\nV. Contact\nFor any questions or comments about these Terms and Conditions, you can contact us at {correoContacto}."
+  },
+  "sitemap": {
+    "main_pages": "Main pages",
+    "resources": "Resources"
+  }
 }

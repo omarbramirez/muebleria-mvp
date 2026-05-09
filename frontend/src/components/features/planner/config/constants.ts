@@ -1,9 +1,9 @@
+export const WALL_THICKNESS = 10; // Unidades 3D
+
 export const ENGINEERING_CONSTANTS = {
-  WALL_THICKNESS: 10,
-  OPENING_DEPTH: 18, // 10 + 8
-  SCALE_FACTOR: 10,  // 1 unidad 3D = 10 mm
-  CORNER_SAFETY_MARGIN: 5,
-  ROOM_HEIGHT_DEFAULT: 2400, // mm
+OPENING_DEPTH : WALL_THICKNESS + 8,
+SCALE_FACTOR : 10, // 1 unidad 3D = 10 mm
+CORNER_SAFETY_MARGIN : WALL_THICKNESS / 2
 } as const;
 
 export const ASSET_PATHS = {

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react"; // Importar HelpCircle
 
 // Imports de Componentes de Presentación (Vistas)
-import Room3DPreview from '@/components/features/planner/Room3DPreview_';
+import Room3DPreview from '@/components/features/planner/Room3DPreview';
 
 // Imports de Módulos de Configuración
 import Materials from '@/components/features/planner/options/Materials';
