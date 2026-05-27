@@ -46,12 +46,12 @@ function useTextureLoader(cabinetDoorMaterial: THREE.MeshStandardMaterial): void
     loader.load(
       ASSET_PATHS.TEXTURES.WOOD_OAK,
       (texture) => {
-        texture.colorSpace   = THREE.SRGBColorSpace;
-        texture.wrapS        = THREE.RepeatWrapping;
-        texture.wrapT        = THREE.RepeatWrapping;
-        texture.minFilter    = THREE.LinearMipmapLinearFilter;
-        texture.magFilter    = THREE.LinearFilter;
-        cabinetDoorMaterial.map         = texture;
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.minFilter = THREE.LinearMipmapLinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        cabinetDoorMaterial.map = texture;
         cabinetDoorMaterial.needsUpdate = true;
       },
       undefined,
@@ -67,12 +67,12 @@ function useTextureLoader(cabinetDoorMaterial: THREE.MeshStandardMaterial): void
 const Room3DPreview: React.FC<Room3DPreviewProps> = ({
   points,
   height,
-  openings        = [],
-  appliances      = [],
-  installations   = [],
+  openings = [],
+  appliances = [],
+  installations = [],
   gasConfig,
-  layoutItems     = [],
-  viewMode        = 'PERSPECTIVE',
+  layoutItems = [],
+  viewMode = 'PERSPECTIVE',
   onInstallationUpdate,
   onApplianceUpdate,
   onOpeningUpdate,
@@ -151,7 +151,7 @@ const Room3DPreview: React.FC<Room3DPreviewProps> = ({
     <div
       ref={mountRef}
       className="relative w-full h-full cursor-move"
-      // El div es el mount point del canvas WebGL y de la capa CSS2D
+    // El div es el mount point del canvas WebGL y de la capa CSS2D
     />
   );
 };
